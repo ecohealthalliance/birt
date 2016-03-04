@@ -1,0 +1,86 @@
+border-radius()
+  border-radius arguments
+
+filter-tab-content-background-color()
+  background-color #ffffff
+
+filter-container-width()
+  width $sidebar-width
+
+dataTable-container-width()
+  width $data-table-width
+
+layer-container-width()
+  width $sidebar-width
+
+verticallyCenter($position=true)
+  if $position
+    position absolute
+  top 50%
+  transform translate(0,-50%)
+
+primaryFont()
+  font-family $primary-font, sans-serif
+
+flexTabs($tab-BG=none, $tab-active-BG=none, $hoverBG, $border=false)
+  display flex
+  border-bottom 1px solid #ddd
+  > li
+    flex 1 0 0
+    align-items center
+    border-bottom 0
+    margin 0
+    float none
+    if $border
+      border-right 1px solid $border-gray
+      &:last-of-type
+        border-right 0
+    .fa
+      margin-right 2px
+      color $d-gray
+    > a
+      margin 0
+      display block
+      border-radius 0
+      color $tab-unselected
+      text-align center
+      border 0
+      background $tab-BG
+      &:hover
+        background $hoverBG
+    &.active
+      font-weight 700
+      .fa
+        color lighten($body-text,10%)
+      > a
+      > a:hover
+      > a:focus
+        border 0
+        color $body-text
+
+  &.nav-tabs
+    > li
+      font-size 1em
+      color $blue
+
+      &.advFilTab
+        font-size 1em
+
+      > a
+        padding 8px 10px
+
+      &.active
+        > a
+          background-color $tab-active-BG
+
+icon()
+  font-family FontAwesome
+
+sortingIcon($unicodeChar)
+  &::after
+    verticallyCenter()
+    icon()
+    right 5px
+    content $unicodeChar
+    color $d-gray
+    font-size 1.2em

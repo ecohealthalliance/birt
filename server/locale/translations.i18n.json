@@ -1,0 +1,228 @@
+{
+    "window-title": {
+        "en": "BIRT"
+    },
+    "mode": {
+        "explore": {
+            "en": "Explore"
+        },
+        "analyze": {
+            "en": "Analyze"
+        }
+    },
+    "gritsLegend": {
+        "path-throughput": {
+            "en": "Flight Seat Count"
+        },
+        "node-throughput": {
+            "en": "Airport Seat Count"
+        },
+        "source": {
+            "en": "Flight and Airport seat count is normalized based on the current filter."
+        }
+    },
+    "gritsDataTable": {
+        "explore": {
+            "title" : {
+               "en": "Migrations"
+            },
+            "col1-heading": {
+                "en": "County"
+            },
+            "col2-heading": {
+                "en": "State"
+            },
+            "col3-heading": {
+                "en": "Date"
+            },
+            "col4-heading": {
+                "en": "Occurrences"
+            },
+            "hidden-col1": {
+                "en": "Origin Name"
+            },
+            "hidden-col2": {
+                "en": "Origin City"
+            },
+            "hidden-col3": {
+                "en": "Origin State"
+            },
+            "hidden-col4": {
+                "en": "Origin Country"
+            },
+            "hidden-col5": {
+                "en": "Destination Name"
+            },
+            "hidden-col6": {
+                "en": "Destination City"
+            },
+            "hidden-col7": {
+                "en": "Destination State"
+            },
+            "hidden-col8": {
+                "en": "Destination Country"
+            }
+        },
+        "analyze": {
+            "title" : {
+               "en": "Risk Analysis"
+            },
+            "col1-heading": {
+                "en": "Origin"
+            },
+            "col2-heading": {
+                "en": "Terminal Destination"
+            },
+            "col3-heading": {
+                "en": "Occurrences"
+            }
+        }
+    },
+    "gritsSearch": {
+        "tokenfield-placeholder": {
+            "en": "Type to search bird taxonomy"
+        },
+        "title": {
+            "en": "Advanced Filtration"
+        },
+        "limit-label": {
+            "en": "Limit search"
+        },
+        "more-button": {
+            "en": "Show More Records"
+        },
+        "apply-button": {
+            "en": "Apply"
+        },
+        "loaded-records": {
+            "en": "Loaded:"
+        },
+        "total-records": {
+            "en": "Total:"
+        },
+        "status-bar-label": {
+            "en": "Results"
+        },
+        "recent-changes": {
+            "en": "Recent changes have not been applied"
+        },
+        "include-nearby-label": {
+            "en": "Include nearby migrations within "
+        },
+        "miles-label": {
+            "en": "miles"
+        },
+        "levels-label": {
+            "en": "Number of Levels"
+        },
+        "start-label": {
+            "en": "Start"
+        },
+        "end-label": {
+            "en": "End"
+        },
+        "simulated-passengers-label": {
+            "en": "Number of Passengers"
+        },
+        "startSimulationButton": {
+            "en": "Start Risk Analysis"
+        },
+        "showThroughputButton": {
+            "en": "Show Migration Pattern"
+        }
+    },
+    "gritsLayerSelector": {
+      "layers-title" : {
+        "en": "Layers"
+      }
+    },
+    "gritsElementDetails": {
+        "tab-1": {
+            "title": {
+                "en": "Flight"
+            },
+            "level-label": {
+                "en": "Level"
+            },
+            "occurrences-label": {
+                "en": "Occurrences"
+            },
+            "weight-label": {
+                "en": "Weight"
+            },
+            "origin-label": {
+                "en": "Origin"
+            },
+            "destination-label": {
+                "en": "Destination"
+            },
+            "normalized-label": {
+                "en": "Normalized"
+            },
+            "stops-label": {
+                "en": "Stops"
+            },
+            "throughput-label": {
+                "en": "Total Seats"
+            }
+        },
+        "tab-2": {
+            "title": {
+                "en": "Airport"
+            },
+            "level-label": {
+                "en": "Level"
+            },
+            "code-label": {
+                "en": "Code"
+            },
+            "name-label": {
+                "en": "Name"
+            },
+            "city-label": {
+                "en": "City"
+            },
+            "country-label": {
+                "en": "Country"
+            },
+            "region-label": {
+                "en": "Region"
+            },
+            "normalized-label": {
+                "en": "Normalized"
+            },
+            "incoming-label": {
+                "en": "Incoming Seats"
+            },
+            "outgoing-label": {
+                "en": "Outgoing Seats"
+            },
+            "total-throughput-label": {
+                "en": "Total Seats"
+            }
+        }
+    },
+    "toastMessages": {
+        "searchTokenRequired": {
+            "en": "The filter requires a bird species to be selected"
+        },
+        "noResults": {
+            "en": "The filter did not return any results"
+        },
+        "clipboard": {
+            "en": "The URL has been copied to your clipboard"
+        },
+        "includeNearbyRequired": {
+            "en": "Include nearby requires at least one species"
+        },
+        "includeNearbyMetaNode": {
+            "en": "Include nearby does not work with MetaNodes"
+        },
+        "layerLoading": {
+            "en": "The layer has not finished loading"
+        },
+        "onlyOneToken": {
+            "en": "Only one bird species may be selected"
+        }
+    }
+}

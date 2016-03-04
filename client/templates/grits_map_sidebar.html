@@ -1,0 +1,38 @@
+<template name="gritsMapSidebar">
+  <div id="sidebar" class="sidebar sidebar-left gritsSidebar sidebar-main">
+    <!-- Nav tabs -->
+    <ul class="sidebar-tabs">
+        <li id="sidebar-collapse-tab"><a href="#sidebar-search" role="tab"><i class="fa fa-chevron-circle-left fa-white"></i></a></li>
+        <li id="sidebar-search-tab" class="active"><a href="#sidebar-search" role="tab"><i class="fa fa-search fa-white"></i></a></li>
+        <li id="sidebar-slider-tab"><a href="#sidebar-slider" role="tab"><i class="fa fa-sliders fa-white"></i></a></li>
+        <li id="sidebar-layer-tab"><a href="#sidebar-layer" role="tab"><i class="fa fa-map-o fa-white"></i></a></li>
+        {{#if GritsConstants.ALL_NODES_ENABLED}}
+        <div id="sidebar-draw-rectangle-tool">
+          <div class="sidebar-button">
+            <i class="fa fa-object-group fa-white"></i>
+          </div>
+        </div>
+        {{/if}}
+        <li id="sidebar-question-tab"><a href="#sidebar-question" role="tab"><i class="fa fa-question-circle fa-white"></i></a></li>
+        <button id="sidebar-plus-button" class="sidebar-zoom-in fa fa-plus btn btn-sm"></button>
+        <button id="sidebar-minus-button" class="sidebar-zoom-out fa fa-minus btn btn-sm"></button>
+        {{#if GritsConstants.MODES_ENABLED}}
+        <div id="mode-toggle" class="btn-group" data-toggle="buttons" style="position: absolute; top: 0px; left: 60px; padding-top: 7px; width: 200px;">
+          <label class="btn btn-mode active">
+            <input type="radio" name="mode" data-mode="{{GritsConstants.MODE_EXPLORE}}" autocomplete="off" checked> {{_ "mode.explore" }}
+          </label>
+          <label class="btn btn-mode">
+            <input type="radio" name="mode" data-mode="{{GritsConstants.MODE_ANALYZE}}" autocomplete="off"> {{_ "mode.analyze" }}
+          </label>
+        </div>
+        {{/if}}
+    </ul>
+    <!-- Tab panes -->
+    <div class="sidebar-content">
+        <div class="sidebar-pane active" id="sidebar-search"></div>
+        <div class="sidebar-pane" id="sidebar-slider"></div>
+        <div class="sidebar-pane" id="sidebar-layer"></div>
+    </div>
+  </div>
+  <div id="element-details"></div>
+</template>

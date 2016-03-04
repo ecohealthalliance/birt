@@ -1,0 +1,59 @@
+machine:
+  services:
+    - docker
+  java:
+    version: oraclejdk8
+
+# Add some environment variables
+  environment:
+    PACKAGE_DIRS: "/home/ubuntu"
+    MONGO_URL: "mongodb://127.0.0.1:27017/grits"
+    FLIRT_SIMULATOR_URL: "http://127.0.0.1:45000/simulator"
+
+checkout:
+  post:
+    - mkdir example/packages
+    - git clone git@github.com:ecohealthalliance/flirt-sidebar.git && cd flirt-sidebar:
+        pwd:
+          example/packages
+    - cd
+    - git clone git@github.com:ecohealthalliance/grits-net-mapper.git && cd grits-net-mapper:
+        pwd:
+          example/packages
+    - cd
+
+dependencies:
+  override:
+    - curl https://install.meteor.com/ | sh
+
+test:
+  override:
+    - mongo < example/tests/mongo/mongo.js
+    - mongoimport --db grits-cucumber --collection airports --file example/tests/mongo/airports.json
+    - mongoimport --db grits-cucumber --collection flights --file example/tests/mongo/flights.json
+    - mongoimport --db grits-cucumber --collection legs --file example/tests/mongo/legs.json
+    - mongoimport --db grits-cucumber --collection 'halunka:i18n' --file example/tests/mongo/i18n.json
+    - chmod +x continuous_integration.sh
+    - ./continuous_integration.sh
+    - CHIMP_OPTIONS='--browser=chrome' VELOCITY_CI=1 DEBUG=1 meteor run --test:
+        pwd:
+          example
+
+deployment:
+  master:
+    branch: master
+    commands:
+      - meteor build /tmp/gritsbuild --directory:
+          pwd:
+            example
+      - cp ./example/Dockerfile /tmp/gritsbuild/bundle/
+      - docker build -t grits/grits-net-meteor /tmp/gritsbuild/bundle/
+      - docker save grits/grits-net-meteor | gzip -9 > grits-net-meteor.docker.tgz
+
+general:
+  artifacts:
+    - "example/.meteor/local/log/cucumber.log"
+    - "grits-net-meteor.docker.tgz"
+  branches:
+    ignore:
+      - gh-pages
