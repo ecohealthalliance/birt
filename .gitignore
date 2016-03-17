@@ -1,3 +1,5 @@
+*~
+.DS_Store
 example/packages
 .project
 node_modules/
