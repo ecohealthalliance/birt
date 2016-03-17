@@ -1,0 +1,44 @@
+@import '../../core/client/stylesheets/variables.import'
+
+.leaflet-left.leaflet-top
+  left $sidebar-full-width
+  top 0
+  right 0
+  border-radius 0
+  transition .5s
+  .info
+    display flex
+    align-items baseline
+    width 100%
+    margin 0
+    padding 12px 15px 15px
+    box-shadow none
+    border-radius 0
+    font-family $primary-font
+    min-height 60px
+    background alpha($whiteBG, 80%)
+    transition .2s
+    &.active
+      background $whiteBG
+    h2
+      display inline-block
+      margin 0
+      font-weight 800
+      font-size 2em
+      // color darken($primary, 20%)
+    ul
+      margin-left 20px
+      margin-bottom 0
+      color $dd-gray
+      span
+        font-weight 600
+      &
+      li
+        display inline-block
+      li
+        font-size 1.3em
+        margin-right 20px
+    p
+      margin 0
+      color $d-gray
+      align-self center
