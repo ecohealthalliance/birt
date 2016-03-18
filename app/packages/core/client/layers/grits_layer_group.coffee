@@ -73,6 +73,10 @@ class GritsLayerGroup #extends L.layerGroup
     self = this
     return self._layers[GritsConstants.PATH_LAYER_ID]
 
+  getHeatmapLayer: ->
+    self = this
+    return self._layers[GritsConstants.HEATMAP_LAYER_ID]
+
   convertFlight: (flight, level, originTokens) ->
     self = this
     nodeLayer = self._layers[GritsConstants.NODE_LAYER_ID]
@@ -99,10 +103,10 @@ class GritsLayerGroup #extends L.layerGroup
     pathLayer.convertItineraries(fields, nodes[0], nodes[1])
     return
 
-  processLocations: (locations) ->
+  updateLocations: (dateKey) ->
     self = this
     heatmapLayer = self._layers[GritsConstants.HEATMAP_LAYER_ID]
-    heatmapLayer.processLocations(locations)
+    heatmapLayer.updateLocations(dateKey)
     return
 
   draw: ->

@@ -94,7 +94,7 @@ class GritsFilterCriteria
     year = start.getFullYear().toString().slice(2,4)
     year = start.getFullYear()
     yearStr = year.toString().slice(2,4)
-    self.operatingDateRangeStart.set(new Date(year, month, date))
+    self.operatingDateRangeStart.set(start)
     return "#{month}/#{date}/#{yearStr}"
   # initialize the end date through the 'effectiveDate' filter
   #
@@ -113,7 +113,7 @@ class GritsFilterCriteria
     date = end.getDate()
     year = end.getFullYear()
     yearStr = year.toString().slice(2,4)
-    self.operatingDateRangeEnd.set(new Date(year, month, date))
+    self.operatingDateRangeEnd.set(end)
     return "#{month}/#{date}/#{yearStr}"
   # initialize the limit through the 'effectiveDate' filter
   #
@@ -220,70 +220,16 @@ class GritsFilterCriteria
     query = self.getQueryObject()
     _state = JSON.stringify(query)
     return
-  # process the results of the meteor methods to get flights
+  # process the results of the remote meteor method
   #
-  # @param [Array] migrations, an Array of migrations to process
+  # @param [Array] documents, an Array of mongoDB documents to process
   # @param [Integer] offset, the offset of the query
-  process: (migrations, token, offset) ->
+  process: (documents, token, offset) ->
     self = this
-    if self._queue != null
-      self._queue.kill()
-      async.nextTick( ->
-        self._queue = null
-      )
-
-    map = Template.gritsMap.getInstance()
-    #layerGroup = GritsLayerGroup.getCurrentLayerGroup()
-    heatmapLayerGroup = Template.gritsMap.getInstance().getGritsLayerGroup(GritsConstants.HEATMAP_GROUP_LAYER_ID)
-    # if the offset is equal to zero, clear the layers
-    if offset == 0
-      #layerGroup.reset()
-      heatmapLayerGroup.reset()
-
-    count = Session.get(GritsConstants.SESSION_KEY_LOADED_RECORDS)
-
-    # reset the locations
-    self.locations = {}
-
-    updateHeatmap = _.throttle(->
-      heatmapLayerGroup.processLocations(self.locations)
-    , 500)
-
-    throttleDraw = _.throttle(->
-      heatmapLayerGroup.draw()
-    , 500)
-
-    self._queue = async.queue(((migration, callback) ->
-      setTimeout( ->
-        id = CryptoJS.MD5(JSON.stringify(migration.loc)).toString()
-        location = self.locations[id]
-        if typeof location == 'undefined'
-          self.locations[id] = {
-            count: migration[token]
-            loc: migration.loc
-          }
-        else
-          location.count += migration[token]
-
-        updateHeatmap()
-        # update the layer
-        throttleDraw()
-        # update the counter
-        Session.set(GritsConstants.SESSION_KEY_LOADED_RECORDS , ++count)
-        # done processing
-        async.nextTick(-> callback())
-      , migrations.length / 20)
-    ), 4)
-
-    # final method for when all items within the queue are processed
-    self._queue.drain = ->
-      #layerGroup.finish()
-      heatmapLayerGroup.finish()
-      Session.set(GritsConstants.SESSION_KEY_LOADED_RECORDS, count)
-      Session.set(GritsConstants.SESSION_KEY_IS_UPDATING, false)
-
-    # add the migrations to thet queue which will start processing
-    self._queue.push(migrations)
+    startDate = moment.utc(self.operatingDateRangeStart.get())
+    endDate = moment.utc(self.operatingDateRangeEnd.get())
+    # start the heatmap animation
+    GritsHeatmapLayer.startAnimation(startDate, endDate, 'months', documents, token, offset)
     return
   # applies the filter but does not reset the offset
   #
@@ -367,7 +313,6 @@ class GritsFilterCriteria
       if cb && _.isFunction(cb)
         cb(null, migrations)
       # process the migrations
-      console.log(migrations)
       self.process(migrations, token, offset)
       return
     )

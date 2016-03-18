@@ -34,6 +34,7 @@ Package.onUse(function(api){
     'tsega:bootstrap3-datetimepicker@4.17.37_1',
     'halunka:i18n@1.1.1',
     'momentjs:moment@2.10.6',
+    'kevbuk:moment-range@2.2.2',
     'kadira:flow-router@2.10.1',
     'zenorocha:clipboard@1.5.8',
     'andrei:tablesorter@0.0.1',
@@ -160,12 +161,12 @@ Package.onUse(function(api){
     'GritsPathLayer',
     'Itinerary',
     'Itineraries',
-    'i18n'
+    'i18n',
+    'moment'
   ]);
 });
 
 Package.onTest(function(api) {
   api.versionsFrom('1.2.1');
-
   api.use('xolvio:cucumber');
 });
