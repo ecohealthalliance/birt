@@ -1,6 +1,6 @@
 HEATMAP_INTENSITY_MULTIPLIER = 1
 FRAME_INTERVAL = 2500 # milliseconds
-window._locations = {} # container to store migration locations
+_locations = {} # container to store migration locations
 
 # Creates an instance of a GritsHeatmapLayer, extends  GritsLayer
 #
@@ -191,6 +191,8 @@ GritsHeatmapLayer.decayLocations = (dateKey, documents, token) ->
 
   interval = FRAME_INTERVAL/documents.length
   async.eachSeries(documents, (doc, next) ->
+    if doc == null
+      return
     setTimeout(->
       id = CryptoJS.MD5(JSON.stringify(doc.loc)).toString()
       _.each(_locations, (location) ->
@@ -263,16 +265,23 @@ GritsHeatmapLayer.startAnimation = (startDate, endDate, period, documents, token
         if d.weeks() == f.weeks() && d.year() == f.year()
           return doc
       if period == 'days'
-        if d.day() == f.day() && d.month() == f.month() && d.year() == f.year()
+        if d.date() == f.date() && d.month() == f.month() && d.year() == f.year()
           return doc
     )
+    console.log('dateKey: ', dateKey)
+    console.log('filteredDocuments: ', filteredDocuments)
     # determine the animation interval by dividing by the lenght of
     # filteredDocuments
-    interval = FRAME_INTERVAL/filteredDocuments.length
+    if filteredDocuments.length == 0
+      filteredDocuments.push(null)
+      interval = FRAME_INTERVAL
+    else
+      interval = FRAME_INTERVAL/filteredDocuments.length
+    # start the animation
     async.eachSeries(filteredDocuments, (doc, nextInner) ->
       setTimeout(()->
         if doc == null
-          # we expect the null case for when there are now documents for the
+          # we expect the null case for when there are no documents for the
           # date range.  call the next callback of the series and return.
           nextInner()
           return
@@ -293,7 +302,7 @@ GritsHeatmapLayer.startAnimation = (startDate, endDate, period, documents, token
       # outer eachSeries to continue
       nextOuter()
       # do not decay the last frame
-      if processed != frames.length
+      if (processed - 1) != frames.length
         # start decaying these locations after the FRAME_INTERVAL
         setTimeout(->
           GritsHeatmapLayer.decayLocations(dateKey, filteredDocuments, token)
