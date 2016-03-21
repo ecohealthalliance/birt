@@ -70,6 +70,7 @@ Package.onUse(function(api){
     'client/stylesheets/globals.import.styl',
     'client/stylesheets/sidebar.import.styl',
     'client/stylesheets/sidebar_table.import.styl',
+    'client/stylesheets/birt.import.styl',
     'client/stylesheets/main.styl',
     'client/stylesheets/overlay.styl',
     'client/lib/L.D3SvgOverlay.min.js',
@@ -161,8 +162,7 @@ Package.onUse(function(api){
     'GritsPathLayer',
     'Itinerary',
     'Itineraries',
-    'i18n',
-    'moment'
+    'i18n'
   ]);
 });
 
