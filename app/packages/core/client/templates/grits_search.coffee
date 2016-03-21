@@ -9,6 +9,8 @@ _initLimit = null # onCreated will initialize the limt through GritsFilterCriter
 _departureSearchMain = null # onRendered will set this to a typeahead object
 _effectiveDatePicker = null # onRendered will set this to a datetime picker object
 _discontinuedDatePicker = null # onRendered will set this to a datetime picker object
+_compareDatePicker = null # onRendered will set this to a datetime picker object
+_animationRunning = new ReactiveVar(false)
 _matchSkip = null # the amount to skip during typeahead pagination
 _simulationProgress = new ReactiveVar(0)
 _disableLimit = new ReactiveVar(false) # toggle if we will allow limit/skip
@@ -88,9 +90,18 @@ _setEffectiveDatePicker = (datetimePicker) ->
 getDiscontinuedDatePicker = ->
   return _discontinuedDatePicker
 
-# sets the datetime picker object for the '#discontinuedDate' input with the label 'Start'
+# sets the datetime picker object for the '#discontinuedDate' input
 _setDiscontinuedDatePicker = (datetimePicker) ->
   _discontinuedDatePicker = datetimePicker
+  return
+
+# returns the datetime picker object fro the '#compareDateOverPeriod' input with the label 'Compare Single Date'
+getCompareDatePicker = ->
+  return _compareDatePicker
+
+# sets the datetime picker object for the '#compareDateOverPeriod'
+_setCompareDatePicker = (datetimePicker) ->
+  _compareDatePicker = datetimePicker
   return
 
 # determines which field was matched by the typeahead into the server response
@@ -220,6 +231,20 @@ _resetSimulationProgress = ->
 
 # sets an object to be used by Meteors' Blaze templating engine (views)
 Template.gritsSearch.helpers({
+  isAnimationRunning: ->
+    _animationRunning.get()
+  periods: ->
+    return [
+      {value: 'days', displayName: i18n.get('gritsSearch.period-days')},
+      {value: 'weeks', displayName: i18n.get('gritsSearch.period-weeks')},
+      {value: 'months', displayName: i18n.get('gritsSearch.period-months')},
+      {value: 'years', displayName: i18n.get('gritsSearch.period-years')}
+    ]
+  defaultPeriod: (period) ->
+    if period.value == 'months'
+      return true
+    else
+      return false
   GritsConstants: ->
     return GritsConstants
   isSimulatorRunning: ->
@@ -281,10 +306,11 @@ Template.gritsSearch.onCreated ->
   Template.gritsSearch.getDepartureSearchMain = getDepartureSearchMain
   Template.gritsSearch.getEffectiveDatePicker = getEffectiveDatePicker
   Template.gritsSearch.getDiscontinuedDatePicker = getDiscontinuedDatePicker
+  Template.gritsSearch.getCompareDatePicker = getCompareDatePicker
   Template.gritsSearch.simulationProgress = _simulationProgress
   Template.gritsSearch.disableLimit = _disableLimit
 
-# triggered when the 'filter' template is rendered
+# triggered when the 'gritsSearch' template is rendered
 Template.gritsSearch.onRendered ->
 
   departureSearchMain = $('#departureSearchMain').tokenfield({
@@ -309,50 +335,24 @@ Template.gritsSearch.onRendered ->
     preventDuplicates: true,
   }
 
-  # set the effectiveDatePicker and options
-  # Note: Meteor.gritsUtil.effectiveDateMinMax is set in startup.coffee
   options = {
     format: 'MM/DD/YY'
   }
   effectiveDatePicker = $('#effectiveDate').datetimepicker(options)
+  effectiveDatePicker.data('DateTimePicker').widgetPositioning({vertical: 'bottom', horizontal: 'left'})
   _setEffectiveDatePicker(effectiveDatePicker)
 
-
-  # set the discontinuedDatePicker and options
-  # Note: Meteor.gritsUtil.discontinuedDateMinMax is set in startup.coffee
-  options = {
-    format: 'MM/DD/YY'
-  }
   discontinuedDatePicker = $('#discontinuedDate').datetimepicker(options)
+  discontinuedDatePicker.data('DateTimePicker').widgetPositioning({vertical: 'bottom', horizontal: 'left'})
   _setDiscontinuedDatePicker(discontinuedDatePicker)
+
+  compareDatePicker = $('#compareDateOverPeriod').datetimepicker(options)
+  compareDatePicker.data('DateTimePicker').widgetPositioning({vertical: 'top', horizontal: 'left'})
+  compareDatePicker.data('DateTimePicker').disable()
+  _setCompareDatePicker(compareDatePicker)
 
   # set the original state of the filter on document ready
   GritsFilterCriteria.setState()
-
-  # When the template is rendered, setup a Tracker autorun to listen to changes
-  # on isUpdating.  This session reactive var enables/disables, shows/hides the
-  # apply button and filterLoading indicator.
-  Meteor.autorun ->
-    # update the disabled status of the [More] button based loadedRecords
-    loadedRecords = Session.get(GritsConstants.SESSION_KEY_LOADED_RECORDS)
-    totalRecords = Session.get(GritsConstants.SESSION_KEY_TOTAL_RECORDS)
-    if loadedRecords < totalRecords
-      # enable the [More] button when loaded is less than total
-      $('#loadMore').prop('disabled', false)
-    else
-      # disable the [More] button
-      $('#loadMore').prop('disabled', true)
-
-  Meteor.autorun ->
-    # update the ajax-loader
-    isUpdating = Session.get(GritsConstants.SESSION_KEY_IS_UPDATING)
-    # do not show the filter spinner if the overlay isLoading
-    if isUpdating && !Template.gritsOverlay.isLoading()
-      $('#applyFilter').prop('disabled', true)
-      #$('#filterLoading').show()
-    else
-      $('#applyFilter').prop('disabled', false)
-      #$('#filterLoading').hide()
 
   Meteor.autorun ->
     mode = Session.get(GritsConstants.SESSION_KEY_MODE)
@@ -389,6 +389,33 @@ Template.gritsSearch.onRendered ->
       if !c.firstRun
         # reset the route when the departures are cleared
         FlowRouter.go('/')
+
+  # enable/disable the compareDatePicker
+  Meteor.autorun ->
+    enable = GritsFilterCriteria.enableDateOverPeriod.get()
+    if enable
+      _compareDatePicker.data('DateTimePicker').enable()
+    else
+      _compareDatePicker.data('DateTimePicker').disable()
+      _compareDatePicker.data('DateTimePicker').date(null)
+
+  # is the animation running
+  Meteor.autorun ->
+    running = GritsHeatmapLayer.animationRunning.get()
+    # update the disabled status of the [More] button based loadedRecords
+    loadedRecords = Session.get(GritsConstants.SESSION_KEY_LOADED_RECORDS)
+    totalRecords = Session.get(GritsConstants.SESSION_KEY_TOTAL_RECORDS)
+    if running
+      _animationRunning.set(true)
+      $('#loadMore').prop('disabled', true)
+    else
+      _animationRunning.set(false)
+      if loadedRecords < totalRecords
+        # enable the [More] button when loaded is less than total
+        $('#loadMore').prop('disabled', false)
+      else
+        # disable the [More] button
+        $('#loadMore').prop('disabled', true)
 
   # Determine if the router set a simId
   # @see lib/router.coffee
@@ -463,9 +490,30 @@ _changeDateHandler = (e) ->
     date = _effectiveDatePicker.data('DateTimePicker').date()
     GritsFilterCriteria.operatingDateRangeEnd.set(date)
     return
+  if id == 'compareDateOverPeriod'
+    if _.isNull(_compareDatePicker)
+      return
+    date = _compareDatePicker.data('DateTimePicker').date()
+    GritsFilterCriteria.compareDateOverPeriod.set(date)
+    return
+_showDateHandler = (e) ->
+  $target = $(e.target)
+  id = $target.attr('id')
+  if id == 'compareDateOverPeriod'
+    if _.isNull(_compareDatePicker)
+      return
+  return
 _changeLimitHandler = (e) ->
   val = parseInt($("#limit").val(), 10)
   GritsFilterCriteria.limit.set(val)
+  return
+_changePeriodHandler = (e) ->
+  GritsFilterCriteria.period.set($(e.target).val())
+_changeEnableDateOverPeriodHandler = (e) ->
+  if $(e.target).is(':checked')
+    GritsFilterCriteria.enableDateOverPeriod.set(true)
+  else
+    GritsFilterCriteria.enableDateOverPeriod.set(false)
   return
 _startSimulation = (e) ->
   if $(e.target).hasClass('disabled')
@@ -500,16 +548,7 @@ Template.gritsSearch.events
   'change #limit': _changeLimitHandler
   'change #departureSearchMain': _changeDepartureHandler
   'dp.change': _changeDateHandler
-  'dp.show': (event) ->
-    # in order to not be contained within the scrolling div, the style of the
-    # .bootstrap-datetimepicker-widget.dropdown-menu is set to fixed then we
-    # position it manually below.
-    $datetimepicker = $(event.target)
-    height = $datetimepicker.height()
-    top = $datetimepicker.offset().top
-    left = $datetimepicker.offset().left
-    $('.bootstrap-datetimepicker-widget.dropdown-menu').css({top: top + height, left: left})
-    return
+  'dp.show': _showDateHandler
   'click #includeNearbyAirports': (event) ->
     miles = parseInt($("#includeNearbyAirportsRadius").val(), 10)
     departures = GritsFilterCriteria.tokens.get()
@@ -596,3 +635,5 @@ Template.gritsSearch.events
 
     token = e.attrs.label
     return false
+  'change #period': _changePeriodHandler
+  'change #enableDateOverPeriod': _changeEnableDateOverPeriodHandler
