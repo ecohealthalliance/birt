@@ -1,5 +1,5 @@
-_ignoreFields = ['limit', 'offset'] # fields that are used for maintaining state but will be ignored when sent to the server
-_validFields = ['startDate', 'endDate', 'limit', 'offset']
+_ignoreFields = ['limit', 'offset', 'period'] # fields that are used for maintaining state but will be ignored when sent to the server
+_validFields = ['startDate', 'endDate', 'limit', 'offset', 'period']
 _validOperators = ['$gte', '$gt', '$lte', '$lt', '$eq', '$ne', '$in', '$near', null]
 _state = null # keeps track of the query string state
 # local/private minimongo collection
@@ -16,8 +16,6 @@ _Filter = Astro.Class(
         Validators.string()
     ],
     operator: [
-        Validators.required(),
-        Validators.string(),
         Validators.choice(_validOperators)
     ],
     value: Validators.required()
@@ -69,6 +67,16 @@ class GritsFilterCriteria
 
     #   offset
     self.offset = new ReactiveVar(0)
+
+    #   compareDateOverPeriod
+    self.compareDateOverPeriod = new ReactiveVar(null)
+
+    #   enableDateOverPeriod
+    self.enableDateOverPeriod = new ReactiveVar(false)
+
+    #   period
+    self.period = new ReactiveVar('months')
+    self.trackPeriod()
 
     # airportCounts
     # during a simulation the airports are counted to update the heatmap
@@ -228,8 +236,9 @@ class GritsFilterCriteria
     self = this
     startDate = moment.utc(self.operatingDateRangeStart.get())
     endDate = moment.utc(self.operatingDateRangeEnd.get())
+    period = self.period.get()
     # start the heatmap animation
-    GritsHeatmapLayer.startAnimation(startDate, endDate, 'months', documents, token, offset)
+    GritsHeatmapLayer.startAnimation(startDate, endDate, period, documents, token, offset)
     return
   # applies the filter but does not reset the offset
   #
@@ -328,8 +337,6 @@ class GritsFilterCriteria
       # reset the loadedRecords and totalRecords
       Session.set(GritsConstants.SESSION_KEY_LOADED_RECORDS, 0)
       Session.set(GritsConstants.SESSION_KEY_TOTAL_RECORDS, 0)
-      # re-enable the loadMore button when a new filter is applied
-      $('#loadMore').prop('disabled', false)
       # pass the callback function if its defined
       if cb && _.isFunction(cb)
         self.more(cb)
@@ -411,6 +418,47 @@ class GritsFilterCriteria
     Meteor.autorun ->
       obj = self.operatingDateRangeEnd.get()
       self.setOperatingDateRangeEnd(obj)
+      async.nextTick( ->
+        self.compareStates()
+      )
+    return
+
+  # set the compare date over period input
+  setCompareDateOverPeriod: (date) ->
+    return
+  # set enable date over period checkbox
+  setEnableDateOverPeriod: (enable) ->
+    return
+  # set the period dropdown
+  setPeriod: (period) ->
+    self = this
+
+    # do not allow this to run prior to jQuery/DOM
+    if _.isUndefined($)
+      return
+
+    val = $('#period').val()
+
+    if _.isNull(period)
+      if _.isEqual(period, val)
+        self.remove('period')
+      else
+        $('#period').val(null)
+        self.period.set(null)
+      return
+
+    if _.isEqual(period, val)
+      # the reactive var is already set, change is from the UI
+      self.createOrUpdate('period', {key: 'period', operator: null, value: val})
+    else
+      $('#period').val(period)
+      self.period.set(period)
+    return
+  trackPeriod: ->
+    self = this
+    Meteor.autorun ->
+      obj = self.period.get()
+      self.setPeriod(obj)
       async.nextTick( ->
         self.compareStates()
       )
