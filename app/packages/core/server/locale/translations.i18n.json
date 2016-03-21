@@ -121,6 +121,24 @@
         "end-label": {
             "en": "End"
         },
+        "compare-label": {
+            "en": "Compare Date Over Inverval"
+        },
+        "period-label": {
+            "en": "Interval"
+        },
+        "period-days": {
+            "en": "Days"
+        },
+        "period-months": {
+            "en": "Months"
+        },
+        "period-weeks": {
+            "en": "Weeks"
+        },
+        "period-years": {
+            "en": "Years"
+        },
         "simulated-passengers-label": {
             "en": "Number of Passengers"
         },
