@@ -469,6 +469,7 @@ migrationsByQuery = (startDate, endDate, token, limit, skip) ->
   if _profile
     recordProfile('migrationsByQuery', new Date() - start)
   return matches
+
 # count the total migrations for the specified date range
 #
 # @param [Object] query, a mongodb query object
@@ -498,6 +499,82 @@ countMigrationsByDateRange = (startDate, endDate, token) ->
   return count
 
 
+# find migrations within an array of dates
+#
+# @note optional limit and offset
+# @param [Array] dates, an array of dates
+# @param [String] token, the token from the UI filter
+# @param [Integer] limit, the amount of records to limit
+# @param [Integer] skip, the amount of records to skip
+# @return [Array] an array of documents
+migrationsByDates = (dates, token, limit, skip) ->
+  if _profile
+    start = new Date()
+
+  if _.isUndefined(dates) or _.isEmpty(dates)
+    return []
+  if _.isUndefined(token) or _.isEmpty(token)
+    return []
+
+  if _.isUndefined(limit)
+    limit = 0
+  if _.isUndefined(skip)
+    skip = 0
+
+  query = {
+    date: {$in: _.map(dates, (dateStr) -> new Date(dateStr))},
+  }
+  query[token] = {$gte: 1}
+  console.log('query: %j', query)
+  fields = {date: 1, country: 1, state_province: 1, county: 1, loc: 1}
+  fields[token] = 1
+
+  matches = []
+  if _useAggregation
+    # prepare the aggregate pipeline
+    pipeline = [
+      {$match: query},
+      {$project: fields},
+      {$sort: {date: 1}},
+      {$skip: skip},
+      {$limit: limit}
+    ]
+    matches = Migrations.aggregate(pipeline)
+  else
+    matches = Migrations.find(query, {fields: fields, limit: limit, skip: skip, sort: {date: 1}, transform: null}).fetch()
+
+  if _profile
+    recordProfile('migrationsByDates', new Date() - start)
+  return matches
+# count the total migrations for the specified date range
+#
+# @param [Array] dates, an array of dates
+# @return [Integer] totalRecorts, the count of the query
+countMigrationsByDates = (dates, token) ->
+  if _profile
+    start = new Date()
+
+  if _.isUndefined(dates) || _.isEmpty(dates)
+    return 0
+
+  if _.isUndefined(token) || _.isEmpty(token)
+    return 0
+
+  query = {
+    date: {$in: _.map(dates, (dateStr) -> new Date(dateStr))},
+  }
+  query[token] = {$gte: 1}
+
+  console.log('query: %j', query)
+
+  count = Migrations.find(query, {transform: null}).count()
+
+  if _profile
+    recordProfile('countMigrationsByDateRange', new Date() - start)
+  return count
+
+
+
 # Public API
 Meteor.methods
   startSimulation: startSimulation
@@ -515,3 +592,5 @@ Meteor.methods
   countTypeaheadBirds: countTypeaheadBirds
   migrationsByQuery: migrationsByQuery
   countMigrationsByDateRange: countMigrationsByDateRange
+  migrationsByDates: migrationsByDates
+  countMigrationsByDates: countMigrationsByDates
