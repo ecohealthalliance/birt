@@ -443,8 +443,8 @@ migrationsByQuery = (startDate, endDate, token, limit, skip) ->
 
   query = {
     date: {
-      $gte: new Date(startDate.$gte),
-      $lt: new Date(endDate.$lt)
+      $gte: new Date(startDate),
+      $lt: new Date(endDate)
     }
   }
   query[token] = {$gte: 1}
@@ -480,8 +480,8 @@ countMigrationsByDateRange = (startDate, endDate, token) ->
 
   query = {
     date: {
-      $gte: new Date(startDate.$gte),
-      $lt: new Date(endDate.$lt)
+      $gte: new Date(startDate),
+      $lt: new Date(endDate)
     }
   }
   query[token] = {$gte: 1}
