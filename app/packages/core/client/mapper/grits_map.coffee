@@ -48,34 +48,25 @@ class GritsMap extends L.Map
 
   # creates the default layer groups required by the map
   _createDefaultLayerGroups: ->
-    self = this
-    # Add analyze layers to a layer group then store to map
-    analyzeLayers = {}
-    analyzeLayers[GritsConstants.NODE_LAYER_ID] = new GritsNodeLayer(self, GritsConstants.NODE_LAYER_ID)
-    analyzeLayers[GritsConstants.PATH_LAYER_ID] = new GritsPathLayer(self, GritsConstants.PATH_LAYER_ID)
-    analyzeLayerGroup = new GritsLayerGroup(analyzeLayers, self, GritsConstants.ANALYZE_GROUP_LAYER_ID, 'Analyze')
-    analyzeLayerGroup.add()
-    self.addGritsLayerGroup(analyzeLayerGroup)
-
     # Add explore layers to a layer group then store to map
     exploreLayers = {}
-    exploreLayers[GritsConstants.NODE_LAYER_ID] = new GritsNodeLayer(self, GritsConstants.NODE_LAYER_ID)
-    exploreLayers[GritsConstants.PATH_LAYER_ID] = new GritsPathLayer(self, GritsConstants.PATH_LAYER_ID)
-    exploreLayerGroup = new GritsLayerGroup(exploreLayers, self, GritsConstants.EXPLORE_GROUP_LAYER_ID, 'Explore')
+    exploreLayers[GritsConstants.NODE_LAYER_ID] = new GritsNodeLayer(this, GritsConstants.NODE_LAYER_ID)
+    exploreLayers[GritsConstants.PATH_LAYER_ID] = new GritsPathLayer(this, GritsConstants.PATH_LAYER_ID)
+    exploreLayerGroup = new GritsLayerGroup(exploreLayers, this, GritsConstants.EXPLORE_GROUP_LAYER_ID, 'Explore')
     exploreLayerGroup.add()
-    self.addGritsLayerGroup(exploreLayerGroup)
+    this.addGritsLayerGroup(exploreLayerGroup)
 
     # Add heatmap layer to a layer group then store to map
     heatmapLayers = {}
-    heatmapLayers[GritsConstants.HEATMAP_LAYER_ID] = new GritsHeatmapLayer(self, GritsConstants.HEATMAP_LAYER_ID)
-    heatmapLayerGroup = new GritsLayerGroup(heatmapLayers, self, GritsConstants.HEATMAP_GROUP_LAYER_ID, 'Heatmap')
-    self.addGritsLayerGroup(heatmapLayerGroup)
+    heatmapLayers[GritsConstants.HEATMAP_LAYER_ID] = new GritsHeatmapLayer(this, GritsConstants.HEATMAP_LAYER_ID)
+    heatmapLayerGroup = new GritsLayerGroup(heatmapLayers, this, GritsConstants.HEATMAP_GROUP_LAYER_ID, 'Heatmap')
+    this.addGritsLayerGroup(heatmapLayerGroup)
 
     # Add all nodes layers to a layer group then add to map
     allNodesLayers = {}
-    allNodesLayers[GritsConstants.NODE_LAYER_ID] = new GritsAllNodesLayer(self)
-    allNodesLayerGroup = new GritsLayerGroup(allNodesLayers, self, GritsConstants.ALL_NODES_GROUP_LAYER_ID, 'All Nodes')
-    self.addGritsLayerGroup(allNodesLayerGroup)
+    allNodesLayers[GritsConstants.NODE_LAYER_ID] = new GritsAllNodesLayer(this)
+    allNodesLayerGroup = new GritsLayerGroup(allNodesLayers, this, GritsConstants.ALL_NODES_GROUP_LAYER_ID, 'All Nodes')
+    this.addGritsLayerGroup(allNodesLayerGroup)
 
   # adds a layer reference to the map object
   #

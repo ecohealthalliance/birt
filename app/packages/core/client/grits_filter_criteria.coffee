@@ -103,6 +103,7 @@ class GritsFilterCriteria
     year = start.getFullYear()
     yearStr = year.toString().slice(2,4)
     self.operatingDateRangeStart.set(start)
+    Session.setDefault('dateRangeStart', start)
     return "#{month}/#{date}/#{yearStr}"
   # initialize the end date through the 'effectiveDate' filter
   #
@@ -122,6 +123,7 @@ class GritsFilterCriteria
     year = end.getFullYear()
     yearStr = year.toString().slice(2,4)
     self.operatingDateRangeEnd.set(end)
+    Session.setDefault('dateRangeStart', end)
     return "#{month}/#{date}/#{yearStr}"
   # initialize the limit through the 'effectiveDate' filter
   #
@@ -245,9 +247,6 @@ class GritsFilterCriteria
   # @param [Function] cb, the callback function
   more: (cb) ->
     self = this
-
-    # applying the filter is always EXPLORE mode
-    Session.set(GritsConstants.SESSION_KEY_MODE, GritsConstants.MODE_EXPLORE)
 
     query = self.getQueryObject()
     token = self.tokens.get()[0]

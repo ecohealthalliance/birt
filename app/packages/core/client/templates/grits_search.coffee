@@ -250,24 +250,6 @@ Template.gritsSearch.helpers({
     return GritsConstants
   isSimulatorRunning: ->
     return GritsFilterCriteria.isSimulatorRunning.get()
-  isExploreMode: ->
-    mode = Session.get(GritsConstants.SESSION_KEY_MODE)
-    if _.isUndefined(mode)
-      return false
-    else
-      if mode == GritsConstants.MODE_EXPLORE
-        return true
-      else
-        return false
-  isAnalyzeMode: ->
-    mode = Session.get(GritsConstants.SESSION_KEY_MODE)
-    if _.isUndefined(mode)
-      return false
-    else
-      if mode == GritsConstants.MODE_ANALYZE
-        return true
-      else
-        return false
   loadedRecords: ->
     return Session.get(GritsConstants.SESSION_KEY_LOADED_RECORDS)
   totalRecords: ->
@@ -357,34 +339,6 @@ Template.gritsSearch.onRendered ->
 
   # set the original state of the filter on document ready
   GritsFilterCriteria.setState()
-
-  Meteor.autorun ->
-    mode = Session.get(GritsConstants.SESSION_KEY_MODE)
-    # do not run if our mode hasn't changed
-    if self.mode == mode
-      return
-    if mode == GritsConstants.MODE_EXPLORE
-      _resetSimulationProgress()
-      _disableLimit.set(false)
-      async.nextTick( ->
-        if GritsFilterCriteria.tokens.get().length isnt 0
-          $("#showThroughput").click()
-      )
-      # reset the URL back to the root
-      FlowRouter.go('/')
-    else
-      # initialize the bootstrap slider (this is not rendered by default in grits_search.html)
-      # it is done using nextTick to give Blaze template time to render
-      async.nextTick(-> $('#simulatedPassengersInputSlider').slider())
-      _disableLimit.set(true)
-      # only allow startSimulation to be clicked when an existing simulation
-      # is not running to avoid duplicate occurrences
-      if !GritsFilterCriteria.isSimulatorRunning.get()
-        async.nextTick( ->
-          if GritsFilterCriteria.tokens.get().length isnt 0
-            $("#startSimulation").click()
-        )
-    self.mode = mode
 
   Meteor.autorun (c) ->
     departures = GritsFilterCriteria.tokens.get()
@@ -492,12 +446,14 @@ _changeDateHandler = (e) ->
       return
     date = _discontinuedDatePicker.data('DateTimePicker').date()
     GritsFilterCriteria.operatingDateRangeStart.set(date)
+    Session.set('dateRangeStart', date.toDate())
     return
-  if id == 'effectiveDate'
+  else if id == 'effectiveDate'
     if _.isNull(_effectiveDatePicker)
       return
     date = _effectiveDatePicker.data('DateTimePicker').date()
     GritsFilterCriteria.operatingDateRangeEnd.set(date)
+    Session.set('dateRangeEnd', date.toDate())
     return
   if id == 'compareDateOverPeriod'
     if _.isNull(_compareDatePicker)
@@ -592,9 +548,7 @@ Template.gritsSearch.events
     return
   'click #loadMore': ->
     GritsFilterCriteria.setOffset()
-    mode = Session.get(GritsConstants.SESSION_KEY_MODE)
-    if mode == GritsConstants.MODE_EXPLORE
-      GritsFilterCriteria.more()
+    GritsFilterCriteria.more()
     return
   'tokenfield:initialize': (e) ->
     $target = $(e.target)
