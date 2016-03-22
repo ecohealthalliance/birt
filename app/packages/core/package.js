@@ -162,7 +162,8 @@ Package.onUse(function(api){
     'GritsPathLayer',
     'Itinerary',
     'Itineraries',
-    'i18n'
+    'i18n',
+    'moment'
   ]);
 });
 
