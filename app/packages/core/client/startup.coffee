@@ -29,8 +29,6 @@ Meteor.startup ->
       console.log('end sync [i18n] (ms): ', new Date() - start)
     # Hide the gritsOverlay indicator
     Template.gritsOverlay.hide()
-    # Set the map mode
-    Session.set GritsConstants.SESSION_KEY_MODE, GritsConstants.MODE_EXPLORE
     # Mark the app ready
     Session.set GritsConstants.SESSION_KEY_IS_READY, true
   )

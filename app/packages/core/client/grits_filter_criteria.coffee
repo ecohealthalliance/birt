@@ -246,9 +246,6 @@ class GritsFilterCriteria
   more: (cb) ->
     self = this
 
-    # applying the filter is always EXPLORE mode
-    Session.set(GritsConstants.SESSION_KEY_MODE, GritsConstants.MODE_EXPLORE)
-
     query = self.getQueryObject()
     token = self.tokens.get()[0]
 

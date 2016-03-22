@@ -38,21 +38,13 @@ _updateSimulationProgress = (progress) ->
 
 # throttle how many time we trigger update during reactive changes to the dataTable
 _throttleTablesChanged = _.throttle(->
-  mode = Session.get(GritsConstants.SESSION_KEY_MODE)
-  if mode == GritsConstants.MODE_ANALYZE
-    if $('#analyzeTable').hasClass('tablesorter')
-      # the tablesorter has already been applied, trigger an update
-      $('#analyzeTable').trigger('update')
-    else
-      # init a new tablesorter
-      $('#analyzeTable').tablesorter()
+  if $('#exploreTable').hasClass('tablesorter')
+    # the tablesorter has already been applied, trigger an update
+    $('#exploreTable').trigger('update')
   else
-    if $('#exploreTable').hasClass('tablesorter')
-      # the tablesorter has already been applied, trigger an update
-      $('#exploreTable').trigger('update')
-    else
-      # init a new tablesorter
-      $('#exploreTable').tablesorter()
+    # init a new tablesorter
+    $('#exploreTable').tablesorter()
+
   _tablesChanged.set(false)
 , 250)
 
@@ -129,24 +121,6 @@ Template.gritsDataTable.helpers({
     if airport.hasOwnProperty('countryName') && airport.countryName != ''
       additionalInfo += ', ' + airport.countryName
     return additionalInfo
-  isExploreMode: ->
-    mode = Session.get(GritsConstants.SESSION_KEY_MODE)
-    if _.isUndefined(mode)
-      return false
-    else
-      if mode == GritsConstants.MODE_EXPLORE
-        return true
-      else
-        return false
-  isAnalyzeMode: ->
-    mode = Session.get(GritsConstants.SESSION_KEY_MODE)
-    if _.isUndefined(mode)
-      return false
-    else
-      if mode == GritsConstants.MODE_ANALYZE
-        return true
-      else
-        return false
   simPas: ->
     if _.isUndefined(Template.instance().simPas)
       return 0
@@ -224,39 +198,17 @@ Template.gritsDataTable.onRendered ->
 
   Meteor.autorun ->
     # determine the current layer group
-    mode = Session.get(GritsConstants.SESSION_KEY_MODE)
     layerGroup = GritsLayerGroup.getCurrentLayerGroup()
     # update the table reactively to the current visible paths
-    if mode == GritsConstants.MODE_ANALYZE
-      # if analyze mode; default sort by occurrences
-      data = layerGroup.getPathLayer().visiblePaths.get()
-      if _.isEmpty(data)
-        self.paths.set([])
-      else
-        sorted = _.sortBy(data, (path) ->
-          return path.occurrences * -1
-        )
-        self.paths.set(sorted)
+    # default sort by throughput
+    data = layerGroup.getPathLayer().visiblePaths.get()
+    if _.isEmpty(data)
+      self.paths.set([])
     else
-      # default sort by throughput
-      data = layerGroup.getPathLayer().visiblePaths.get()
-      if _.isEmpty(data)
-        self.paths.set([])
-      else
-        sorted = _.sortBy(data, (path) ->
-          return path.throughput * -1
-        )
-        self.paths.set(sorted)
-
-  Meteor.autorun ->
-    # determine the current layer group
-    mode = Session.get(GritsConstants.SESSION_KEY_MODE)
-
-    # clear the datatable if mode has changed
-    if _previousMode != null
-      if _previousMode != mode
-        self._reset()
-    _previousMode = mode
+      sorted = _.sortBy(data, (path) ->
+        return path.throughput * -1
+      )
+      self.paths.set(sorted)
 
   Meteor.autorun ->
     departures = GritsFilterCriteria.tokens.get()
