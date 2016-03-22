@@ -8,11 +8,14 @@ Package.onUse(function(api){
   api.use([
     'templating',
     'coffeescript',
-    'mquandalle:stylus@1.1.1'
+    'mquandalle:stylus@1.1.1',
+    'momentjs:moment@2.10.6'
   ], 'client');
 
   api.addFiles([
     'stylesheets/info.styl',
+
+    'templates/info.html',
 
     'info.coffee'
   ], 'client');

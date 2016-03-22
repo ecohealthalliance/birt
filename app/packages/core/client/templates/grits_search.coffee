@@ -437,12 +437,14 @@ _changeDateHandler = (e) ->
       return
     date = _discontinuedDatePicker.data('DateTimePicker').date()
     GritsFilterCriteria.operatingDateRangeStart.set(date)
+    Session.set('dateRangeStart', date.toDate())
     return
-  if id == 'effectiveDate'
+  else if id == 'effectiveDate'
     if _.isNull(_effectiveDatePicker)
       return
     date = _effectiveDatePicker.data('DateTimePicker').date()
     GritsFilterCriteria.operatingDateRangeEnd.set(date)
+    Session.set('dateRangeEnd', date.toDate())
     return
   if id == 'compareDateOverPeriod'
     if _.isNull(_compareDatePicker)
