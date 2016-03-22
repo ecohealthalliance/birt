@@ -87,13 +87,14 @@ class GritsHeatmapLayer extends GritsLayer
   # @param [String] dateKey, the animation frame id
   updateLocations: (dateKey) ->
     self = this
+    locations = _.filter(_locations, (location) -> location.hasOwnProperty(dateKey))
     if self._data.length == 0
-      _.each(_locations, (location) ->
-        if location.hasOwnProperty(dateKey)
-          self._data.push([location.loc.coordinates[1], location.loc.coordinates[0], location[dateKey]/1000, dateKey, location.id])
+      # the heatmap doesn't have any data, all locations need pushed into the array
+      _.each(locations, (location) ->
+        self._data.push([location.loc.coordinates[1], location.loc.coordinates[0], location[dateKey]/1000, dateKey, location.id])
       )
     else
-      locations = _.filter(_locations, (location) -> location.hasOwnProperty(dateKey))
+      # each location within the heatmap array needs its count updated
       _.each(locations, (location) ->
         elements = _.filter(self._data, (d) -> return d[3] == dateKey && d[4] == location.id)
         if elements.length > 0
@@ -316,3 +317,127 @@ GritsHeatmapLayer.startAnimation = (startDate, endDate, period, documents, token
     # the outer eachSeries is complete
     GritsHeatmapLayer.animationRunning.set(false)
   )
+
+
+# get mirgations from mongo by an array of dates and token from the UI filter
+#
+# @param [Array] dates, the array of dates to match
+# @param [String] token, the token from the filter
+# @param [Number] limit, the limit from the filter
+# @param [Number] offset, the offset from the filter
+# @param [Function] done, callback when done
+GritsHeatmapLayer.migrationsByDate = (dates, token, limit, offset, done) ->
+  # show the loading indicator and call the server-side method
+  Session.set(GritsConstants.SESSION_KEY_IS_UPDATING, true)
+  async.auto({
+    # get the totalRecords count first
+    'getCount': (callback, result) ->
+      Meteor.call('countMigrationsByDates', dates, token, (err, totalRecords) ->
+        if (err)
+          callback(err)
+          return
+
+        if Meteor.gritsUtil.debug
+          console.log 'totalRecords: ', totalRecords
+
+        Session.set(GritsConstants.SESSION_KEY_TOTAL_RECORDS, totalRecords)
+        callback(null, totalRecords)
+      )
+    # when count is finished, get the migrations if greater than 0
+    'getMigrations': ['getCount', (callback, result) ->
+      totalRecords = result.getCount
+      if totalRecords.length <= 0
+        toastr.info(i18n.get('toastMessages.noResults'))
+        Session.set(GritsConstants.SESSION_KEY_IS_UPDATING, false)
+        callback(null)
+        return
+
+      Meteor.call('migrationsByDates',dates, token, limit, offset, (err, migrations) ->
+        if (err)
+          callback(err)
+          return
+
+        if _.isUndefined(migrations) || migrations.length <= 0
+          toastr.info(i18n.get('toastMessages.noResults'))
+          Session.set(GritsConstants.SESSION_KEY_IS_UPDATING, false)
+          callback(null, [])
+          return
+
+        callback(null, migrations)
+      )
+    ]
+  }, (err, result) ->
+    if err
+      Meteor.gritsUtil.errorHandler(err)
+      return
+    # if there hasn't been any errors, getCount and getMigrations will
+    # have completed
+    migrations = result.getMigrations
+    # execute the callback to process the migrations
+    done(null, migrations)
+    return
+  )
+  return
+
+
+# get mirgations from mongo by a startDate, endDate, and token from the UI filter
+#
+# @param [Date] startDate, the startDate from the filter
+# @param [Date] endDate, the endDate from the filter
+# @param [String] token, the token from the filter
+# @param [Number] limit, the limit from the filter
+# @param [Number] offset, the offset from the filter
+# @param [Function] done, callback when done
+GritsHeatmapLayer.migrationsByDateRange = (startDate, endDate, token, limit, offset, done) ->
+  # show the loading indicator and call the server-side method
+  Session.set(GritsConstants.SESSION_KEY_IS_UPDATING, true)
+  async.auto({
+    # get the totalRecords count first
+    'getCount': (callback, result) ->
+      Meteor.call('countMigrationsByDateRange', startDate, endDate, token, (err, totalRecords) ->
+        if (err)
+          callback(err)
+          return
+
+        if Meteor.gritsUtil.debug
+          console.log 'totalRecords: ', totalRecords
+
+        Session.set(GritsConstants.SESSION_KEY_TOTAL_RECORDS, totalRecords)
+        callback(null, totalRecords)
+      )
+    # when count is finished, get the migrations if greater than 0
+    'getMigrations': ['getCount', (callback, result) ->
+      totalRecords = result.getCount
+
+      if totalRecords.length <= 0
+        toastr.info(i18n.get('toastMessages.noResults'))
+        Session.set(GritsConstants.SESSION_KEY_IS_UPDATING, false)
+        callback(null)
+        return
+
+      Meteor.call('migrationsByQuery', startDate, endDate, token, limit, offset, (err, migrations) ->
+        if (err)
+          callback(err)
+          return
+
+        if _.isUndefined(migrations) || migrations.length <= 0
+          toastr.info(i18n.get('toastMessages.noResults'))
+          Session.set(GritsConstants.SESSION_KEY_IS_UPDATING, false)
+          callback(null, [])
+          return
+
+        callback(null, migrations)
+      )
+    ]
+  }, (err, result) ->
+    if err
+      Meteor.gritsUtil.errorHandler(err)
+      return
+    # if there hasn't been any errors, getCount and getMigrations will
+    # have completed
+    migrations = result.getMigrations
+    # execute the callback to process the migrations
+    done(null, migrations)
+    return
+  )
+  return
