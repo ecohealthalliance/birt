@@ -241,6 +241,12 @@
         },
         "onlyOneToken": {
             "en": "Only one bird species may be selected"
+        },
+        "dateOverIntervalWarning": {
+            "en": "The Start and End dates are within the same Interval"
+        },
+        "invalidCompareDate": {
+            "en": "The compare date must be specified"
         }
     }
 }
