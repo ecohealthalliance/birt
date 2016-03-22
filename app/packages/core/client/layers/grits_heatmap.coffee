@@ -93,15 +93,15 @@ class GritsHeatmapLayer extends GritsLayer
           self._data.push([location.loc.coordinates[1], location.loc.coordinates[0], location[dateKey]/1000, dateKey, location.id])
       )
     else
-      _.each(_locations, (location) ->
+      locations = _.filter(_locations, (location) -> location.hasOwnProperty(dateKey))
+      _.each(locations, (location) ->
         elements = _.filter(self._data, (d) -> return d[3] == dateKey && d[4] == location.id)
         if elements.length > 0
           _.each(elements, (element) ->
             element[2] = location[dateKey]/1000
           )
         else
-          if location.hasOwnProperty(dateKey)
-            self._data.push([location.loc.coordinates[1], location.loc.coordinates[0], location[dateKey]/1000, dateKey, location.id])
+          self._data.push([location.loc.coordinates[1], location.loc.coordinates[0], location[dateKey]/1000, dateKey, location.id])
       )
 
   # get the heatmap data
@@ -227,6 +227,11 @@ GritsHeatmapLayer.startAnimation = (startDate, endDate, period, documents, token
     heatmapLayerGroup.draw()
   , 250)
 
+  # throttle how many updates to the global session counter
+  throttleCount = _.throttle((count) ->
+    Session.set(GritsConstants.SESSION_KEY_LOADED_RECORDS , count)
+  , 250)
+
   # get the current count, may not be zero in case of a limit/offset
   count = Session.get(GritsConstants.SESSION_KEY_LOADED_RECORDS)
 
@@ -277,7 +282,6 @@ GritsHeatmapLayer.startAnimation = (startDate, endDate, period, documents, token
       interval = FRAME_INTERVAL
     else
       interval = FRAME_INTERVAL/filteredDocuments.length
-    # start the animation
     async.eachSeries(filteredDocuments, (doc, nextInner) ->
       setTimeout(()->
         if doc == null
@@ -289,7 +293,7 @@ GritsHeatmapLayer.startAnimation = (startDate, endDate, period, documents, token
         # limit how many times we perform the draw
         throttleDraw(dateKey)
         # update the global counter
-        Session.set(GritsConstants.SESSION_KEY_LOADED_RECORDS , ++count)
+        throttleCount(++count)
         # allow next iteration of the eachSeries to animate by calling the
         # nextInner() callback
         nextInner()
