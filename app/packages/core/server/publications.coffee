@@ -255,7 +255,7 @@ findMinMaxDateRange = tempCache (key) ->
 # determines if the runtime environment is for testing
 #
 # @return [Boolean] isTest, true or false
-isTestEnvironment = () ->
+isTestEnvironment = ->
   return process.env.hasOwnProperty('VELOCITY_MAIN_APP_PATH')
 
 # finds airports that match the search
