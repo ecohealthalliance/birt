@@ -534,17 +534,17 @@ _startSimulation = (e) ->
   GritsFilterCriteria.startSimulation(simPas, startDate, endDate)
   return
 _showThroughput = (e) ->
+  if $(e.target).hasClass('disabled')
+    return
   GritsFilterCriteria.apply()
   return
 # events
 #
 # Event handlers for the grits_filter.html template
 Template.gritsSearch.events
-  'keyup #departureSearchMain-tokenfield': (event) ->
-    if event.keyCode == 13
-      departures = GritsFilterCriteria.tokens.get()
-      if departures.length == 0
-        toastr.error(i18n.get('toastMessages.departureRequired'))
+  'keyup #departureSearchMain-tokenfield': (e) ->
+    if e.keyCode == 13
+      if $(e.target).hasClass('disabled')
         return
       GritsFilterCriteria.apply()
     return
