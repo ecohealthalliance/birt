@@ -1,5 +1,5 @@
 _ignoreFields = ['limit', 'offset', 'period'] # fields that are used for maintaining state but will be ignored when sent to the server
-_validFields = ['startDate', 'endDate', 'limit', 'offset', 'period']
+_validFields = ['startDate', 'endDate', 'limit', 'offset', 'period', 'compareDate']
 _validOperators = ['$gte', '$gt', '$lte', '$lt', '$eq', '$ne', '$in', '$near', null]
 _state = null # keeps track of the query string state
 # local/private minimongo collection
@@ -271,61 +271,41 @@ class GritsFilterCriteria
         delete query[field]
     )
 
-    # show the loading indicator and call the server-side method
-    Session.set(GritsConstants.SESSION_KEY_IS_UPDATING, true)
-    async.auto({
-      # get the totalRecords count first
-      'getCount': (callback, result) ->
-        Meteor.call('countMigrationsByDateRange', query.startDate, query.endDate, token, (err, totalRecords) ->
-          if (err)
-            callback(err)
-            return
+    startDate = moment.utc(query.startDate.$gte)
+    endDate = moment.utc(query.endDate.$lt)
 
-          if Meteor.gritsUtil.debug
-            console.log 'totalRecords: ', totalRecords
+    # determine the type of query
+    if self.enableDateOverPeriod.get()
+      compareDate = self.compareDateOverPeriod.get()
 
-          Session.set(GritsConstants.SESSION_KEY_TOTAL_RECORDS, totalRecords)
-          callback(null, totalRecords)
-        )
-      # when count is finished, get the migrations if greater than 0
-      'getMigrations': ['getCount', (callback, result) ->
-        totalRecords = result.getCount
-
-        if totalRecords.length <= 0
-          toastr.info(i18n.get('toastMessages.noResults'))
-          Session.set(GritsConstants.SESSION_KEY_IS_UPDATING, false)
-          callback(null)
-          return
-
-        Meteor.call('migrationsByQuery', query.startDate, query.endDate, token, limit, offset, (err, migrations) ->
-          if (err)
-            callback(err)
-            return
-
-          if _.isUndefined(migrations) || migrations.length <= 0
-            toastr.info(i18n.get('toastMessages.noResults'))
-            Session.set(GritsConstants.SESSION_KEY_IS_UPDATING, false)
-            callback(null, [])
-            return
-
-          callback(null, migrations)
-        )
-      ]
-    }, (err, result) ->
-      if err
-        Meteor.gritsUtil.errorHandler(err)
+      if _.isEmpty(compareDate)
+        toastr.error(i18n.get('toastMessages.invalidCompareDate'))
         return
-      # if there hasn't been any errors, getCount and getMigrations will
-      # have completed
-      migrations = result.getMigrations
-      # call the original callback function if its defined
-      if cb && _.isFunction(cb)
-        cb(null, migrations)
-      # process the migrations
-      self.process(migrations, token, offset)
-      return
-    )
-    return
+
+      period = self.period.get()
+      window.range = moment.range(startDate, endDate)
+      if range.diff(period) == 0
+        toastr.warning(i18n.get('toastMessages.dateOverIntervalWarning'))
+
+      years = range.toArray('years')
+      date = compareDate.date()
+      month = compareDate.month()
+      dates = _.map(years, (m) -> moment.utc(Date.UTC(m.year(), month, date)).toISOString())
+
+      GritsHeatmapLayer.migrationsByDate(dates, token, limit, offset, (err, migrations) ->
+        self.process(migrations, token, offset)
+        # call the original callback function if its defined
+        if cb && _.isFunction(cb)
+          cb(null, migrations)
+      )
+    else
+      GritsHeatmapLayer.migrationsByDateRange(startDate.toISOString(), endDate.toISOString(), token, limit, offset, (err, migrations) ->
+        self.process(migrations, token, offset)
+        # call the original callback function if its defined
+        if cb && _.isFunction(cb)
+          cb(null, migrations)
+      )
+
   # applies the filter; resets the offset, loadedRecords, and totalRecords
   #
   # @param [Function] cb, the callback function
@@ -424,11 +404,32 @@ class GritsFilterCriteria
     return
 
   # set the compare date over period input
-  setCompareDateOverPeriod: (date) ->
+  setCompareDateOverPeriod: (date) =>
+    # do not allow this to run prior to jQuery/DOM
+    if _.isUndefined($)
+      return
+    compareDatePicker = Template.gritsSearch.getCompareDatePicker()
+    if _.isNull(compareDatePicker)
+      return
+
+    compareDate = compareDatePicker.data('DateTimePicker').date()
+
+    if _.isNull(date) || _.isNull(compareDate)
+      if _.isEqual(date, compareDate)
+        self.remove('endDate')
+      else
+        compareDatePicker.data('DateTimePicker').date(null)
+        self.compareDateOverPeriod.set(null)
+      return
+
+    if _.isEqual(date.toISOString(), compareDate.toISOString())
+      # the reactive var is already set, change is from the UI
+      self.createOrUpdate('compareDate', {key: 'compareDate', operator: null, value: compareDate})
+    else
+      compareDatePicker.data('DateTimePicker').date(date)
+      self.compareDateOverPeriod.set(date)
     return
-  # set enable date over period checkbox
-  setEnableDateOverPeriod: (enable) ->
-    return
+
   # set the period dropdown
   setPeriod: (period) ->
     self = this
