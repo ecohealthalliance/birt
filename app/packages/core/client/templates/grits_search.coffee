@@ -10,6 +10,7 @@ _departureSearchMain = null # onRendered will set this to a typeahead object
 _effectiveDatePicker = null # onRendered will set this to a datetime picker object
 _discontinuedDatePicker = null # onRendered will set this to a datetime picker object
 _compareDatePicker = null # onRendered will set this to a datetime picker object
+_lastPeriod = 'months' # remember the last selected period when enable/disable compare date over interval, defaults to 'months'
 _animationRunning = new ReactiveVar(false)
 _matchSkip = null # the amount to skip during typeahead pagination
 _simulationProgress = new ReactiveVar(0)
@@ -346,6 +347,9 @@ Template.gritsSearch.onRendered ->
   discontinuedDatePicker.data('DateTimePicker').widgetPositioning({vertical: 'bottom', horizontal: 'left'})
   _setDiscontinuedDatePicker(discontinuedDatePicker)
 
+  options = {
+    format: 'MM/DD'
+  }
   compareDatePicker = $('#compareDateOverPeriod').datetimepicker(options)
   compareDatePicker.data('DateTimePicker').widgetPositioning({vertical: 'top', horizontal: 'left'})
   compareDatePicker.data('DateTimePicker').disable()
@@ -390,14 +394,19 @@ Template.gritsSearch.onRendered ->
         # reset the route when the departures are cleared
         FlowRouter.go('/')
 
-  # enable/disable the compareDatePicker
+  # enable/disable the compareDatePicker and periods 'days', 'weeks', 'months'
+  # when the reactive var enableDateOverPeriod changes.
   Meteor.autorun ->
     enable = GritsFilterCriteria.enableDateOverPeriod.get()
     if enable
       _compareDatePicker.data('DateTimePicker').enable()
+      GritsFilterCriteria.period.set('years')
+      $('#period').prop('disabled', true)
     else
       _compareDatePicker.data('DateTimePicker').disable()
       _compareDatePicker.data('DateTimePicker').date(null)
+      GritsFilterCriteria.period.set(_lastPeriod)
+      $('#period').prop('disabled', false)
 
   # is the animation running
   Meteor.autorun ->
@@ -508,7 +517,8 @@ _changeLimitHandler = (e) ->
   GritsFilterCriteria.limit.set(val)
   return
 _changePeriodHandler = (e) ->
-  GritsFilterCriteria.period.set($(e.target).val())
+  _lastPeriod = $(e.target).val()
+  GritsFilterCriteria.period.set(_lastPeriod)
 _changeEnableDateOverPeriodHandler = (e) ->
   if $(e.target).is(':checked')
     GritsFilterCriteria.enableDateOverPeriod.set(true)
@@ -524,10 +534,6 @@ _startSimulation = (e) ->
   GritsFilterCriteria.startSimulation(simPas, startDate, endDate)
   return
 _showThroughput = (e) ->
-  departures = GritsFilterCriteria.tokens.get()
-  if departures.length == 0
-    toastr.error(i18n.get('toastMessages.departureRequired'))
-    return
   GritsFilterCriteria.apply()
   return
 # events
