@@ -123,7 +123,7 @@ class GritsFilterCriteria
     year = end.getFullYear()
     yearStr = year.toString().slice(2,4)
     self.operatingDateRangeEnd.set(end)
-    Session.setDefault('dateRangeStart', end)
+    Session.setDefault('dateRangeEnd', end)
     return "#{month}/#{date}/#{yearStr}"
   # initialize the limit through the 'effectiveDate' filter
   #

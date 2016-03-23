@@ -22,6 +22,8 @@ Template.gritsMap.onRendered ->
 Template.scrubber.onCreated ->
   Session.setDefault("slider", [20, 80])
   @isPlaying = new ReactiveVar(false)
+  Meteor.autorun =>
+    @isPlaying.set( GritsHeatmapLayer.animationRunning.get() )
 
 Template.scrubber.onRendered ->
   $('#slider').noUiSlider(
@@ -52,4 +54,8 @@ Template.scrubber.events
     event.stopImmediatePropagation()
     event.stopPropagation()
   'click .scrubber-play': (event, instance) ->
-    instance.isPlaying.set( not instance.isPlaying.get() )
+    isPlaying = instance.isPlaying.get()
+    unless isPlaying
+      $('#showThroughput').click()
+    else
+      instance.isPlaying.set( not isPlaying )

@@ -73,18 +73,18 @@ Package.onUse(function(api){
     'client/layers/grits_heatmap.coffee',
     'client/templates/header.html',
     'client/templates/grits_dataTable.html',
-    'client/templates/grits_dataTable.coffee',
     'client/templates/grits_layerSelector.html',
-    'client/templates/grits_layerSelector.coffee',
     'client/templates/grits_map.html',
     'client/templates/grits_map_sidebar.html',
-    'client/templates/grits_map_sidebar.coffee',
     'client/templates/grits_map_table_sidebar.html',
-    'client/templates/grits_map.coffee',
     'client/templates/grits_search.html',
-    'client/templates/grits_search.coffee',
     'client/templates/grits_overlay.html',
-    'client/templates/grits_overlay.coffee'
+    'client/controllers/grits_dataTable.coffee',
+    'client/controllers/grits_layerSelector.coffee',
+    'client/controllers/grits_map_sidebar.coffee',
+    'client/controllers/grits_map.coffee',
+    'client/controllers/grits_search.coffee',
+    'client/controllers/grits_overlay.coffee'
   ], 'client');
 
   // static assets

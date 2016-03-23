@@ -40,7 +40,7 @@ class GritsHeatmapLayer extends GritsLayer
 
   # The heatmap library's gradient doesn't load until the map moves
   # so this moves the map slightly to make it load.
-  _perturbMap: ()->
+  _perturbMap: ->
     currentCenter = @_map.getCenter()
     @_map.setView(
       lat: currentCenter.lat + 1
@@ -52,27 +52,25 @@ class GritsHeatmapLayer extends GritsLayer
   #
   # @note method overrides the parent class GritsLayer clear method
   # @override
-  draw: () ->
-    self = this
+  draw: ->
     # An extra point with no intensity is added because passing in an empty
     # array causes a bug where the previous heatmap is frozen in view.
-    self._layer.setData(_locations.concat([[0.0, 0.0, 0.0]]))
-    self._perturbMap()
-    self.hasLoaded.set(true)
+    this._layer.setData(_locations.concat([[0.0, 0.0, 0.0]]))
+    this._perturbMap()
+    this.hasLoaded.set(true)
     return
 
   # clears the heatmap
   #
   # @note method overrides the parent class GritsLayer clear method
   # @override
-  clear: () ->
-    self = this
+  clear: ->
     _locations = []
-    self._layer.setData(_locations)
-    self.hasLoaded.set(false)
+    this._layer.setData(_locations)
+    this.hasLoaded.set(false)
     return
 
-  _trackTokens: () ->
+  _trackTokens: ->
     self = this
     Tracker.autorun ->
       tokens = GritsFilterCriteria.tokens.get()
@@ -82,7 +80,7 @@ class GritsHeatmapLayer extends GritsLayer
   # get the heatmap data
   #
   # @return [Array] array of the heatmap data
-  getData: () ->
+  getData: ->
     self = this
     if _.isEmpty(_locations)
       return []
@@ -90,7 +88,7 @@ class GritsHeatmapLayer extends GritsLayer
 
   # binds to the Tracker.gritsMap.getInstance() map event listener .on
   # 'overlyadd' and 'overlayremove' methods
-  _bindMapEvents: () ->
+  _bindMapEvents: ->
     self = this
     if typeof self._map == 'undefined'
       return
@@ -119,18 +117,18 @@ GritsHeatmapLayer.animationCompleted = new ReactiveVar(false)
 #
 # @param [String] dateKey, the animation frame id
 GritsHeatmapLayer.findIndex = (dateKey, locationID) ->
-    idx = -1
-    i = 0
-    len = _locations.length
-    while (i < len)
-      d = _locations[i]
-      if d[3] == dateKey && d[4] == locationID
-        idx = i
-        break
-      i++
-    return idx
+  idx = -1
+  i = 0
+  len = _locations.length
+  while (i < len)
+    d = _locations[i]
+    if d[3] == dateKey && d[4] == locationID
+      idx = i
+      break
+    i++
+  return idx
 # resets the array of locations
-GritsHeatmapLayer.resetLocations = () ->
+GritsHeatmapLayer.resetLocations = ->
   _locations = []
   return
 # creates a migration location element based on a mongodb document
@@ -333,7 +331,7 @@ GritsHeatmapLayer.migrationsByDate = (dates, token, limit, offset, done) ->
       if totalRecords == 0
         callback(null, [])
         return
-      Meteor.call('migrationsByDates',dates, token, limit, offset, callback)
+      Meteor.call('migrationsByDates', dates, token, limit, offset, callback)
     ]
   }, (err, result) ->
     if err
