@@ -555,34 +555,6 @@ Template.gritsSearch.events
   'change #departureSearchMain': _changeDepartureHandler
   'dp.change': _changeDateHandler
   'dp.show': _showDateHandler
-  'click #includeNearbyAirports': (event) ->
-    miles = parseInt($("#includeNearbyAirportsRadius").val(), 10)
-    departures = GritsFilterCriteria.tokens.get()
-
-    if departures.length <= 0
-      toastr.error(i18n.get('includeNearbyRequired'))
-      return false
-
-    if (departures[0].indexOf(GritsMetaNode.PREFIX) >= 0)
-      toastr.error(i18n.get('includeNearbyMetaNode'))
-      return false
-
-    if $('#includeNearbyAirports').is(':checked')
-      Session.set(GritsConstants.SESSION_KEY_IS_UPDATING, true)
-      Meteor.call('findNearbyAirports', departures[0], miles, (err, airports) ->
-        if err
-          Meteor.gritsUtil.errorHandler(err)
-          return
-
-        nearbyTokens = _.pluck(airports, '_id')
-        union = _.union(departures, nearbyTokens)
-        _departureSearchMain.tokenfield('setTokens', union)
-        Session.set(GritsConstants.SESSION_KEY_IS_UPDATING, false)
-      )
-    else
-      departureSearch = getDepartureSearchMain()
-      departureSearch.tokenfield('setTokens', departures)
-    return
   'click #toggleFilter': (e) ->
     $self = $(e.currentTarget)
     $("#filter").toggle("fast")
@@ -634,11 +606,6 @@ Template.gritsSearch.events
   'tokenfield:removedtoken': (e) ->
     $target = $(e.target)
     tokens = $target.tokenfield('getTokens')
-    # determine if the remaining tokens is empty, then show the placeholder text
-    if tokens.length == 0
-      if $target.attr('id') in ['departureSearchMain']
-        $('#includeNearbyAirports').prop('checked', false)
-
     token = e.attrs.label
     return false
   'change #period': _changePeriodHandler
