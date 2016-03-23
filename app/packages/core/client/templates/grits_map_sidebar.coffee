@@ -9,6 +9,3 @@ Template.gritsMapSidebar.events
   'click #sidebar-minus-button': (event) ->
     Template.gritsMap.getInstance().zoomOut()
     return
-
-Template.gritsMapSidebar.onRendered ->
-  self = this

@@ -1,6 +1,6 @@
 HEATMAP_INTENSITY_MULTIPLIER = 1
 FRAME_INTERVAL = 2500 # milliseconds
-_locations = {} # container to store migration locations
+_locations = [] # container to store heatmap data
 
 # Creates an instance of a GritsHeatmapLayer, extends  GritsLayer
 #
@@ -23,7 +23,6 @@ class GritsHeatmapLayer extends GritsLayer
 
     self._name = 'Heatmap'
     self._map = map
-    self._data = []
 
     self._layer = new L.TileLayer.WebGLHeatMap(
       size: 1609.34 * 150 # meters equals 250 miles
@@ -54,12 +53,9 @@ class GritsHeatmapLayer extends GritsLayer
   # @override
   draw: () ->
     self = this
-    data = self._data.map((d)->
-      [d[0], d[1], d[2] * HEATMAP_INTENSITY_MULTIPLIER]
-    )
     # An extra point with no intensity is added because passing in an empty
     # array causes a bug where the previous heatmap is frozen in view.
-    self._layer.setData(data.concat([[0.0, 0.0, 0.0]]))
+    self._layer.setData(_locations.concat([[0.0, 0.0, 0.0]]))
     self._perturbMap()
     self.hasLoaded.set(true)
     return
@@ -70,8 +66,8 @@ class GritsHeatmapLayer extends GritsLayer
   # @override
   clear: () ->
     self = this
-    self._data = []
-    self._layer.setData(self._data)
+    _locations = []
+    self._layer.setData(_locations)
     self.hasLoaded.set(false)
     return
 
@@ -82,37 +78,14 @@ class GritsHeatmapLayer extends GritsLayer
       if tokens.length == 0
         self.clear()
 
-  # update the heatmap data for each location
-  #
-  # @param [String] dateKey, the animation frame id
-  updateLocations: (dateKey) ->
-    self = this
-    locations = _.filter(_locations, (location) -> location.hasOwnProperty(dateKey))
-    if self._data.length == 0
-      # the heatmap doesn't have any data, all locations need pushed into the array
-      _.each(locations, (location) ->
-        self._data.push([location.loc.coordinates[1], location.loc.coordinates[0], location[dateKey]/1000, dateKey, location.id])
-      )
-    else
-      # each location within the heatmap array needs its count updated
-      _.each(locations, (location) ->
-        elements = _.filter(self._data, (d) -> return d[3] == dateKey && d[4] == location.id)
-        if elements.length > 0
-          _.each(elements, (element) ->
-            element[2] = location[dateKey]/1000
-          )
-        else
-          self._data.push([location.loc.coordinates[1], location.loc.coordinates[0], location[dateKey]/1000, dateKey, location.id])
-      )
-
   # get the heatmap data
   #
   # @return [Array] array of the heatmap data
   getData: () ->
     self = this
-    if _.isEmpty(self._data)
+    if _.isEmpty(_locations)
       return []
-    return self._data
+    return self._locations
 
   # binds to the Tracker.gritsMap.getInstance() map event listener .on
   # 'overlyadd' and 'overlayremove' methods
@@ -139,41 +112,47 @@ class GritsHeatmapLayer extends GritsLayer
 GritsHeatmapLayer.animationRunning = new ReactiveVar(false)
 GritsHeatmapLayer.animationProgress = new ReactiveVar(0)
 GritsHeatmapLayer.animationFrame = new ReactiveVar(null)
-# find a migration location
+
+# find the index of the heatmap data matching dateKey and locationID
 #
-# @param [String] id, the uniqued id of the location (md5 hash of GeoJSON coordinates)
-# @return [Object] location, the location object
-GritsHeatmapLayer.findLocation = (id) ->
-  if _locations.hasOwnProperty(id)
-    return _metaNodes[id]
-  else
-    return null
-# resets the set of locations
+# @param [String] dateKey, the animation frame id
+GritsHeatmapLayer.findIndex = (dateKey, locationID) ->
+    idx = -1
+    i = 0
+    len = _locations.length
+    while (i < len)
+      d = _locations[i]
+      if d[3] == dateKey && d[4] == locationID
+        idx = i
+        break
+      i++
+    return idx
+# resets the array of locations
 GritsHeatmapLayer.resetLocations = () ->
-  _locations = {}
+  _locations = []
   return
-# creates a migration location based on a mongodb document
+# creates a migration location element based on a mongodb document
 #
 # @param [String] dateKey, the current animation frame
 # @param [Array] doc, the GeoJSON mongoDB document
 # @param [String] token, the token from the filter
 GritsHeatmapLayer.createLocation = (dateKey, doc, token) ->
   id = CryptoJS.MD5(JSON.stringify(doc.loc)).toString()
-  count = doc[token] # the count that is embedded into the mongo document
-  location = _locations[id] # see if a location already exists
-  if typeof location == 'undefined'
-    location = {} # create new location if undefined
-    location[dateKey] = count # the count for this date
-    location.loc = doc.loc # the coordinates of the location
-    location.id = id
-    _locations[id] = location # store into the collection
+  count = doc[token] / 1000  # the count that is embedded into the mongo document
+  idx = GritsHeatmapLayer.findIndex(dateKey, id)
+  if idx < 0
+    location = [] # create new location if undefined
+    location.push(doc.loc.coordinates[1])
+    location.push(doc.loc.coordinates[0])
+    location.push(count) # the count for this date
+    location.push(dateKey)
+    location.push(id)
+    _locations.push(location)
   else
     # do we have a count for this date?
-    if location.hasOwnProperty(dateKey)
-      location[dateKey] += count # increment by the count
-    else
-      # set the initial date count
-      location[dateKey] = count
+    location = _locations[idx]
+    location[2] += count # increment by the count
+
 # decrements the value of the locations
 #
 # @param [String] dateKey, the current animation frame
@@ -186,7 +165,6 @@ GritsHeatmapLayer.decayLocations = (dateKey, documents, token) ->
 
   # throttle how many time the heatmap can be drawn
   throttleDraw = _.throttle((dateKey) ->
-    heatmapLayerGroup.updateLocations(dateKey)
     heatmapLayerGroup.draw()
   , 250)
 
@@ -196,14 +174,15 @@ GritsHeatmapLayer.decayLocations = (dateKey, documents, token) ->
       return
     setTimeout(->
       id = CryptoJS.MD5(JSON.stringify(doc.loc)).toString()
-      _.each(_locations, (location) ->
-        if location.id == id && location.hasOwnProperty(dateKey)
-          location[dateKey] -= doc[token]
-      )
-      throttleDraw(dateKey)
+      idx = GritsHeatmapLayer.findIndex(dateKey, id)
+      if idx >= 0
+        location = _locations[idx]
+        location[2] -= doc[token] / 1000
+        throttleDraw(dateKey)
       next()
     , interval)
   )
+
 # start the heatmap animation
 #
 # @note: this method sets the ReactiveVar for the animation: animationProgress, animationRunning, and animationFrame
@@ -224,9 +203,8 @@ GritsHeatmapLayer.startAnimation = (startDate, endDate, period, documents, token
 
   # throttle how many time the heatmap can be drawn
   throttleDraw = _.throttle((dateKey) ->
-    heatmapLayerGroup.updateLocations(dateKey)
     heatmapLayerGroup.draw()
-  , 250)
+  , 500)
 
   # throttle how many updates to the global session counter
   throttleCount = _.throttle((count) ->
@@ -443,3 +421,6 @@ GritsHeatmapLayer.migrationsByDateRange = (startDate, endDate, token, limit, off
     return
   )
   return
+
+
+

@@ -38,21 +38,13 @@ _updateSimulationProgress = (progress) ->
 
 # throttle how many time we trigger update during reactive changes to the dataTable
 _throttleTablesChanged = _.throttle(->
-  mode = Session.get(GritsConstants.SESSION_KEY_MODE)
-  if mode == GritsConstants.MODE_ANALYZE
-    if $('#analyzeTable').hasClass('tablesorter')
-      # the tablesorter has already been applied, trigger an update
-      $('#analyzeTable').trigger('update')
-    else
-      # init a new tablesorter
-      $('#analyzeTable').tablesorter()
+  if $('#exploreTable').hasClass('tablesorter')
+    # the tablesorter has already been applied, trigger an update
+    $('#exploreTable').trigger('update')
   else
-    if $('#exploreTable').hasClass('tablesorter')
-      # the tablesorter has already been applied, trigger an update
-      $('#exploreTable').trigger('update')
-    else
-      # init a new tablesorter
-      $('#exploreTable').tablesorter()
+    # init a new tablesorter
+    $('#exploreTable').tablesorter()
+
   _tablesChanged.set(false)
 , 250)
 
@@ -129,24 +121,6 @@ Template.gritsDataTable.helpers({
     if airport.hasOwnProperty('countryName') && airport.countryName != ''
       additionalInfo += ', ' + airport.countryName
     return additionalInfo
-  isExploreMode: ->
-    mode = Session.get(GritsConstants.SESSION_KEY_MODE)
-    if _.isUndefined(mode)
-      return false
-    else
-      if mode == GritsConstants.MODE_EXPLORE
-        return true
-      else
-        return false
-  isAnalyzeMode: ->
-    mode = Session.get(GritsConstants.SESSION_KEY_MODE)
-    if _.isUndefined(mode)
-      return false
-    else
-      if mode == GritsConstants.MODE_ANALYZE
-        return true
-      else
-        return false
   simPas: ->
     if _.isUndefined(Template.instance().simPas)
       return 0
@@ -221,16 +195,6 @@ Template.gritsDataTable.onRendered ->
   # get the heatmap layer
   heatmapLayerGroup = self.map.getGritsLayerGroup(GritsConstants.HEATMAP_GROUP_LAYER_ID)
   self.heatmapLayer = heatmapLayerGroup.find(GritsConstants.HEATMAP_LAYER_ID)
-
-  Meteor.autorun ->
-    # determine the current layer group
-    mode = Session.get(GritsConstants.SESSION_KEY_MODE)
-
-    # clear the datatable if mode has changed
-    if _previousMode != null
-      if _previousMode != mode
-        self._reset()
-    _previousMode = mode
 
   Meteor.autorun ->
     departures = GritsFilterCriteria.tokens.get()

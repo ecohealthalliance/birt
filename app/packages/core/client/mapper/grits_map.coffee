@@ -48,12 +48,11 @@ class GritsMap extends L.Map
 
   # creates the default layer groups required by the map
   _createDefaultLayerGroups: ->
-    self = this
     # Add heatmap layer to a layer group then store to map
     heatmapLayers = {}
-    heatmapLayers[GritsConstants.HEATMAP_LAYER_ID] = new GritsHeatmapLayer(self, GritsConstants.HEATMAP_LAYER_ID)
-    heatmapLayerGroup = new GritsLayerGroup(heatmapLayers, self, GritsConstants.HEATMAP_GROUP_LAYER_ID, 'Heatmap')
-    self.addGritsLayerGroup(heatmapLayerGroup)
+    heatmapLayers[GritsConstants.HEATMAP_LAYER_ID] = new GritsHeatmapLayer(this, GritsConstants.HEATMAP_LAYER_ID)
+    heatmapLayerGroup = new GritsLayerGroup(heatmapLayers, this, GritsConstants.HEATMAP_GROUP_LAYER_ID, 'Heatmap')
+    this.addGritsLayerGroup(heatmapLayerGroup)
 
   # adds a layer reference to the map object
   #
