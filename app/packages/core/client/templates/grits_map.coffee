@@ -26,7 +26,6 @@ setInstance = (map) ->
 #
 # @param [GritsMap] map - map to apply the default controls
 addDefaultControls = (map) ->
-  Blaze.render(Template.gritsLegend, $('#sidebar-slider')[0])
   Blaze.render(Template.gritsSearch, $('#sidebar-search')[0])
   Blaze.render(Template.gritsDataTable, $('#sidebar-flightData')[0])
   Blaze.render(Template.gritsLayerSelector, $('#sidebar-layer')[0])
