@@ -20,7 +20,7 @@ Package.onUse(function(api){
     'mquandalle:stylus@1.1.1',
     'jparker:crypto-md5@0.1.1',
     'bevanhunt:leaflet@0.3.18',
-    'fortawesome:fontawesome@4.4.0',
+    'fortawesome:fontawesome@4.5.0',
     'fourq:typeahead@1.0.0',
     'ajduke:bootstrap-tokenfield@0.5.0',
     'flawless:meteor-toastr@1.0.1',

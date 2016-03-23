@@ -234,6 +234,8 @@ Template.gritsSearch.helpers({
     return Session.get(GritsConstants.SESSION_KEY_LOADED_RECORDS)
   totalRecords: ->
     return Session.get(GritsConstants.SESSION_KEY_TOTAL_RECORDS)
+  isSimulatorRunning: ->
+    return GritsFilterCriteria.isSimulatorRunning.get()
   state: ->
     # GritsFilterCriteria.stateChanged is a reactive-var
     state = GritsFilterCriteria.stateChanged.get()

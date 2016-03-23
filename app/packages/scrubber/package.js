@@ -8,11 +8,14 @@ Package.onUse(function(api){
   api.use([
     'templating',
     'coffeescript',
-    'mquandalle:stylus@1.1.1'
+    'mquandalle:stylus@1.1.1',
+    'reactive-var'
   ], 'client');
 
   api.addFiles([
     'stylesheets/scrubber.styl',
+
+    'templates/scrubber.html',
 
     'scrubber.coffee'
   ], 'client');

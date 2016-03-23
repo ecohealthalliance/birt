@@ -1,5 +1,13 @@
 @import '../../core/client/stylesheets/variables.import'
 
+.sidebar-left-closed
+  .leaflet-left.leaflet-bottom
+    left $sidebar-tabs-width - 10px
+
+.sidebar-right-closed
+  .leaflet-left.leaflet-bottom
+    right $data-table-width - 20px
+
 .leaflet-left.leaflet-bottom
   left $sidebar-full-width
   right 0
@@ -50,7 +58,7 @@
 .scrubber-play
   width 60px
   float left
-  overflow hidden  
+  overflow hidden
 
 .right-slider-container
   margin-top 15px
