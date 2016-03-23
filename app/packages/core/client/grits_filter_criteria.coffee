@@ -62,7 +62,7 @@ class GritsFilterCriteria
     self.trackOperatingDateRangeEnd()
 
     #   limit
-    self.limit = new ReactiveVar(1000)
+    self.limit = new ReactiveVar(10000)
     self.trackLimit()
 
     #   offset
