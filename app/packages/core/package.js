@@ -79,7 +79,6 @@ Package.onUse(function(api){
     'client/lib/webgl-heatmap-leaflet.js',
     'client/grits_constants.coffee',
     'client/mapper/grits_layer.coffee',
-    'client/mapper/grits_marker.coffee',
     'client/mapper/grits_map.coffee',
     'client/startup.coffee',
     'client/grits_util.coffee',
