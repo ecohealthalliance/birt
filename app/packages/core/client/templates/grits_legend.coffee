@@ -6,9 +6,7 @@ Template.gritsLegend.events({
     map = Template.gritsMap.getInstance()
     # determine the current layer group
     layerGroup = GritsLayerGroup.getCurrentLayerGroup()
-    if name == GritsConstants.PATH_LAYER_ID
-      layer = layerGroup.getPathLayer()
-    else if name == GritsConstants.NODE_LAYER_ID
+    if name == GritsConstants.NODE_LAYER_ID
       layer = layerGroup.getNodeLayer()
     if layer == null
       return
@@ -23,15 +21,10 @@ Template.gritsLegend.helpers({
   nodeLayerName: ->
     return GritsConstants.NODE_LAYER_ID
   nodeColorScale: (k) ->
-    num = parseInt(k, 10)
-    return GritsNodeLayer.colorScale[num]
+    return 0
   pathColorScale: (k) ->
-    num = parseInt(k, 10)
-    return GritsPathLayer.colorScale[num]
+    return 0
 })
-
-Template.gritsLegend.onCreated ->
-  #Public API
 
 Template.gritsLegend.onRendered ->
   self = this

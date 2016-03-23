@@ -54,14 +54,9 @@ Template.gritsElementDetails.helpers({
     else
       return Template.instance().node.get()
   path: ->
-    if _.isUndefined(Template.instance().path)
-      return {}
-    else
-      return Template.instance().path.get()
+    return {}
   pathWeight: (path) ->
-    if _.isUndefined(path) || _.isNull(path)
-      return ''
-    return +(path.weight).toFixed(2)
+    return 0
   normalized: (obj) ->
     if _.isUndefined(obj) || _.isNull(obj)
       return ''
@@ -87,30 +82,3 @@ Template.gritsElementDetails.onRendered ->
   $('.element-details').hide()
   #store reference to the map and layer instances
   self.map = Template.gritsMap.getInstance()
-
-  # update the currentPath
-  Meteor.autorun ->
-    # determine the current layer group
-    mode = Session.get(GritsConstants.SESSION_KEY_MODE)
-    layerGroup = GritsLayerGroup.getCurrentLayerGroup()
-    p1 = layerGroup.getPathLayer().currentPath.get()
-    p2 = self.path.get()
-    if _.isEqual(p1, p2)
-      return
-    self.path.set(p1)
-    showPath()
-    return
-
-  # update the currentNode
-  Meteor.autorun ->
-    # determine the current layer group
-    mode = Session.get(GritsConstants.SESSION_KEY_MODE)
-    layerGroup = GritsLayerGroup.getCurrentLayerGroup()
-    n1 = layerGroup.getNodeLayer().currentNode.get()
-    n2 = self.node.get()
-    if _.isEqual(n1, n2)
-      return
-    if !_.isNull(n1)
-      self.node.set(n1)
-      showNode()
-    return
