@@ -328,7 +328,7 @@ GritsHeatmapLayer.startAnimation = (startDate, endDate, period, documents, token
 # @param [Function] done, callback when done
 GritsHeatmapLayer.migrationsByDate = (dates, token, limit, offset, done) ->
   # show the loading indicator and call the server-side method
-  Session.set(GritsConstants.SESSION_KEY_IS_UPDATING, true)
+  GritsHeatmapLayer.animationRunning.set(true)
   async.auto({
     # get the totalRecords count first
     'getCount': (callback, result) ->
@@ -348,7 +348,7 @@ GritsHeatmapLayer.migrationsByDate = (dates, token, limit, offset, done) ->
       totalRecords = result.getCount
       if totalRecords.length <= 0
         toastr.info(i18n.get('toastMessages.noResults'))
-        Session.set(GritsConstants.SESSION_KEY_IS_UPDATING, false)
+        GritsHeatmapLayer.animationRunning.set(false)
         callback(null)
         return
 
@@ -359,7 +359,7 @@ GritsHeatmapLayer.migrationsByDate = (dates, token, limit, offset, done) ->
 
         if _.isUndefined(migrations) || migrations.length <= 0
           toastr.info(i18n.get('toastMessages.noResults'))
-          Session.set(GritsConstants.SESSION_KEY_IS_UPDATING, false)
+          GritsHeatmapLayer.animationRunning.set(false)
           callback(null, [])
           return
 
@@ -368,6 +368,7 @@ GritsHeatmapLayer.migrationsByDate = (dates, token, limit, offset, done) ->
     ]
   }, (err, result) ->
     if err
+      GritsHeatmapLayer.animationRunning.set(false)
       Meteor.gritsUtil.errorHandler(err)
       return
     # if there hasn't been any errors, getCount and getMigrations will
@@ -390,7 +391,7 @@ GritsHeatmapLayer.migrationsByDate = (dates, token, limit, offset, done) ->
 # @param [Function] done, callback when done
 GritsHeatmapLayer.migrationsByDateRange = (startDate, endDate, token, limit, offset, done) ->
   # show the loading indicator and call the server-side method
-  Session.set(GritsConstants.SESSION_KEY_IS_UPDATING, true)
+  GritsHeatmapLayer.animationRunning.set(true)
   async.auto({
     # get the totalRecords count first
     'getCount': (callback, result) ->
@@ -411,7 +412,7 @@ GritsHeatmapLayer.migrationsByDateRange = (startDate, endDate, token, limit, off
 
       if totalRecords.length <= 0
         toastr.info(i18n.get('toastMessages.noResults'))
-        Session.set(GritsConstants.SESSION_KEY_IS_UPDATING, false)
+        GritsHeatmapLayer.animationRunning.set(false)
         callback(null)
         return
 
@@ -422,7 +423,7 @@ GritsHeatmapLayer.migrationsByDateRange = (startDate, endDate, token, limit, off
 
         if _.isUndefined(migrations) || migrations.length <= 0
           toastr.info(i18n.get('toastMessages.noResults'))
-          Session.set(GritsConstants.SESSION_KEY_IS_UPDATING, false)
+          GritsHeatmapLayer.animationRunning.set(false)
           callback(null, [])
           return
 
@@ -431,6 +432,7 @@ GritsHeatmapLayer.migrationsByDateRange = (startDate, endDate, token, limit, off
     ]
   }, (err, result) ->
     if err
+      GritsHeatmapLayer.animationRunning.set(false)
       Meteor.gritsUtil.errorHandler(err)
       return
     # if there hasn't been any errors, getCount and getMigrations will
