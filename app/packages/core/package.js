@@ -98,8 +98,6 @@ Package.onUse(function(api){
     'client/templates/grits_search.coffee',
     'client/templates/grits_legend.html',
     'client/templates/grits_legend.coffee',
-    'client/templates/grits_elementDetails.html',
-    'client/templates/grits_elementDetails.coffee',
     'client/templates/loading.html',
     'client/templates/grits_overlay.html',
     'client/templates/grits_overlay.coffee'
