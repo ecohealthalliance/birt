@@ -71,12 +71,6 @@ class GritsMap extends L.Map
     heatmapLayerGroup = new GritsLayerGroup(heatmapLayers, self, GritsConstants.HEATMAP_GROUP_LAYER_ID, 'Heatmap')
     self.addGritsLayerGroup(heatmapLayerGroup)
 
-    # Add all nodes layers to a layer group then add to map
-    allNodesLayers = {}
-    allNodesLayers[GritsConstants.NODE_LAYER_ID] = new GritsAllNodesLayer(self)
-    allNodesLayerGroup = new GritsLayerGroup(allNodesLayers, self, GritsConstants.ALL_NODES_GROUP_LAYER_ID, 'All Nodes')
-    self.addGritsLayerGroup(allNodesLayerGroup)
-
   # adds a layer reference to the map object
   #
   # @note This does not add the layer to the Leaflet map.  Its just a container
