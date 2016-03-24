@@ -546,6 +546,50 @@ migrationsByDates = (dates, token, limit, skip) ->
   if _profile
     recordProfile('migrationsByDates', new Date() - start)
   return matches
+
+migrationsBySeason = (params)->
+  query = switch params.season
+    when "autumn" then {
+      $and: [{
+        month:
+          $gte: 9
+      }, {
+        month:
+          $lte: 11
+      }]
+    }
+    when "winter" then {
+      $or: [{
+        month:
+          $gte: 12
+      }, {
+        month:
+          $lte: 2
+      }]
+    }
+    when "spring" then {
+      $and: [{
+        month:
+          $gte: 3
+      }, {
+        month:
+          $lte: 5
+      }]
+    }
+    when "summer" then {
+      $and: [{
+        month:
+          $gte: 6
+      }, {
+        month:
+          $lte: 8
+      }]
+    }
+    else throw new Meteor.Error("Unknown season:" + season)
+  for bird in (params.birds or [])
+    query[bird] = {$gte: 1}
+  Migrations.find(query).fetch()
+
 # count the total migrations for the specified date range
 #
 # @param [Array] dates, an array of dates
@@ -594,3 +638,4 @@ Meteor.methods
   countMigrationsByDateRange: countMigrationsByDateRange
   migrationsByDates: migrationsByDates
   countMigrationsByDates: countMigrationsByDates
+  migrationsBySeason: migrationsBySeason

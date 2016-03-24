@@ -274,6 +274,16 @@ Template.gritsSearch.helpers({
     else
       # reactive var
       return GritsFilterCriteria.limit.get()
+  historicalView: ->
+    Template.instance().historicalView.get()
+  summer: ->
+    Template.instance().season.get() == "summer"
+  autumn: ->
+    Template.instance().season.get() == "autumn"
+  winter: ->
+    Template.instance().season.get() == "winter"
+  spring: ->
+    Template.instance().season.get() == "spring"
 })
 
 Template.gritsSearch.onCreated ->
@@ -282,6 +292,38 @@ Template.gritsSearch.onCreated ->
   _initLimit = GritsFilterCriteria.initLimit()
   _init = false # done initializing initial input values
 
+  @season = new ReactiveVar null
+  @historicalView = new ReactiveVar true
+  @autorun =>
+    unless @historicalView.get() == 'historicalView'
+      # reset the seaon when the view changes
+      @season.set null
+
+  @autorun =>
+    season = @season.get()
+    tokens = GritsFilterCriteria.tokens.get()
+    if tokens.length > 0
+      # TODO Other places in the app allow only a single bird name token
+      # so I'm only using the first one for now.
+      token = tokens[0]
+    if season
+      params =
+        season: season
+        birds: [token]
+      Meteor.call 'migrationsBySeason', params, (err, result)->
+        if err
+          console.log err
+          alert("Server error while computing migrations for season.")
+        map = Template.gritsMap.getInstance()
+        # reset the historical heatmap
+        heatmapLayerGroup = map.getGritsLayerGroup(GritsConstants.HEATMAP_GROUP_LAYER_ID)
+        heatmapLayerGroup.reset()
+        result.forEach (doc)->
+          GritsHeatmapLayer.createLocation(
+            season,
+            doc,
+            token)
+        heatmapLayerGroup.updateLocations(season)
   # Public API
   # Currently we declare methods above for documentation purposes then assign
   # to the Template.gritsSearch as a global export
@@ -597,3 +639,10 @@ Template.gritsSearch.events
     return false
   'change #period': _changePeriodHandler
   'change #enableDateOverPeriod': _changeEnableDateOverPeriodHandler
+  'click .historical-view': (e, instance)->
+    instance.historicalView.set true
+  'click .seasonal-view': (e, instance)->
+    instance.historicalView.set false
+  'click .seasons a': (e, instance)->
+    console.log $(e.target).text().toLowerCase()
+    instance.season.set $(e.target).text().toLowerCase()
