@@ -92,7 +92,6 @@ Package.onUse(function(api){
     'public/images/asc.png',
     'public/images/birt-logo-inline.png',
     'public/images/desc.png',
-    'public/images/flirt.png',
     'public/images/origin-marker-icon.svg',
     'public/images/viridis.png'
   ], 'client');
