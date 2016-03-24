@@ -13,8 +13,8 @@ _compareDatePicker = null # onRendered will set this to a datetime picker object
 _lastPeriod = 'months' # remember the last selected period when enable/disable compare date over interval, defaults to 'months'
 _animationRunning = new ReactiveVar(false)
 _matchSkip = null # the amount to skip during typeahead pagination
-_simulationProgress = new ReactiveVar(0)
 _disableLimit = new ReactiveVar(false) # toggle if we will allow limit/skip
+# the underscore template for the typeahead result
 _suggestionTemplate = _.template('
   <span class="typeahead-code"><%= raw._id %></span><br/>
   <span class="typeahead-info">
@@ -46,19 +46,6 @@ _typeaheadFooter = _.template('
       </div>
     </div>
   </div>')
-
-# returns the first origin within GritsFilterCriteria
-#
-# @return [String] origin, a string airport IATA code
-getOrigin = ->
-  query = GritsFilterCriteria.getQueryObject()
-  if _.has(query, 'departureAirport._id')
-    # the filter has an array of airports
-    if _.has(query['departureAirport._id'], '$in')
-      origins = query['departureAirport._id']['$in']
-      if _.isArray(origins) and origins.length > 0
-        return origins[0]
-  return null
 
 # returns the typeahead object for the '#searchBar' input
 #
@@ -161,7 +148,7 @@ _determineFieldMatchesByWeight = (input, res) ->
     console.log('matches:', matches)
   return matches
 
-# method to generate suggestions and drive the pagination feature
+# recursive method to generate suggestions and drive the pagination feature
 _suggestionGenerator = (query, skip, callback) ->
   _matchSkip = skip
   Meteor.call('typeahead', 'birds', query, skip, (err, res) ->
@@ -225,11 +212,6 @@ _suggestionGenerator = (query, skip, callback) ->
   )
   return
 
-# resets the simulation-progress bars
-_resetSimulationProgress = ->
-  _simulationProgress.set(0)
-  $('.simulation-progress').css({width: '0%'})
-
 # sets an object to be used by Meteors' Blaze templating engine (views)
 Template.gritsSearch.helpers({
   isAnimationRunning: ->
@@ -285,12 +267,10 @@ Template.gritsSearch.onCreated ->
   # Public API
   # Currently we declare methods above for documentation purposes then assign
   # to the Template.gritsSearch as a global export
-  Template.gritsSearch.getOrigin = getOrigin
   Template.gritsSearch.getSearchBar = getSearchBar
   Template.gritsSearch.getEndDatePicker = getEndDatePicker
   Template.gritsSearch.getStartDatePicker = getStartDatePicker
   Template.gritsSearch.getCompareDatePicker = getCompareDatePicker
-  Template.gritsSearch.simulationProgress = _simulationProgress
   Template.gritsSearch.disableLimit = _disableLimit
 
 # triggered when the 'gritsSearch' template is rendered
@@ -318,6 +298,7 @@ Template.gritsSearch.onRendered ->
     preventDuplicates: true,
   }
 
+  # initialize the DateTimePickers
   options = {
     format: 'MM/DD/YY'
   }
@@ -335,17 +316,6 @@ Template.gritsSearch.onRendered ->
   compareDatePicker.data('DateTimePicker').widgetPositioning({vertical: 'top', horizontal: 'left'})
   compareDatePicker.data('DateTimePicker').disable()
   _setCompareDatePicker(compareDatePicker)
-
-  # set the original state of the filter on document ready
-  GritsFilterCriteria.setState()
-
-  Meteor.autorun (c) ->
-    departures = GritsFilterCriteria.tokens.get()
-    if departures.length == 0
-      _resetSimulationProgress()
-      if !c.firstRun
-        # reset the route when the departures are cleared
-        FlowRouter.go('/')
 
   # enable/disable the compareDatePicker and periods 'days', 'weeks', 'months'
   # when the reactive var enableDateOverPeriod changes.
@@ -379,54 +349,6 @@ Template.gritsSearch.onRendered ->
         # disable the [More] button
         $('#loadMore').prop('disabled', true)
 
-  # Determine if the router set a simId
-  # @see lib/router.coffee
-  Meteor.autorun (c) ->
-    simId = Session.get(GritsConstants.SESSION_KEY_SHARED_SIMID)
-    if _.isUndefined(simId)
-      return
-    # mark the simulator as running
-    GritsFilterCriteria.isSimulatorRunning.set(true)
-    Meteor.call('findSimulationBySimId', simId, (err, simulation) ->
-      if err
-        Meteor.gritsUtil.errorHandler(err)
-        console.error(err)
-        return
-      if _.isEmpty(simulation)
-        Meteor.gritsUtil.errorHandler({message: 'Invalid simulation'})
-        return
-      # get the values from the simulation
-      startDate = moment.utc(simulation.get('startDate'))
-      endDate = moment.utc(simulation.get('endDate'))
-      tokens = simulation.get('departureNodes')
-      simPas = simulation.get('numberPassengers')
-      # update the filter and UI elements
-      GritsFilterCriteria.setOperatingDateRangeStart(startDate)
-      GritsFilterCriteria.setOperatingDateRangeEnd(endDate)
-      GritsFilterCriteria.setDepartures(tokens)
-      # GritsFilterCriteria does not have a interface for the simulatedPassengersInputSlider
-      async.nextTick(->
-        $('#simulatedPassengersInputSlider').slider('setValue', simPas)
-        $('#simulatedPassengersInputSliderValIndicator').html(simPas)
-      )
-      # Update the dataTable
-      Template.gritsDataTable.simId.set(simId)
-      # Set the total records
-      Session.set(GritsConstants.SESSION_KEY_TOTAL_RECORDS, simPas)
-      # Process the existing simulation
-      GritsFilterCriteria.processSimulation(simPas, simulation.get('simId'))
-      # Do not rerun initSharedSim
-      c.stop()
-    )
-
-_changeSimulatedPassengersHandler = (e) ->
-  val = parseInt($("#simulatedPassengersInputSlider").val(), 10)
-  if val isnt _wfStartVal
-    _wfStartVal = val
-    if _.isNaN(val)
-      val = null
-    $('#simulatedPassengersInputSliderValIndicator').empty().html(val)
-  return
 _changeSearchBarHandler = (e) ->
   combined = []
   tokens =  _searchBar.tokenfield('getTokens')
@@ -480,7 +402,7 @@ _changeEnableDateOverPeriodHandler = (e) ->
   else
     GritsFilterCriteria.enableDateOverPeriod.set(false)
   return
-_showThroughput = (e) ->
+_applyFilter = (e) ->
   if $(e.target).hasClass('disabled')
     return
   GritsFilterCriteria.apply()
@@ -495,16 +417,11 @@ Template.gritsSearch.events
         return
       GritsFilterCriteria.apply()
     return
-  'slideStop #simulatedPassengersInputSlider': _changeSimulatedPassengersHandler
-  'click #showThroughput': _showThroughput
+  'click #applyFilter': _applyFilter
   'change #limit': _changeLimitHandler
   'change #searchBar': _changeSearchBarHandler
   'dp.change': _changeDateHandler
   'dp.show': _showDateHandler
-  'click #toggleFilter': (e) ->
-    $self = $(e.currentTarget)
-    $("#filter").toggle("fast")
-    return
   'click #applyFilter': (event, template) ->
     GritsFilterCriteria.apply()
     return
