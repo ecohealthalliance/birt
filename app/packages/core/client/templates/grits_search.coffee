@@ -7,8 +7,8 @@ _initStartDate = null # onCreated will initialize the date through GritsFilterCr
 _initEndDate = null # onCreated will initialize the date through GritsFilterCriteria
 _initLimit = null # onCreated will initialize the limt through GritsFilterCriteria
 _searchBar = null # onRendered will set this to a typeahead object
-_effectiveDatePicker = null # onRendered will set this to a datetime picker object
-_discontinuedDatePicker = null # onRendered will set this to a datetime picker object
+_endDatePicker = null # onRendered will set this to a datetime picker object
+_startDatePicker = null # onRendered will set this to a datetime picker object
 _compareDatePicker = null # onRendered will set this to a datetime picker object
 _lastPeriod = 'months' # remember the last selected period when enable/disable compare date over interval, defaults to 'months'
 _animationRunning = new ReactiveVar(false)
@@ -72,28 +72,28 @@ _setSearchBar = (typeahead) ->
   _searchBar = typeahead
   return
 
-# returns the datetime picker object for the '#effectiveDate' input  with the label 'End'
+# returns the datetime picker object for the '#endDate' input  with the label 'End'
 #
 # @see http://eonasdan.github.io/bootstrap-datetimepicker/Functions/
 # @return [Object] datetimePicker object
-getEffectiveDatePicker = ->
-  return _effectiveDatePicker
+getEndDatePicker = ->
+  return _endDatePicker
 
-# sets the datetime picker object for the '#effectiveDate' input with the label 'End'
-_setEffectiveDatePicker = (datetimePicker) ->
-  _effectiveDatePicker = datetimePicker
+# sets the datetime picker object for the '#endDate' input with the label 'End'
+_setEndDatePicker = (datetimePicker) ->
+  _endDatePicker = datetimePicker
   return
 
-# returns the datetime picker object for the '#discontinuedDate' input with the label 'Start'
+# returns the datetime picker object for the '#startDate' input with the label 'Start'
 #
 # @see http://eonasdan.github.io/bootstrap-datetimepicker/Functions/
 # @return [Object] datetimePicker object
-getDiscontinuedDatePicker = ->
-  return _discontinuedDatePicker
+getStartDatePicker = ->
+  return _startDatePicker
 
-# sets the datetime picker object for the '#discontinuedDate' input
-_setDiscontinuedDatePicker = (datetimePicker) ->
-  _discontinuedDatePicker = datetimePicker
+# sets the datetime picker object for the '#startDate' input
+_setStartDatePicker = (datetimePicker) ->
+  _startDatePicker = datetimePicker
   return
 
 # returns the datetime picker object fro the '#compareDateOverPeriod' input with the label 'Compare Single Date'
@@ -287,8 +287,8 @@ Template.gritsSearch.onCreated ->
   # to the Template.gritsSearch as a global export
   Template.gritsSearch.getOrigin = getOrigin
   Template.gritsSearch.getSearchBar = getSearchBar
-  Template.gritsSearch.getEffectiveDatePicker = getEffectiveDatePicker
-  Template.gritsSearch.getDiscontinuedDatePicker = getDiscontinuedDatePicker
+  Template.gritsSearch.getEndDatePicker = getEndDatePicker
+  Template.gritsSearch.getStartDatePicker = getStartDatePicker
   Template.gritsSearch.getCompareDatePicker = getCompareDatePicker
   Template.gritsSearch.simulationProgress = _simulationProgress
   Template.gritsSearch.disableLimit = _disableLimit
@@ -321,13 +321,12 @@ Template.gritsSearch.onRendered ->
   options = {
     format: 'MM/DD/YY'
   }
-  effectiveDatePicker = $('#effectiveDate').datetimepicker(options)
-  effectiveDatePicker.data('DateTimePicker').widgetPositioning({vertical: 'bottom', horizontal: 'left'})
-  _setEffectiveDatePicker(effectiveDatePicker)
-
-  discontinuedDatePicker = $('#discontinuedDate').datetimepicker(options)
-  discontinuedDatePicker.data('DateTimePicker').widgetPositioning({vertical: 'bottom', horizontal: 'left'})
-  _setDiscontinuedDatePicker(discontinuedDatePicker)
+  startDatePicker = $('#startDate').datetimepicker(options)
+  startDatePicker.data('DateTimePicker').widgetPositioning({vertical: 'bottom', horizontal: 'left'})
+  _setStartDatePicker(startDatePicker)
+  endDatePicker = $('#endDate').datetimepicker(options)
+  endDatePicker.data('DateTimePicker').widgetPositioning({vertical: 'bottom', horizontal: 'left'})
+  _setEndDatePicker(endDatePicker)
 
   options = {
     format: 'MM/DD'
@@ -441,17 +440,17 @@ _changeSearchBarHandler = (e) ->
 _changeDateHandler = (e) ->
   $target = $(e.target)
   id = $target.attr('id')
-  if id == 'discontinuedDate'
-    if _.isNull(_discontinuedDatePicker)
+  if id == 'startDate'
+    if _.isNull(_startDatePicker)
       return
-    date = _discontinuedDatePicker.data('DateTimePicker').date()
+    date = _startDatePicker.data('DateTimePicker').date()
     GritsFilterCriteria.operatingDateRangeStart.set(date)
     Session.set('dateRangeStart', date.toDate())
     return
-  else if id == 'effectiveDate'
-    if _.isNull(_effectiveDatePicker)
+  else if id == 'endDate'
+    if _.isNull(_endDatePicker)
       return
-    date = _effectiveDatePicker.data('DateTimePicker').date()
+    date = _endDatePicker.data('DateTimePicker').date()
     GritsFilterCriteria.operatingDateRangeEnd.set(date)
     Session.set('dateRangeEnd', date.toDate())
     return
@@ -481,14 +480,6 @@ _changeEnableDateOverPeriodHandler = (e) ->
   else
     GritsFilterCriteria.enableDateOverPeriod.set(false)
   return
-_startSimulation = (e) ->
-  if $(e.target).hasClass('disabled')
-    return
-  simPas = parseInt($('#simulatedPassengersInputSlider').slider('getValue'), 10)
-  startDate = _discontinuedDatePicker.data('DateTimePicker').date().format('DD/MM/YYYY')
-  endDate = _effectiveDatePicker.data('DateTimePicker').date().format('DD/MM/YYYY')
-  GritsFilterCriteria.startSimulation(simPas, startDate, endDate)
-  return
 _showThroughput = (e) ->
   if $(e.target).hasClass('disabled')
     return
@@ -505,7 +496,6 @@ Template.gritsSearch.events
       GritsFilterCriteria.apply()
     return
   'slideStop #simulatedPassengersInputSlider': _changeSimulatedPassengersHandler
-  'click #startSimulation': _startSimulation
   'click #showThroughput': _showThroughput
   'change #limit': _changeLimitHandler
   'change #searchBar': _changeSearchBarHandler

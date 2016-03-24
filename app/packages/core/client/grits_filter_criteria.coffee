@@ -332,17 +332,17 @@ class GritsFilterCriteria
     # do not allow this to run prior to jQuery/DOM
     if _.isUndefined($)
       return
-    discontinuedDatePicker = Template.gritsSearch.getDiscontinuedDatePicker()
-    if _.isNull(discontinuedDatePicker)
+    startDatePicker = Template.gritsSearch.getStartDatePicker()
+    if _.isNull(startDatePicker)
       return
 
-    discontinuedDate = discontinuedDatePicker.data('DateTimePicker').date()
+    discontinuedDate = startDatePicker.data('DateTimePicker').date()
 
     if _.isNull(date) || _.isNull(discontinuedDate)
       if _.isEqual(date, discontinuedDate)
         self.remove('startDate')
       else
-        discontinuedDatePicker.data('DateTimePicker').date(null)
+        startDatePicker.data('DateTimePicker').date(null)
         self.operatingDateRangeStart.set(null)
       return
 
@@ -350,7 +350,7 @@ class GritsFilterCriteria
       # the reactive var is already set, change is from the UI
       self.createOrUpdate('startDate', {key: 'startDate', operator: '$gte', value: discontinuedDate})
     else
-      discontinuedDatePicker.data('DateTimePicker').date(date)
+      startDatePicker.data('DateTimePicker').date(date)
       self.operatingDateRangeStart.set(date)
     return
   trackOperatingDateRangeStart: ->
@@ -371,17 +371,17 @@ class GritsFilterCriteria
     # do not allow this to run prior to jQuery/DOM
     if _.isUndefined($)
       return
-    effectiveDatePicker = Template.gritsSearch.getEffectiveDatePicker()
-    if _.isNull(effectiveDatePicker)
+    endDatePicker = Template.gritsSearch.getEndDatePicker()
+    if _.isNull(endDatePicker)
       return
 
-    effectiveDate = effectiveDatePicker.data('DateTimePicker').date()
+    effectiveDate = endDatePicker.data('DateTimePicker').date()
 
     if _.isNull(date) || _.isNull(effectiveDate)
       if _.isEqual(date, effectiveDate)
         self.remove('endDate')
       else
-        effectiveDatePicker.data('DateTimePicker').date(null)
+        endDatePicker.data('DateTimePicker').date(null)
         self.operatingDateRangeEnd.set(null)
       return
 
@@ -389,7 +389,7 @@ class GritsFilterCriteria
       # the reactive var is already set, change is from the UI
       self.createOrUpdate('endDate', {key: 'endDate', operator: '$lt', value: effectiveDate})
     else
-      effectiveDatePicker.data('DateTimePicker').date(date)
+      endDatePicker.data('DateTimePicker').date(date)
       self.operatingDateRangeEnd.set(date)
     return
   trackOperatingDateRangeEnd: ->
