@@ -96,7 +96,6 @@ Package.onUse(function(api){
     'client/templates/grits_map.coffee',
     'client/templates/grits_search.html',
     'client/templates/grits_search.coffee',
-    'client/templates/loading.html',
     'client/templates/grits_overlay.html',
     'client/templates/grits_overlay.coffee'
   ], 'client');
