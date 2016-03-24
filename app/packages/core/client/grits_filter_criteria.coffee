@@ -473,10 +473,10 @@ class GritsFilterCriteria
         if !(_.isUndefined(Template.gritsMap) || _.isUndefined(Template.gritsMap.getInstance))
           map = Template.gritsMap.getInstance()
           if !_.isNull(map)
-            layerGroup = GritsLayerGroup.getCurrentLayerGroup()
+            heatmapLayerGroup = map.getGritsLayerGroup(GritsConstants.HEATMAP_GROUP_LAYER_ID)
             # clears the sub-layers and resets the layer group
-            if layerGroup != null
-              layerGroup.reset()
+            if heatmapLayerGroup != null
+              heatmapLayerGroup.reset()
     return
   # sets the limit input on the UI to the 'value'
   # specified, as well as, updating the underlying FilterCriteria.
