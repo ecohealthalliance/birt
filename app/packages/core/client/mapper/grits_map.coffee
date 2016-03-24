@@ -48,25 +48,11 @@ class GritsMap extends L.Map
 
   # creates the default layer groups required by the map
   _createDefaultLayerGroups: ->
-    # Add explore layers to a layer group then store to map
-    exploreLayers = {}
-    exploreLayers[GritsConstants.NODE_LAYER_ID] = new GritsNodeLayer(this, GritsConstants.NODE_LAYER_ID)
-    exploreLayers[GritsConstants.PATH_LAYER_ID] = new GritsPathLayer(this, GritsConstants.PATH_LAYER_ID)
-    exploreLayerGroup = new GritsLayerGroup(exploreLayers, this, GritsConstants.EXPLORE_GROUP_LAYER_ID, 'Explore')
-    exploreLayerGroup.add()
-    this.addGritsLayerGroup(exploreLayerGroup)
-
     # Add heatmap layer to a layer group then store to map
     heatmapLayers = {}
     heatmapLayers[GritsConstants.HEATMAP_LAYER_ID] = new GritsHeatmapLayer(this, GritsConstants.HEATMAP_LAYER_ID)
     heatmapLayerGroup = new GritsLayerGroup(heatmapLayers, this, GritsConstants.HEATMAP_GROUP_LAYER_ID, 'Heatmap')
     this.addGritsLayerGroup(heatmapLayerGroup)
-
-    # Add all nodes layers to a layer group then add to map
-    allNodesLayers = {}
-    allNodesLayers[GritsConstants.NODE_LAYER_ID] = new GritsAllNodesLayer(this)
-    allNodesLayerGroup = new GritsLayerGroup(allNodesLayers, this, GritsConstants.ALL_NODES_GROUP_LAYER_ID, 'All Nodes')
-    this.addGritsLayerGroup(allNodesLayerGroup)
 
   # adds a layer reference to the map object
   #

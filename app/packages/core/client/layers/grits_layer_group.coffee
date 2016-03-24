@@ -65,49 +65,9 @@ class GritsLayerGroup #extends L.layerGroup
     self.add()
     return
 
-  getNodeLayer: ->
-    self = this
-    return self._layers[GritsConstants.NODE_LAYER_ID]
-
-  getPathLayer: ->
-    self = this
-    return self._layers[GritsConstants.PATH_LAYER_ID]
-
   getHeatmapLayer: ->
     self = this
     return self._layers[GritsConstants.HEATMAP_LAYER_ID]
-
-  convertFlight: (flight, level, originTokens) ->
-    self = this
-    nodeLayer = self._layers[GritsConstants.NODE_LAYER_ID]
-    pathLayer = self._layers[GritsConstants.PATH_LAYER_ID]
-    nodes = nodeLayer.convertFlight(flight, level, originTokens)
-    # convertFlight may return null in the case of a metaNode
-    # which signifies that the node is contained within the bounding
-    # box, so do not draw a path
-    if (nodes[0] == null || nodes[1] == null)
-      return
-    pathLayer.convertFlight(flight, level, nodes[0], nodes[1])
-    return
-
-  convertItineraries: (fields, originToken) ->
-    self = this
-    nodeLayer = self._layers[GritsConstants.NODE_LAYER_ID]
-    pathLayer = self._layers[GritsConstants.PATH_LAYER_ID]
-    nodes = nodeLayer.convertItineraries(fields, originToken)
-    # convertFlight may return null in the case of a metaNode
-    # which signifies that the node is contained within the bounding
-    # box, so do not draw a path
-    if nodes[0] == null || nodes[1] == null
-      return
-    pathLayer.convertItineraries(fields, nodes[0], nodes[1])
-    return
-
-  updateLocations: (dateKey) ->
-    self = this
-    heatmapLayer = self._layers[GritsConstants.HEATMAP_LAYER_ID]
-    heatmapLayer.updateLocations(dateKey)
-    return
 
   draw: ->
     self = this
@@ -141,16 +101,3 @@ class GritsLayerGroup #extends L.layerGroup
     if self._layers.hasOwnProperty(id)
       return self._layers[id]
     return null
-
-_resetPreviousLayer = (newLayerGroup) ->
-  if _previousLayerGroup != null
-    if _previousLayerGroup._id != newLayerGroup._id
-      _previousLayerGroup.reset()
-  _previousLayerGroup = newLayerGroup
-  return
-
-GritsLayerGroup.getCurrentLayerGroup = ->
-  map = Template.gritsMap.getInstance()
-  layerGroup = map.getGritsLayerGroup(GritsConstants.EXPLORE_GROUP_LAYER_ID)
-  _resetPreviousLayer(layerGroup)
-  return layerGroup

@@ -8,7 +8,6 @@ Meteor.gritsUtil =
         toastr.error(err)
         console.error(err)
     Session.set(GritsConstants.SESSION_KEY_IS_UPDATING, false)
-    GritsFilterCriteria.isSimulationRunning.set(false)
     return
   # smooth out the rate at which the given function is called by queuing up calls
   # and spreading them out over time.

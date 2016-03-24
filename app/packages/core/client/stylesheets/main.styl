@@ -1,8 +1,6 @@
 @import 'variables.import'
 @import 'mixins.import'
-
 @import 'globals.import'
-
 @import 'sidebar.import'
 @import 'sidebar_table.import'
 @import 'birt.import'
@@ -19,72 +17,9 @@ body
 .bootstrap-datetimepicker-widget.dropdown-menu
   font-size small
 
-.element-details-container
-  position absolute
-  bottom 10px
-  right 20px
-  min-width 300px
-  border-radius 4px
-  border 5px solid $blue-transparent
-  font-family $fonts
-  .tab-content
-    padding 10px
-    background $whiteBG
-  .tab-pane
-    min-height 140px
-    .row
-      margin-bottom 3px
-
-.element-details-nav
-  position relative
-  background $whiteBG
-  border-bottom 1px solid rgba(226, 226, 226, 1)
-  > li
-    width auto
-    float left
-    border-right 1px solid #E2E2E2
-    &:last-of-type
-      border-right 0
-    > a
-      color $blue
-  .active
-    background #EFEFEF
-    font-weight bold
-
-.element-details-close
-  line-height inherit
-  position absolute
-  right 10px
-  top 50%
-  transform translate(0,-50%)
-
-.marker-icon
-  cursor pointer
-
 .tab-content
   overflow-x hidden
   overflow-y auto
-
-.nav-tabs > li.active > a
-.nav-tabs > li.active > a:hover
-.nav-tabs > li.active > a:focus
-  background-color $blue
-  color white
-
-.filter-tab-pane
-  padding 20px
-  .filter-group
-    margin-right 10px
-    margin-left 10px
-    margin-bottom 25px
-
-.filter-tabs
-  flexTabs(none, $l-gray, $ll-gray)
-
-.tableDivider
-  height 3px
-  background-color $blue
-  border-left solid #ddd 1px
 
 .date > span.input-group-addon
   background-color #ddd
@@ -96,22 +31,9 @@ body
   border-radius 5px
   filter-container-width()
 
-#filterLoading
-  display none
-
 #sidebar-layer
   layer-container-width()
   box-shadow 0 0px 0px rgba(0,0,0,0)
-
-.advFilHdr
-  text-align center
-  background-color lighten($m-gray,10%)
-  color #444
-  padding .3em
-  margin-bottom 0
-
-.dow
-  padding 0
 
 .applyFilter
   padding 5px
@@ -125,19 +47,6 @@ body
 
 .token-input
   font-size 1em
-
-.hamburger
-  float left
-  margin 2px
-
-.row-status-bar
-  margin 15px 5px 0 5px
-
-.col-status-bar
-  padding 0
-  > div
-    padding-right 0
-    padding-top 5px
 
 .status-bar
   border-top solid 2px #b7b7b7
@@ -175,28 +84,10 @@ body
 .leaflet-bottom.leaflet-right
   z-index 1001
 
-#mapLegendPanel
-	width 180px
-
 p.intro
 	line-height 1.5
 	margin 5px 0 35px 0
 	font-size larger
-
-.legend
-	font-size smaller
-	font-weight bold
-	margin-left 20px
-	display inline-block
-  position relative
-	top -22px
-	text-align left
-
-.legendBlock
-	width 17px
-	height 17px
-	vertical-align middle
-	display inline-block
 
 #container
 	width 100%
@@ -235,47 +126,6 @@ p.intro
 	.notice
 		font-size 11px
 
-.my-legend
-  padding 40px 40px 40px 35px
-  .legend-title
-    margin-bottom 8px
-    font-weight 600
-    font-size 20px
-
-  .legend-scale ul
-    margin 0
-    padding 0
-    list-style none
-    display flex
-
-  .legend-scale
-    ul
-      li
-        display block
-        flex-grow 1
-        text-align center
-        font-size 80%
-        list-style none
-
-  ul.legend-labels
-    margin-top 5px
-    border-radius 4px
-    li
-      span
-        display block
-        height 15px
-
-  .legend-source
-    font-size 70%
-    color #999
-    width 100%
-    margin-top 20px
-    text-align center
-
-  a
-    color #777
-
-
 .leaflet-heatmap-layer
   z-index -1
 
@@ -294,7 +144,6 @@ p.intro
   border-top 4px solid $blue
   border-bottom 1px solid $blue
   font-size 1em
-
 
 #searchIcon
   verticallyCenter()
@@ -347,47 +196,6 @@ p.intro
 .pager
   display inline
 
-.slider.slider-horizontal
-  width 225px
-  cursor pointer
-
-.slider-wrapper
-  max-width 225px
-  margin-bottom 50px
-
-.slider
-  &.slider-horizontal
-    .slider-handle
-      margin-left -7px
-      margin-top -6px
-
-.slider-handle
-  width 22px
-  height 22px
-  border 2px solid white
-  background lighten($blue, 10%)
-  transition background .1s
-  &:focus
-    outline 0
-    border-color darken($blue, 30%)
-    background darken($blue, 10%)
-  &:active
-    background $green
-    border-color white
-
-.min-slider-handle
-  opacity 1
-
-.max-slider-handle
-  opacity 1
-
-.slider-track
-  background-image: linear-gradient(to bottom, $ll-gray 0%, $l-gray 100%)
-
-.slider-selection
-  background-image none
-  background-color rgba(51, 122, 183, 0.25)
-
 .tt-suggestion
   position relative
   padding 5px 10px 5px 20%
@@ -405,7 +213,7 @@ p.intro
   strong
     color #000
 
-#flirtTitle
+#title
   background url("/packages/birt_core/public/images/birt-logo-inline.png")
   background-size 300px 100px
   background-position center center
@@ -414,13 +222,6 @@ p.intro
   margin 0px
   text-indent -9999px
   background-repeat no-repeat
-
-#flirtTitleText
-  float right
-  text-align left
-  margin-right 95px
-  font-size 70px
-  font-weight bold
 
 #loadMore
   margin-right 0px
@@ -432,10 +233,6 @@ p.intro
 #sidebar-search-tab
   position absolute
   top 140px
-
-#sidebar-slider-tab
-  position absolute
-  top 200px
 
 #sidebar-layer-tab
   position absolute
@@ -460,31 +257,6 @@ p.intro
   margin-top 2px
   margin-bottom 0
 
- .slider-range-labels
-   margin-top 3px
-
-.sliderValIndicator
-.sliderRangeIndicatorRight
-.sliderRangeIndicatorLeft
-  font-size .9em
-  color darken($d-gray, 20%)
-
-.sliderValIndicator
-  text-align right
-  font-weight 600
-
-.sliderRangeIndicatorRight
-.sliderRangeIndicatorLeft
-  margin-top 3px
-  width 50%
-  word-wrap break-word
-
-.sliderRangeIndicatorRight
-  text-align right
-
-.advancedFilterRow
-  padding 10px 15px 30px 10px
-
 .sidebar-tabs > li:hover
   color #333
 
@@ -498,82 +270,21 @@ p.intro
   margin 0px 10px 0px 0px
 
 .limitInput
-  width 82px
+  width 84px
   padding-left 0
   padding-right 10px
-
-.circle
-  float right
-  width 20px
-  height 20px
-  border-radius 50%
 
 .leaflet-control-layers-base
 .leaflet-control-layers-overlays
   padding-left 20px
   padding-right 20px
 
-.airport-footer
-  position absolute
-  bottom 0px
-
-.sidebar-tabs > li:hover
-  color #333
-
 .sidebar-highlight
   color #333
-
-#sidebar-draw-rectangle-tool
-  opacity .5
-  position absolute
-  width 50px
-  height 60px
-  bottom 75px
-  padding 15px 9px 0px 9px
-  cursor pointer
-  cursor hand
-
-#sidebar-draw-rectangle-tool:hover
-  opacity .75
-
-#sidebar-draw-rectangle-tool.sidebar-highlight
-  opacity 1
-
-.action-menu
-  display none
-  list-style none
-  position absolute
-  bottom 90px
-  right -105px
-  margin-top 5px
-  margin-left 5px
-  padding 0
-  white-space nowrap
-
-.action-menu li
-  display inline-block
-  margin-left 2px
-
-.action-menu div:hover
-  opacity .50
-
-.action-menu-btn
-  background-color $blue
-  color white
-
-.action-menu-btn-selected
-  background-color #333
-  opacity .75
-
-.action-menu span
-  font-size smaller
 
 .pager li > a, .pager li > span
   padding 5px 5px
   border-radius 8px
-
-canvas
-  z-index -1
 
 .datatable-container
   background-color white
@@ -590,15 +301,8 @@ canvas
   color $blue
   font-weight bold
 
-.risk-analysis-container
-  background-color white
-  margin-bottom 20px
-
 .datatable-hr
   border-bottom 2px solid $blue
-
-.progress
-  border-radius 0
 
 .filter
   display table;
@@ -652,12 +356,6 @@ canvas
 .btn-filter:hover
   color #eee
 
-#element-details
-  display none
-  position relative
-  right 15px
-  font-size smaller
-
 .leaflet-control-layers
   box-shadow none
   border-radius 0px
@@ -671,55 +369,11 @@ canvas
   font-weight 600
   font-size 20px
 
-#mode-toggle
-  display none /* hide until i18n loads in startup.coffee */
-
-.btn-mode
-  color #eee
-  border-color #537994
-  background-color #537994
-  padding-top 3px
-  padding-bottom 3px
-  width 100px
-  opacity .8
-  font-weight bold
-
-.btn-mode.active
-  border-color #537994
-  background-color #449d44
-
-.btn-mode:hover, .btn-mode.active:hover
-  border-color #537994
-  background-color #449d44
-
 .dataTable th
   text-align center
 
 .dtHidden
   display none
-
-.share-btn-container
-  padding-bottom 20px
-  font-size larger
-  margin-right 25px
-
-.share-btn
-  cursor pointer
-  padding 0 5px 0 5px
-  i
-    color white !important  /* overrides mixins.import */
-
-.share-link-container
-  display none
-  background-color white
-  opacity 1
-  margin 0 -15px 0 0
-  padding 10px 0 15px 0
-
-.share-link
-  width 100%
-  padding 0
-  line-height 1.3em
 
 .toast-error, .toast-info, .toast-warning, .toast-success
   width 70% !important
@@ -727,9 +381,3 @@ canvas
 
 .toast-message
   text-align center !important
-
-.simulator-running
-  position relative
-  right -5px
-  font-size larger
-  color #333

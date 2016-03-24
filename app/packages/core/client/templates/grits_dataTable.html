@@ -11,59 +11,26 @@
           <thead>
             <tr>
               <th>{{_ "gritsDataTable.explore.col1-heading"}}</th>
-              <th class="dtHidden">{{_ "gritsDataTable.explore.hidden-col1"}}</th>
-              <th class="dtHidden">{{_ "gritsDataTable.explore.hidden-col2"}}</th>
-              <th class="dtHidden">{{_ "gritsDataTable.explore.hidden-col3"}}</th>
-              <th class="dtHidden">{{_ "gritsDataTable.explore.hidden-col4"}}</th>
               <th>{{_ "gritsDataTable.explore.col2-heading"}}</th>
-              <th class="dtHidden">{{_ "gritsDataTable.explore.hidden-col5"}}</th>
-              <th class="dtHidden">{{_ "gritsDataTable.explore.hidden-col6"}}</th>
-              <th class="dtHidden">{{_ "gritsDataTable.explore.hidden-col7"}}</th>
-              <th class="dtHidden">{{_ "gritsDataTable.explore.hidden-col8"}}</th>
               <th>{{_ "gritsDataTable.explore.col3-heading"}}</th>
               <th>{{_ "gritsDataTable.explore.col4-heading"}}</th>
             </tr>
           </thead>
           <tbody>
-            {{#with paths}}
-              {{#each paths}}
+            {{#with migrations}}
+              {{#each migrations}}
                 <tr class="pathTableRow" data-id="{{this._id}}" >
                   <td>
-                    {{this.origin._id}}
-                  </td>
-                  <td class="dtHidden">
-                    {{getNodeName this.origin}}
-                  </td>
-                  <td class="dtHidden">
-                    {{getNodeCity this.origin}}
-                  </td>
-                  <td class="dtHidden">
-                    {{getNodeState this.origin}}
-                  </td>
-                  <td class="dtHidden">
-                    {{getNodeCountry this.origin}}
+
                   </td>
                   <td>
-                    {{this.destination._id}}
-                  </td>
-                  <td class="dtHidden">
-                    {{getNodeName this.destination}}
-                  </td>
-                  <td class="dtHidden">
-                    {{getNodeCity this.destination}}
-                  </td>
-                  <td class="dtHidden">
-                    {{getNodeState this.destination}}
-                  </td>
-                  <td class="dtHidden">
-                    {{getNodeCountry this.destination}}
+
                   </td>
                   <td>
-                    {{this.occurrences}}
+
                   </td>
                   <td>
-                    {{this.throughput}}
-                    <div class="circle" style="background-color: {{getPathThroughputColor this}}"></div>
+                    
                   </td>
                 </tr>
               {{/each}}

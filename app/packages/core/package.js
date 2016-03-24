@@ -12,7 +12,6 @@ Package.onUse(function(api){
     'coffeescript',
     'mongo',
     'reactive-var',
-    'reactive-dict',
     'http',
     'jagi:astronomy@1.2.5',
     'jagi:astronomy-validators@1.1.1',
@@ -21,21 +20,16 @@ Package.onUse(function(api){
     'mquandalle:stylus@1.1.1',
     'jparker:crypto-md5@0.1.1',
     'bevanhunt:leaflet@0.3.18',
-    'brylie:leaflet-heat@0.1.0',
     'fortawesome:fontawesome@4.4.0',
-    'd3js:d3@3.5.5',
     'fourq:typeahead@1.0.0',
     'ajduke:bootstrap-tokenfield@0.5.0',
     'flawless:meteor-toastr@1.0.1',
     'meteorhacks:aggregate@1.3.0',
     'momentjs:moment@2.10.6',
     'jaywon:meteor-node-uuid@1.0.1',
-    'kidovate:bootstrap-slider@0.0.5',
     'tsega:bootstrap3-datetimepicker@4.17.37_1',
     'halunka:i18n@1.1.1',
     'kevbuk:moment-range@2.2.2',
-    'kadira:flow-router@2.10.1',
-    'zenorocha:clipboard@1.5.8',
     'andrei:tablesorter@0.0.1',
     'okgrow:analytics@1.0.4',
     'grits:flirt-sidebar@0.0.1'
@@ -51,14 +45,8 @@ Package.onUse(function(api){
 
   // both client and server files
   api.addFiles([
-    'models/airports.coffee',
-    'models/flights.coffee',
-    'models/heatmaps.coffee',
-    'models/itineraries.coffee',
-    'models/simulations.coffee',
     'models/birds.coffee',
-    'models/migrations.coffee',
-    'lib/routes.coffee'
+    'models/migrations.coffee'
   ]);
 
   // client-side only files
@@ -72,25 +60,16 @@ Package.onUse(function(api){
     'client/stylesheets/birt.import.styl',
     'client/stylesheets/main.styl',
     'client/stylesheets/overlay.styl',
-    'client/lib/L.D3SvgOverlay.min.js',
     'client/lib/tableExport.min.js',
     'client/lib/webgl-heatmap.js',
     'client/lib/webgl-heatmap-leaflet.js',
     'client/grits_constants.coffee',
     'client/mapper/grits_layer.coffee',
-    'client/mapper/grits_marker.coffee',
-    'client/mapper/grits_node.coffee',
-    'client/mapper/grits_path.coffee',
-    'client/mapper/grits_meta_node.coffee',
     'client/mapper/grits_map.coffee',
-    'client/mapper/grits_bounding_box.coffee',
     'client/startup.coffee',
     'client/grits_util.coffee',
     'client/grits_filter_criteria.coffee',
     'client/layers/grits_layer_group.coffee',
-    'client/layers/grits_nodes.coffee',
-    'client/layers/grits_all_nodes.coffee',
-    'client/layers/grits_paths.coffee',
     'client/layers/grits_heatmap.coffee',
     'client/templates/header.html',
     'client/templates/grits_dataTable.html',
@@ -104,11 +83,6 @@ Package.onUse(function(api){
     'client/templates/grits_map.coffee',
     'client/templates/grits_search.html',
     'client/templates/grits_search.coffee',
-    'client/templates/grits_legend.html',
-    'client/templates/grits_legend.coffee',
-    'client/templates/grits_elementDetails.html',
-    'client/templates/grits_elementDetails.coffee',
-    'client/templates/loading.html',
     'client/templates/grits_overlay.html',
     'client/templates/grits_overlay.coffee'
   ], 'client');
@@ -118,7 +92,6 @@ Package.onUse(function(api){
     'public/images/asc.png',
     'public/images/birt-logo-inline.png',
     'public/images/desc.png',
-    'public/images/flirt.png',
     'public/images/origin-marker-icon.svg',
     'public/images/viridis.png'
   ], 'client');
@@ -132,37 +105,16 @@ Package.onUse(function(api){
 
   // public API, client and server
   api.export([
-    'FlowRouter',
-    'Airport',
-    'Airports',
-    'Flight',
-    'Flights',
-    'Heatmap',
-    'Heatmaps',
-    'Simulation',
-    'Simulations',
     'Bird',
     'Birds',
     'Migrations',
     'GritsConstants',
-    'GritsBoundingBox',
-    'GritsControl',
     'GritsFilterCriteria',
     'GritsLayer',
     'GritsLayerGroup',
     'GritsMap',
-    'GritsMarker',
-    'GritsMetaNode',
-    'GritsNode',
-    'GritsPath',
     'GritsHeatmapLayer',
-    'GritsNodeLayer',
-    'GritsAllNodesLayer',
-    'GritsPathLayer',
-    'Itinerary',
-    'Itineraries',
-    'i18n',
-    'moment'
+    'i18n'
   ]);
 });
 

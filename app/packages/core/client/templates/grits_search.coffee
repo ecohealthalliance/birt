@@ -6,15 +6,15 @@ _init = true # flag, set to false when initialization is done
 _initStartDate = null # onCreated will initialize the date through GritsFilterCriteria
 _initEndDate = null # onCreated will initialize the date through GritsFilterCriteria
 _initLimit = null # onCreated will initialize the limt through GritsFilterCriteria
-_departureSearchMain = null # onRendered will set this to a typeahead object
-_effectiveDatePicker = null # onRendered will set this to a datetime picker object
-_discontinuedDatePicker = null # onRendered will set this to a datetime picker object
+_searchBar = null # onRendered will set this to a typeahead object
+_endDatePicker = null # onRendered will set this to a datetime picker object
+_startDatePicker = null # onRendered will set this to a datetime picker object
 _compareDatePicker = null # onRendered will set this to a datetime picker object
 _lastPeriod = 'months' # remember the last selected period when enable/disable compare date over interval, defaults to 'months'
 _animationRunning = new ReactiveVar(false)
 _matchSkip = null # the amount to skip during typeahead pagination
-_simulationProgress = new ReactiveVar(0)
 _disableLimit = new ReactiveVar(false) # toggle if we will allow limit/skip
+# the underscore template for the typeahead result
 _suggestionTemplate = _.template('
   <span class="typeahead-code"><%= raw._id %></span><br/>
   <span class="typeahead-info">
@@ -47,53 +47,40 @@ _typeaheadFooter = _.template('
     </div>
   </div>')
 
-# returns the first origin within GritsFilterCriteria
-#
-# @return [String] origin, a string airport IATA code
-getOrigin = ->
-  query = GritsFilterCriteria.getQueryObject()
-  if _.has(query, 'departureAirport._id')
-    # the filter has an array of airports
-    if _.has(query['departureAirport._id'], '$in')
-      origins = query['departureAirport._id']['$in']
-      if _.isArray(origins) and origins.length > 0
-        return origins[0]
-  return null
-
-# returns the typeahead object for the '#departureSearchMain' input
+# returns the typeahead object for the '#searchBar' input
 #
 # @see: http://sliptree.github.io/bootstrap-tokenfield/#methods
 # @return [Object] typeahead
-getDepartureSearchMain = ->
-  return _departureSearchMain
+getSearchBar = ->
+  return _searchBar
 
-# sets the typeahead object for the '#departureSearchMain' input
-_setDepartureSearchMain = (typeahead) ->
-  _departureSearchMain = typeahead
+# sets the typeahead object for the '#searchBar' input
+_setSearchBar = (typeahead) ->
+  _searchBar = typeahead
   return
 
-# returns the datetime picker object for the '#effectiveDate' input  with the label 'End'
+# returns the datetime picker object for the '#endDate' input  with the label 'End'
 #
 # @see http://eonasdan.github.io/bootstrap-datetimepicker/Functions/
 # @return [Object] datetimePicker object
-getEffectiveDatePicker = ->
-  return _effectiveDatePicker
+getEndDatePicker = ->
+  return _endDatePicker
 
-# sets the datetime picker object for the '#effectiveDate' input with the label 'End'
-_setEffectiveDatePicker = (datetimePicker) ->
-  _effectiveDatePicker = datetimePicker
+# sets the datetime picker object for the '#endDate' input with the label 'End'
+_setEndDatePicker = (datetimePicker) ->
+  _endDatePicker = datetimePicker
   return
 
-# returns the datetime picker object for the '#discontinuedDate' input with the label 'Start'
+# returns the datetime picker object for the '#startDate' input with the label 'Start'
 #
 # @see http://eonasdan.github.io/bootstrap-datetimepicker/Functions/
 # @return [Object] datetimePicker object
-getDiscontinuedDatePicker = ->
-  return _discontinuedDatePicker
+getStartDatePicker = ->
+  return _startDatePicker
 
-# sets the datetime picker object for the '#discontinuedDate' input
-_setDiscontinuedDatePicker = (datetimePicker) ->
-  _discontinuedDatePicker = datetimePicker
+# sets the datetime picker object for the '#startDate' input
+_setStartDatePicker = (datetimePicker) ->
+  _startDatePicker = datetimePicker
   return
 
 # returns the datetime picker object fro the '#compareDateOverPeriod' input with the label 'Compare Single Date'
@@ -161,7 +148,7 @@ _determineFieldMatchesByWeight = (input, res) ->
     console.log('matches:', matches)
   return matches
 
-# method to generate suggestions and drive the pagination feature
+# recursive method to generate suggestions and drive the pagination feature
 _suggestionGenerator = (query, skip, callback) ->
   _matchSkip = skip
   Meteor.call('typeahead', 'birds', query, skip, (err, res) ->
@@ -225,11 +212,6 @@ _suggestionGenerator = (query, skip, callback) ->
   )
   return
 
-# resets the simulation-progress bars
-_resetSimulationProgress = ->
-  _simulationProgress.set(0)
-  $('.simulation-progress').css({width: '0%'})
-
 # sets an object to be used by Meteors' Blaze templating engine (views)
 Template.gritsSearch.helpers({
   isAnimationRunning: ->
@@ -248,8 +230,6 @@ Template.gritsSearch.helpers({
       return false
   GritsConstants: ->
     return GritsConstants
-  isSimulatorRunning: ->
-    return GritsFilterCriteria.isSimulatorRunning.get()
   loadedRecords: ->
     return Session.get(GritsConstants.SESSION_KEY_LOADED_RECORDS)
   totalRecords: ->
@@ -310,10 +290,13 @@ Template.gritsSearch.onCreated ->
       params =
         season: season
         birds: [token]
+      Template.gritsOverlay.show()
       Meteor.call 'migrationsBySeason', params, (err, result)->
+        Template.gritsOverlay.hide()
         if err
           console.log err
           alert("Server error while computing migrations for season.")
+        console.log('result: ', result)
         map = Template.gritsMap.getInstance()
         # reset the historical heatmap
         heatmapLayerGroup = map.getGritsLayerGroup(GritsConstants.HEATMAP_GROUP_LAYER_ID)
@@ -323,22 +306,20 @@ Template.gritsSearch.onCreated ->
             season,
             doc,
             token)
-        heatmapLayerGroup.updateLocations(season)
+        heatmapLayerGroup.draw()
   # Public API
   # Currently we declare methods above for documentation purposes then assign
   # to the Template.gritsSearch as a global export
-  Template.gritsSearch.getOrigin = getOrigin
-  Template.gritsSearch.getDepartureSearchMain = getDepartureSearchMain
-  Template.gritsSearch.getEffectiveDatePicker = getEffectiveDatePicker
-  Template.gritsSearch.getDiscontinuedDatePicker = getDiscontinuedDatePicker
+  Template.gritsSearch.getSearchBar = getSearchBar
+  Template.gritsSearch.getEndDatePicker = getEndDatePicker
+  Template.gritsSearch.getStartDatePicker = getStartDatePicker
   Template.gritsSearch.getCompareDatePicker = getCompareDatePicker
-  Template.gritsSearch.simulationProgress = _simulationProgress
   Template.gritsSearch.disableLimit = _disableLimit
 
 # triggered when the 'gritsSearch' template is rendered
 Template.gritsSearch.onRendered ->
 
-  departureSearchMain = $('#departureSearchMain').tokenfield({
+  searchBar = $('#searchBar').tokenfield({
     typeahead: [{hint: false, highlight: true}, {
       display: (match) ->
         if _.isUndefined(match)
@@ -352,7 +333,7 @@ Template.gritsSearch.onRendered ->
         return
     }]
   })
-  _setDepartureSearchMain(departureSearchMain)
+  _setSearchBar(searchBar)
 
   # Toast notification options
   toastr.options = {
@@ -360,16 +341,16 @@ Template.gritsSearch.onRendered ->
     preventDuplicates: true,
   }
 
+  # initialize the DateTimePickers
   options = {
     format: 'MM/DD/YY'
   }
-  effectiveDatePicker = $('#effectiveDate').datetimepicker(options)
-  effectiveDatePicker.data('DateTimePicker').widgetPositioning({vertical: 'bottom', horizontal: 'left'})
-  _setEffectiveDatePicker(effectiveDatePicker)
-
-  discontinuedDatePicker = $('#discontinuedDate').datetimepicker(options)
-  discontinuedDatePicker.data('DateTimePicker').widgetPositioning({vertical: 'bottom', horizontal: 'left'})
-  _setDiscontinuedDatePicker(discontinuedDatePicker)
+  startDatePicker = $('#startDate').datetimepicker(options)
+  startDatePicker.data('DateTimePicker').widgetPositioning({vertical: 'bottom', horizontal: 'left'})
+  _setStartDatePicker(startDatePicker)
+  endDatePicker = $('#endDate').datetimepicker(options)
+  endDatePicker.data('DateTimePicker').widgetPositioning({vertical: 'bottom', horizontal: 'left'})
+  _setEndDatePicker(endDatePicker)
 
   options = {
     format: 'MM/DD'
@@ -378,17 +359,6 @@ Template.gritsSearch.onRendered ->
   compareDatePicker.data('DateTimePicker').widgetPositioning({vertical: 'top', horizontal: 'left'})
   compareDatePicker.data('DateTimePicker').disable()
   _setCompareDatePicker(compareDatePicker)
-
-  # set the original state of the filter on document ready
-  GritsFilterCriteria.setState()
-
-  Meteor.autorun (c) ->
-    departures = GritsFilterCriteria.tokens.get()
-    if departures.length == 0
-      _resetSimulationProgress()
-      if !c.firstRun
-        # reset the route when the departures are cleared
-        FlowRouter.go('/')
 
   # enable/disable the compareDatePicker and periods 'days', 'weeks', 'months'
   # when the reactive var enableDateOverPeriod changes.
@@ -422,57 +392,9 @@ Template.gritsSearch.onRendered ->
         # disable the [More] button
         $('#loadMore').prop('disabled', true)
 
-  # Determine if the router set a simId
-  # @see lib/router.coffee
-  Meteor.autorun (c) ->
-    simId = Session.get(GritsConstants.SESSION_KEY_SHARED_SIMID)
-    if _.isUndefined(simId)
-      return
-    # mark the simulator as running
-    GritsFilterCriteria.isSimulatorRunning.set(true)
-    Meteor.call('findSimulationBySimId', simId, (err, simulation) ->
-      if err
-        Meteor.gritsUtil.errorHandler(err)
-        console.error(err)
-        return
-      if _.isEmpty(simulation)
-        Meteor.gritsUtil.errorHandler({message: 'Invalid simulation'})
-        return
-      # get the values from the simulation
-      startDate = moment.utc(simulation.get('startDate'))
-      endDate = moment.utc(simulation.get('endDate'))
-      tokens = simulation.get('departureNodes')
-      simPas = simulation.get('numberPassengers')
-      # update the filter and UI elements
-      GritsFilterCriteria.setOperatingDateRangeStart(startDate)
-      GritsFilterCriteria.setOperatingDateRangeEnd(endDate)
-      GritsFilterCriteria.setDepartures(tokens)
-      # GritsFilterCriteria does not have a interface for the simulatedPassengersInputSlider
-      async.nextTick(->
-        $('#simulatedPassengersInputSlider').slider('setValue', simPas)
-        $('#simulatedPassengersInputSliderValIndicator').html(simPas)
-      )
-      # Update the dataTable
-      Template.gritsDataTable.simId.set(simId)
-      # Set the total records
-      Session.set(GritsConstants.SESSION_KEY_TOTAL_RECORDS, simPas)
-      # Process the existing simulation
-      GritsFilterCriteria.processSimulation(simPas, simulation.get('simId'))
-      # Do not rerun initSharedSim
-      c.stop()
-    )
-
-_changeSimulatedPassengersHandler = (e) ->
-  val = parseInt($("#simulatedPassengersInputSlider").val(), 10)
-  if val isnt _wfStartVal
-    _wfStartVal = val
-    if _.isNaN(val)
-      val = null
-    $('#simulatedPassengersInputSliderValIndicator').empty().html(val)
-  return
-_changeDepartureHandler = (e) ->
+_changeSearchBarHandler = (e) ->
   combined = []
-  tokens =  _departureSearchMain.tokenfield('getTokens')
+  tokens =  _searchBar.tokenfield('getTokens')
   codes = _.pluck(tokens, 'label')
   combined = _.union(codes, combined)
   if _.isEqual(combined, GritsFilterCriteria.tokens.get())
@@ -483,17 +405,17 @@ _changeDepartureHandler = (e) ->
 _changeDateHandler = (e) ->
   $target = $(e.target)
   id = $target.attr('id')
-  if id == 'discontinuedDate'
-    if _.isNull(_discontinuedDatePicker)
+  if id == 'startDate'
+    if _.isNull(_startDatePicker)
       return
-    date = _discontinuedDatePicker.data('DateTimePicker').date()
+    date = _startDatePicker.data('DateTimePicker').date()
     GritsFilterCriteria.operatingDateRangeStart.set(date)
     Session.set('dateRangeStart', date.toDate())
     return
-  else if id == 'effectiveDate'
-    if _.isNull(_effectiveDatePicker)
+  else if id == 'endDate'
+    if _.isNull(_endDatePicker)
       return
-    date = _effectiveDatePicker.data('DateTimePicker').date()
+    date = _endDatePicker.data('DateTimePicker').date()
     GritsFilterCriteria.operatingDateRangeEnd.set(date)
     Session.set('dateRangeEnd', date.toDate())
     return
@@ -523,15 +445,7 @@ _changeEnableDateOverPeriodHandler = (e) ->
   else
     GritsFilterCriteria.enableDateOverPeriod.set(false)
   return
-_startSimulation = (e) ->
-  if $(e.target).hasClass('disabled')
-    return
-  simPas = parseInt($('#simulatedPassengersInputSlider').slider('getValue'), 10)
-  startDate = _discontinuedDatePicker.data('DateTimePicker').date().format('DD/MM/YYYY')
-  endDate = _effectiveDatePicker.data('DateTimePicker').date().format('DD/MM/YYYY')
-  GritsFilterCriteria.startSimulation(simPas, startDate, endDate)
-  return
-_showThroughput = (e) ->
+_applyFilter = (e) ->
   if $(e.target).hasClass('disabled')
     return
   GritsFilterCriteria.apply()
@@ -540,51 +454,17 @@ _showThroughput = (e) ->
 #
 # Event handlers for the grits_filter.html template
 Template.gritsSearch.events
-  'keyup #departureSearchMain-tokenfield': (e) ->
+  'keyup #searchBar-tokenfield': (e) ->
     if e.keyCode == 13
       if $(e.target).hasClass('disabled')
         return
       GritsFilterCriteria.apply()
     return
-  'slideStop #simulatedPassengersInputSlider': _changeSimulatedPassengersHandler
-  'click #startSimulation': _startSimulation
-  'click #showThroughput': _showThroughput
+  'click #applyFilter': _applyFilter
   'change #limit': _changeLimitHandler
-  'change #departureSearchMain': _changeDepartureHandler
+  'change #searchBar': _changeSearchBarHandler
   'dp.change': _changeDateHandler
   'dp.show': _showDateHandler
-  'click #includeNearbyAirports': (event) ->
-    miles = parseInt($("#includeNearbyAirportsRadius").val(), 10)
-    departures = GritsFilterCriteria.tokens.get()
-
-    if departures.length <= 0
-      toastr.error(i18n.get('includeNearbyRequired'))
-      return false
-
-    if (departures[0].indexOf(GritsMetaNode.PREFIX) >= 0)
-      toastr.error(i18n.get('includeNearbyMetaNode'))
-      return false
-
-    if $('#includeNearbyAirports').is(':checked')
-      Session.set(GritsConstants.SESSION_KEY_IS_UPDATING, true)
-      Meteor.call('findNearbyAirports', departures[0], miles, (err, airports) ->
-        if err
-          Meteor.gritsUtil.errorHandler(err)
-          return
-
-        nearbyTokens = _.pluck(airports, '_id')
-        union = _.union(departures, nearbyTokens)
-        _departureSearchMain.tokenfield('setTokens', union)
-        Session.set(GritsConstants.SESSION_KEY_IS_UPDATING, false)
-      )
-    else
-      departureSearch = getDepartureSearchMain()
-      departureSearch.tokenfield('setTokens', departures)
-    return
-  'click #toggleFilter': (e) ->
-    $self = $(e.currentTarget)
-    $("#filter").toggle("fast")
-    return
   'click #applyFilter': (event, template) ->
     GritsFilterCriteria.apply()
     return
@@ -630,11 +510,6 @@ Template.gritsSearch.events
   'tokenfield:removedtoken': (e) ->
     $target = $(e.target)
     tokens = $target.tokenfield('getTokens')
-    # determine if the remaining tokens is empty, then show the placeholder text
-    if tokens.length == 0
-      if $target.attr('id') in ['departureSearchMain']
-        $('#includeNearbyAirports').prop('checked', false)
-
     token = e.attrs.label
     return false
   'change #period': _changePeriodHandler
