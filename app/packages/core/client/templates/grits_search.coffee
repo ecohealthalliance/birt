@@ -6,7 +6,7 @@ _init = true # flag, set to false when initialization is done
 _initStartDate = null # onCreated will initialize the date through GritsFilterCriteria
 _initEndDate = null # onCreated will initialize the date through GritsFilterCriteria
 _initLimit = null # onCreated will initialize the limt through GritsFilterCriteria
-_departureSearchMain = null # onRendered will set this to a typeahead object
+_searchBar = null # onRendered will set this to a typeahead object
 _effectiveDatePicker = null # onRendered will set this to a datetime picker object
 _discontinuedDatePicker = null # onRendered will set this to a datetime picker object
 _compareDatePicker = null # onRendered will set this to a datetime picker object
@@ -60,16 +60,16 @@ getOrigin = ->
         return origins[0]
   return null
 
-# returns the typeahead object for the '#departureSearchMain' input
+# returns the typeahead object for the '#searchBar' input
 #
 # @see: http://sliptree.github.io/bootstrap-tokenfield/#methods
 # @return [Object] typeahead
-getDepartureSearchMain = ->
-  return _departureSearchMain
+getSearchBar = ->
+  return _searchBar
 
-# sets the typeahead object for the '#departureSearchMain' input
-_setDepartureSearchMain = (typeahead) ->
-  _departureSearchMain = typeahead
+# sets the typeahead object for the '#searchBar' input
+_setSearchBar = (typeahead) ->
+  _searchBar = typeahead
   return
 
 # returns the datetime picker object for the '#effectiveDate' input  with the label 'End'
@@ -286,7 +286,7 @@ Template.gritsSearch.onCreated ->
   # Currently we declare methods above for documentation purposes then assign
   # to the Template.gritsSearch as a global export
   Template.gritsSearch.getOrigin = getOrigin
-  Template.gritsSearch.getDepartureSearchMain = getDepartureSearchMain
+  Template.gritsSearch.getSearchBar = getSearchBar
   Template.gritsSearch.getEffectiveDatePicker = getEffectiveDatePicker
   Template.gritsSearch.getDiscontinuedDatePicker = getDiscontinuedDatePicker
   Template.gritsSearch.getCompareDatePicker = getCompareDatePicker
@@ -296,7 +296,7 @@ Template.gritsSearch.onCreated ->
 # triggered when the 'gritsSearch' template is rendered
 Template.gritsSearch.onRendered ->
 
-  departureSearchMain = $('#departureSearchMain').tokenfield({
+  searchBar = $('#searchBar').tokenfield({
     typeahead: [{hint: false, highlight: true}, {
       display: (match) ->
         if _.isUndefined(match)
@@ -310,7 +310,7 @@ Template.gritsSearch.onRendered ->
         return
     }]
   })
-  _setDepartureSearchMain(departureSearchMain)
+  _setSearchBar(searchBar)
 
   # Toast notification options
   toastr.options = {
@@ -428,9 +428,9 @@ _changeSimulatedPassengersHandler = (e) ->
       val = null
     $('#simulatedPassengersInputSliderValIndicator').empty().html(val)
   return
-_changeDepartureHandler = (e) ->
+_changeSearchBarHandler = (e) ->
   combined = []
-  tokens =  _departureSearchMain.tokenfield('getTokens')
+  tokens =  _searchBar.tokenfield('getTokens')
   codes = _.pluck(tokens, 'label')
   combined = _.union(codes, combined)
   if _.isEqual(combined, GritsFilterCriteria.tokens.get())
@@ -498,7 +498,7 @@ _showThroughput = (e) ->
 #
 # Event handlers for the grits_filter.html template
 Template.gritsSearch.events
-  'keyup #departureSearchMain-tokenfield': (e) ->
+  'keyup #searchBar-tokenfield': (e) ->
     if e.keyCode == 13
       if $(e.target).hasClass('disabled')
         return
@@ -508,7 +508,7 @@ Template.gritsSearch.events
   'click #startSimulation': _startSimulation
   'click #showThroughput': _showThroughput
   'change #limit': _changeLimitHandler
-  'change #departureSearchMain': _changeDepartureHandler
+  'change #searchBar': _changeSearchBarHandler
   'dp.change': _changeDateHandler
   'dp.show': _showDateHandler
   'click #toggleFilter': (e) ->
