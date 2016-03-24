@@ -230,8 +230,6 @@ Template.gritsSearch.helpers({
       return false
   GritsConstants: ->
     return GritsConstants
-  isSimulatorRunning: ->
-    return GritsFilterCriteria.isSimulatorRunning.get()
   loadedRecords: ->
     return Session.get(GritsConstants.SESSION_KEY_LOADED_RECORDS)
   totalRecords: ->
