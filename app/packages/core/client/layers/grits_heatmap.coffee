@@ -224,7 +224,7 @@ GritsHeatmapLayer.startAnimation = (startDate, endDate, period, documents, token
 
   # throttle how many updates to the global session counter
   throttleCount = _.throttle((count) ->
-    Session.set(GritsConstants.SESSION_KEY_LOADED_RECORDS , count)
+    Session.set(GritsConstants.SESSION_KEY_LOADED_RECORDS, count)
   , 250)
 
   # get the current count, may not be zero in case of a limit/offset
