@@ -51,14 +51,8 @@ Package.onUse(function(api){
 
   // both client and server files
   api.addFiles([
-    'models/airports.coffee',
-    'models/flights.coffee',
-    'models/heatmaps.coffee',
-    'models/itineraries.coffee',
-    'models/simulations.coffee',
     'models/birds.coffee',
-    'models/migrations.coffee',
-    'lib/routes.coffee'
+    'models/migrations.coffee'
   ]);
 
   // client-side only files
@@ -119,30 +113,16 @@ Package.onUse(function(api){
 
   // public API, client and server
   api.export([
-    'FlowRouter',
-    'Airport',
-    'Airports',
-    'Flight',
-    'Flights',
-    'Heatmap',
-    'Heatmaps',
-    'Simulation',
-    'Simulations',
     'Bird',
     'Birds',
     'Migrations',
     'GritsConstants',
-    'GritsControl',
     'GritsFilterCriteria',
     'GritsLayer',
     'GritsLayerGroup',
     'GritsMap',
-    'GritsMarker',
     'GritsHeatmapLayer',
-    'Itinerary',
-    'Itineraries',
-    'i18n',
-    'moment'
+    'i18n'
   ]);
 });
 
