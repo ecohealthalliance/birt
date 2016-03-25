@@ -135,10 +135,14 @@ GritsHeatmapLayer.resetLocations = () ->
 #
 # @param [String] dateKey, the current animation frame
 # @param [Array] doc, the GeoJSON mongoDB document
-# @param [String] token, the token from the filter
-GritsHeatmapLayer.createLocation = (dateKey, doc, token) ->
+# @param [Array] tokens, the tokens from the filter
+GritsHeatmapLayer.createLocation = (dateKey, doc, tokens) ->
   id = CryptoJS.MD5(JSON.stringify(doc.loc)).toString()
-  count = doc[token] / 1000  # the count that is embedded into the mongo document
+  count = 0
+  _.map(tokens, (t) ->
+    if doc.hasOwnProperty(t)
+      count += doc[t] / 1000
+  )
   idx = GritsHeatmapLayer.findIndex(dateKey, id)
   if idx < 0
     location = [] # create new location if undefined
@@ -157,8 +161,8 @@ GritsHeatmapLayer.createLocation = (dateKey, doc, token) ->
 #
 # @param [String] dateKey, the current animation frame
 # @param [Array] documents, the array of GeoJSON documents from mongoDB
-# @param [String] token, the token from the filter
-GritsHeatmapLayer.decayLocations = (dateKey, documents, token) ->
+# @param [Array] tokens, the tokens from the filter
+GritsHeatmapLayer.decayLocations = (dateKey, documents, tokens) ->
   # the GritsMap instance
   map = Template.gritsMap.getInstance()
   heatmapLayerGroup = map.getGritsLayerGroup(GritsConstants.HEATMAP_GROUP_LAYER_ID)
@@ -176,8 +180,13 @@ GritsHeatmapLayer.decayLocations = (dateKey, documents, token) ->
       id = CryptoJS.MD5(JSON.stringify(doc.loc)).toString()
       idx = GritsHeatmapLayer.findIndex(dateKey, id)
       if idx >= 0
+        count = 0
+        _.map(tokens, (t) ->
+          if doc.hasOwnProperty(t)
+            count += doc[t] / 1000
+        )
         location = _locations[idx]
-        location[2] -= doc[token] / 1000
+        location[2] -= count
         throttleDraw(dateKey)
       next()
     , interval)
@@ -190,9 +199,9 @@ GritsHeatmapLayer.decayLocations = (dateKey, documents, token) ->
 # @param [Date] endDate, the endDate from the filter
 # @param [String] period, the period determines the number of frames to the animation, 'days', 'weeks', 'months', 'years'
 # @param [Array] documents, the array of GeoJSON documents from mongoDB
-# @param [String] token, the token from the filter
+# @param [Array] tokens, the tokens from the filter
 # @param [Number] offset, the offset from the filter
-GritsHeatmapLayer.startAnimation = (startDate, endDate, period, documents, token, offset) ->
+GritsHeatmapLayer.startAnimation = (startDate, endDate, period, documents, tokens, offset) ->
   # the GritsMap instance
   map = Template.gritsMap.getInstance()
   heatmapLayerGroup = map.getGritsLayerGroup(GritsConstants.HEATMAP_GROUP_LAYER_ID)
@@ -268,7 +277,7 @@ GritsHeatmapLayer.startAnimation = (startDate, endDate, period, documents, token
           # date range.  call the next callback of the series and return.
           nextInner()
           return
-        GritsHeatmapLayer.createLocation(dateKey, doc, token)
+        GritsHeatmapLayer.createLocation(dateKey, doc, tokens)
         # limit how many times we perform the draw
         throttleDraw(dateKey)
         # update the global counter
@@ -288,7 +297,7 @@ GritsHeatmapLayer.startAnimation = (startDate, endDate, period, documents, token
       if (processed - 1) != frames.length
         # start decaying these locations after the FRAME_INTERVAL
         setTimeout(->
-          GritsHeatmapLayer.decayLocations(dateKey, filteredDocuments, token)
+          GritsHeatmapLayer.decayLocations(dateKey, filteredDocuments, tokens)
         , FRAME_INTERVAL)
     )
   , (err) ->
@@ -324,25 +333,10 @@ GritsHeatmapLayer.migrationsByDate = (dates, token, limit, offset, done) ->
     # when count is finished, get the migrations if greater than 0
     'getMigrations': ['getCount', (callback, result) ->
       totalRecords = result.getCount
-      if totalRecords.length <= 0
-        toastr.info(i18n.get('toastMessages.noResults'))
-        GritsHeatmapLayer.animationRunning.set(false)
-        callback(null)
+      if totalRecords == 0
+        callback(null, [])
         return
-
-      Meteor.call('migrationsByDates',dates, token, limit, offset, (err, migrations) ->
-        if (err)
-          callback(err)
-          return
-
-        if _.isUndefined(migrations) || migrations.length <= 0
-          toastr.info(i18n.get('toastMessages.noResults'))
-          GritsHeatmapLayer.animationRunning.set(false)
-          callback(null, [])
-          return
-
-        callback(null, migrations)
-      )
+      Meteor.call('migrationsByDates',dates, token, limit, offset, callback)
     ]
   }, (err, result) ->
     if err
@@ -352,6 +346,12 @@ GritsHeatmapLayer.migrationsByDate = (dates, token, limit, offset, done) ->
     # if there hasn't been any errors, getCount and getMigrations will
     # have completed
     migrations = result.getMigrations
+    # check if migrations is undefiend or empty
+    if _.isUndefined(migrations) || _.isEmpty(migrations)
+      toastr.info(i18n.get('toastMessages.noResults'))
+      GritsHeatmapLayer.animationRunning.set(false)
+      return
+
     # execute the callback to process the migrations
     done(null, migrations)
     return
@@ -387,40 +387,28 @@ GritsHeatmapLayer.migrationsByDateRange = (startDate, endDate, token, limit, off
     # when count is finished, get the migrations if greater than 0
     'getMigrations': ['getCount', (callback, result) ->
       totalRecords = result.getCount
-
-      if totalRecords.length <= 0
-        toastr.info(i18n.get('toastMessages.noResults'))
-        GritsHeatmapLayer.animationRunning.set(false)
-        callback(null)
+      if totalRecords == 0
+        callback(null, [])
         return
-
-      Meteor.call('migrationsByQuery', startDate, endDate, token, limit, offset, (err, migrations) ->
-        if (err)
-          callback(err)
-          return
-
-        if _.isUndefined(migrations) || migrations.length <= 0
-          toastr.info(i18n.get('toastMessages.noResults'))
-          GritsHeatmapLayer.animationRunning.set(false)
-          callback(null, [])
-          return
-
-        callback(null, migrations)
-      )
+      Meteor.call('migrationsByQuery', startDate, endDate, token, limit, offset, callback)
     ]
   }, (err, result) ->
     if err
       GritsHeatmapLayer.animationRunning.set(false)
       Meteor.gritsUtil.errorHandler(err)
       return
+
     # if there hasn't been any errors, getCount and getMigrations will
     # have completed
     migrations = result.getMigrations
+    # check if migrations is undefiend or empty
+    if _.isUndefined(migrations) || _.isEmpty(migrations)
+      toastr.info(i18n.get('toastMessages.noResults'))
+      GritsHeatmapLayer.animationRunning.set(false)
+      return
+
     # execute the callback to process the migrations
     done(null, migrations)
     return
   )
   return
-
-
-

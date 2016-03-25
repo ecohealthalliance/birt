@@ -98,9 +98,6 @@
         "layerLoading": {
             "en": "The layer has not finished loading"
         },
-        "onlyOneToken": {
-            "en": "Only one bird species may be selected"
-        },
         "dateOverIntervalWarning": {
             "en": "The Start and End dates are within the same Interval"
         },

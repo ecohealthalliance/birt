@@ -234,13 +234,13 @@ class GritsFilterCriteria
   #
   # @param [Array] documents, an Array of mongoDB documents to process
   # @param [Integer] offset, the offset of the query
-  process: (documents, token, offset) ->
+  process: (documents, tokens, offset) ->
     self = this
     startDate = moment.utc(self.operatingDateRangeStart.get())
     endDate = moment.utc(self.operatingDateRangeEnd.get())
     period = self.period.get()
     # start the heatmap animation
-    GritsHeatmapLayer.startAnimation(startDate, endDate, period, documents, token, offset)
+    GritsHeatmapLayer.startAnimation(startDate, endDate, period, documents, tokens, offset)
     return
   # applies the filter but does not reset the offset
   #
@@ -249,9 +249,9 @@ class GritsFilterCriteria
     self = this
 
     query = self.getQueryObject()
-    token = self.tokens.get()[0]
+    tokens = self.tokens.get()
 
-    if _.isUndefined(token)
+    if _.isEmpty(tokens)
       toastr.error(i18n.get('toastMessages.searchTokenRequired'))
       Session.set(GritsConstants.SESSION_KEY_IS_UPDATING, false)
       return
@@ -291,15 +291,19 @@ class GritsFilterCriteria
       month = compareDate.month()
       dates = _.map(years, (m) -> moment.utc(Date.UTC(m.year(), month, date)).toISOString())
 
-      GritsHeatmapLayer.migrationsByDate(dates, token, limit, offset, (err, migrations) ->
-        self.process(migrations, token, offset)
+      GritsHeatmapLayer.migrationsByDate(dates, tokens, limit, offset, (err, migrations) ->
+        if err
+          return
+        self.process(migrations, tokens, offset)
         # call the original callback function if its defined
         if cb && _.isFunction(cb)
           cb(null, migrations)
       )
     else
-      GritsHeatmapLayer.migrationsByDateRange(startDate.toISOString(), endDate.toISOString(), token, limit, offset, (err, migrations) ->
-        self.process(migrations, token, offset)
+      GritsHeatmapLayer.migrationsByDateRange(startDate.toISOString(), endDate.toISOString(), tokens, limit, offset, (err, migrations) ->
+        if err
+          return
+        self.process(migrations, tokens, offset)
         # call the original callback function if its defined
         if cb && _.isFunction(cb)
           cb(null, migrations)
