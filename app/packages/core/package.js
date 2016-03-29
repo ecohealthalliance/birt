@@ -37,7 +37,6 @@ Package.onUse(function(api){
     'templating',
     'minimongo',
     'session',
-    'tracker',
     'mquandalle:jade@0.4.9',
     'twbs:bootstrap@3.3.5',
     'mquandalle:stylus@1.1.1',

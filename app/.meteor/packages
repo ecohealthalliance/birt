@@ -10,7 +10,6 @@ mobile-experience       # Packages for a great mobile UX
 mongo                   # The database Meteor supports right now
 session                 # Client-side reactive dictionary for your app
 jquery                  # Helpful client-side library
-tracker                 # Fallback dependency
 
 # Deployment
 standard-minifiers      # JS/CSS minifiers run for production mode
@@ -25,4 +24,3 @@ grits:flirt-sidebar
 birt:ui
 birt:info
 birt:scrubber
-
