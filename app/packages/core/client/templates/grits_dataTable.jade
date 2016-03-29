@@ -1,0 +1,34 @@
+template(name='gritsDataTable')
+  ul.nav.nav-tabs.table-tabs
+    li.active
+      a#pathTab(href='#paths' data-toggle='tab') {{_ "gritsDataTable.explore.title"}}
+  .tab-content.dataTableContent
+    #paths.tab-pane.active
+      .pathsTableContainer
+        table#exploreTable.table.dataTable
+          thead
+            tr
+              th {{_ "gritsDataTable.explore.col1-heading"}}
+              th {{_ "gritsDataTable.explore.col2-heading"}}
+              th {{_ "gritsDataTable.explore.col3-heading"}}
+              th {{_ "gritsDataTable.explore.col4-heading"}}
+          tbody
+            with migrations
+              each migrations
+                tr.pathTableRow(data-id=this._id)
+                  td
+                  td
+                  td
+                  td
+            else
+              tr
+                td(colspan='12')
+                  span(style='font-style: italic;') No data
+
+  .sidebarRightFooter
+    .export
+      i.fa.fa-cloud-download.downloadIcon
+      button.btn.btn-sm.btn-default.exportData(type='button', data-type='json') JSON
+      button.btn.btn-sm.btn-default.exportData(type='button', data-type='csv') CSV
+      button.btn.btn-sm.btn-default.exportData(type='button', data-type='xml') XML
+      button.btn.btn-sm.btn-default.exportData(type='button', data-type='excel') XLSX
