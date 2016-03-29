@@ -56,6 +56,6 @@ Template.scrubber.events
   'click .scrubber-play': (event, instance) ->
     isPlaying = instance.isPlaying.get()
     unless isPlaying
-      $('#showThroughput').click()
+      $('#applyFilter').click()
     else
       instance.isPlaying.set( not isPlaying )
