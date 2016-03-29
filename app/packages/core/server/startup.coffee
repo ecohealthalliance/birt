@@ -5,4 +5,5 @@ Meteor.startup ->
   # Ensure indexes on migrations
   Migrations._ensureIndex
     date: 1
+  Migrations._ensureIndex
     'sightings.bird_id': 1
