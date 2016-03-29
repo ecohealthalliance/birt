@@ -30,7 +30,7 @@ ejson@1.0.7
 es5-shim@4.1.14
 fastclick@1.0.7
 flawless:meteor-toastr@1.0.1
-fortawesome:fontawesome@4.4.0
+fortawesome:fontawesome@4.5.0
 fourq:typeahead@1.0.0
 geojson-utils@1.0.4
 grits:flirt-sidebar@0.0.1
