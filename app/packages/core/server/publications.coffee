@@ -83,7 +83,7 @@ countTypeaheadBirds = (search) ->
 # @param [Integer] limit, the amount of records to limit
 # @param [Integer] skip, the amount of records to skip
 # @return [Array] an array of documents
-migrationsByQuery = (startDate, endDate, token, limit, skip) ->
+migrationsByQuery = (startDate, endDate, tokens, limit, skip) ->
   if _profile
     start = new Date()
 
@@ -91,7 +91,7 @@ migrationsByQuery = (startDate, endDate, token, limit, skip) ->
     return []
   if _.isUndefined(endDate) or _.isEmpty(endDate)
     return []
-  if _.isUndefined(token) or _.isEmpty(token)
+  if _.isUndefined(tokens) or _.isEmpty(tokens)
     return []
 
   if _.isUndefined(limit)
@@ -103,12 +103,17 @@ migrationsByQuery = (startDate, endDate, token, limit, skip) ->
     date: {
       $gte: new Date(startDate),
       $lt: new Date(endDate)
-    }
+    },
+    $or: []
   }
-  query[token] = {$gte: 1}
-  console.log('query: %j', query)
   fields = {date: 1, country: 1, state_province: 1, county: 1, loc: 1}
-  fields[token] = 1
+  _.each(tokens, (t) ->
+    obj = {}
+    obj[t] = {$gte: 1}
+    query.$or.push(obj)
+    fields[t] = 1
+  )
+  console.log('query: %j', query)
 
   matches = []
   if _useAggregation
@@ -132,7 +137,7 @@ migrationsByQuery = (startDate, endDate, token, limit, skip) ->
 #
 # @param [Object] query, a mongodb query object
 # @return [Integer] totalRecorts, the count of the query
-countMigrationsByDateRange = (startDate, endDate, token) ->
+countMigrationsByDateRange = (startDate, endDate, tokens) ->
   if _profile
     start = new Date()
 
@@ -141,8 +146,13 @@ countMigrationsByDateRange = (startDate, endDate, token) ->
       $gte: new Date(startDate),
       $lt: new Date(endDate)
     }
+    $or: []
   }
-  query[token] = {$gte: 1}
+  _.each(tokens, (t) ->
+    obj = {}
+    obj[t] = {$gte: 1}
+    query.$or.push(obj)
+  )
 
   if _.isUndefined(startDate) or _.isEmpty(startDate)
     return 0
@@ -155,7 +165,6 @@ countMigrationsByDateRange = (startDate, endDate, token) ->
     recordProfile('countMigrationsByDateRange', new Date() - start)
   return count
 
-
 # find migrations within an array of dates
 #
 # @note optional limit and offset
@@ -164,13 +173,13 @@ countMigrationsByDateRange = (startDate, endDate, token) ->
 # @param [Integer] limit, the amount of records to limit
 # @param [Integer] skip, the amount of records to skip
 # @return [Array] an array of documents
-migrationsByDates = (dates, token, limit, skip) ->
+migrationsByDates = (dates, tokens, limit, skip) ->
   if _profile
     start = new Date()
 
   if _.isUndefined(dates) or _.isEmpty(dates)
     return []
-  if _.isUndefined(token) or _.isEmpty(token)
+  if _.isUndefined(tokens) or _.isEmpty(tokens)
     return []
 
   if _.isUndefined(limit)
@@ -180,11 +189,18 @@ migrationsByDates = (dates, token, limit, skip) ->
 
   query = {
     date: {$in: _.map(dates, (dateStr) -> new Date(dateStr))},
+    $or: []
   }
-  query[token] = {$gte: 1}
-  console.log('query: %j', query)
   fields = {date: 1, country: 1, state_province: 1, county: 1, loc: 1}
-  fields[token] = 1
+  _.each(tokens, (t) ->
+    obj = {}
+    obj[t] = {$gte: 1}
+    query.$or.push(obj)
+    fields[t] = 1
+  )
+  console.log('query: %j', query)
+
+  _.each(tokens, (t) -> )
 
   matches = []
   if _useAggregation
@@ -251,28 +267,31 @@ migrationsBySeason = (params)->
 #
 # @param [Array] dates, an array of dates
 # @return [Integer] totalRecorts, the count of the query
-countMigrationsByDates = (dates, token) ->
+countMigrationsByDates = (dates, tokens) ->
   if _profile
     start = new Date()
 
   if _.isUndefined(dates) || _.isEmpty(dates)
     return 0
 
-  if _.isUndefined(token) || _.isEmpty(token)
+  if _.isUndefined(tokens) || _.isEmpty(tokens)
     return 0
 
   query = {
     date: {$in: _.map(dates, (dateStr) -> new Date(dateStr))},
+    $or: []
   }
-  query[token] = {$gte: 1}
+  _.each(tokens, (t) ->
+    obj = {}
+    obj[t] = {$gte: 1}
+    query.$or.push(obj)
+  )
 
   count = Migrations.find(query, {transform: null}).count()
 
   if _profile
     recordProfile('countMigrationsByDateRange', new Date() - start)
   return count
-
-
 
 # Public API
 Meteor.methods

@@ -492,10 +492,6 @@ Template.gritsSearch.events
     $target = $(e.target)
     $container = $target.closest('.tokenized')
     tokens = $target.tokenfield('getTokens')
-    if tokens.length > 0
-      toastr.error(i18n.get('toastMessage.onlyOneToken'))
-      e.preventDefault()
-      return
     match = _.find(tokens, (t) -> t.label == e.attrs.label)
     if match
       # do not create a token and clear the input
