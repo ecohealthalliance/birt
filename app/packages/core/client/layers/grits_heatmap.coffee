@@ -58,7 +58,6 @@ class GritsHeatmapLayer extends GritsLayer
     data = _locations.concat([[0.0, 0.0, 0]])
     # Normalize the intensity
     totalSightings = data.reduce(((sofar, d)-> sofar + d[2]), 0)
-    console.log totalSightings
     data.forEach((d)-> 100 * d[2] /= totalSightings)
     self._layer.setData(data)
     self._perturbMap()
