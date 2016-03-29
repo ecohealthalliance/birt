@@ -259,9 +259,18 @@ migrationsBySeason = (params)->
       }]
     }
     else throw new Meteor.Error("Unknown season:" + season)
-  for bird in (params.birds or [])
-    query[bird] = {$gte: 1}
-  Migrations.find(query).fetch()
+  if params.birds?.length == 0
+    throw new Meteor.Error("An array of birds is required.")
+  query['sightings.bird_id'] = {$in: params.birds}
+  Migrations.find(query, {
+    fields:
+      loc: 1
+      sightings: 1
+      date: 1
+      country: 1
+      state_province: 1
+      county: 1
+  }).fetch()
 
 # count the total migrations for the specified date range
 #
