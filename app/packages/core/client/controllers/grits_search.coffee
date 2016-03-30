@@ -224,7 +224,7 @@ Template.gritsSearch.helpers({
       {value: 'years', displayName: i18n.get('gritsSearch.period-years')}
     ]
   defaultPeriod: (period) ->
-    if period.value == 'months'
+    if period.value == 'days'
       return true
     else
       return false
@@ -234,8 +234,6 @@ Template.gritsSearch.helpers({
     return Session.get(GritsConstants.SESSION_KEY_LOADED_RECORDS)
   totalRecords: ->
     return Session.get(GritsConstants.SESSION_KEY_TOTAL_RECORDS)
-  isSimulatorRunning: ->
-    return GritsFilterCriteria.isSimulatorRunning.get()
   state: ->
     # GritsFilterCriteria.stateChanged is a reactive-var
     state = GritsFilterCriteria.stateChanged.get()

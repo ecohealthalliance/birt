@@ -75,7 +75,7 @@ class GritsFilterCriteria
     self.enableDateOverPeriod = new ReactiveVar(false)
 
     #   period
-    self.period = new ReactiveVar('months')
+    self.period = new ReactiveVar('days')
     self.trackPeriod()
 
     # airportCounts
