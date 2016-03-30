@@ -220,7 +220,7 @@ migrationsByDates = (dates, tokens, limit, skip) ->
     recordProfile('migrationsByDates', new Date() - start)
   return matches
 
-migrationsBySeason = (params)->
+migrationsBySeason = (params) ->
   MAX_RESULTS = 500
   query = switch params.season
     when "autumn" then {
