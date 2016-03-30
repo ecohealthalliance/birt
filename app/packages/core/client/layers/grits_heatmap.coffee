@@ -1,7 +1,7 @@
 HEATMAP_INTENSITY_MULTIPLIER = 1
 FRAME_INTERVAL = 2500 # milliseconds
 _locations = [] # container to store heatmap data
-_animation = [] # stores the setInterval id of the animation
+_animation = null # stores the setInterval id of the animation
 
 # Creates an instance of a GritsHeatmapLayer, extends  GritsLayer
 #
@@ -112,6 +112,7 @@ GritsHeatmapLayer.animationRunning = new ReactiveVar(false)
 GritsHeatmapLayer.animationProgress = new ReactiveVar(0)
 GritsHeatmapLayer.animationFrame = new ReactiveVar(null)
 GritsHeatmapLayer.animationCompleted = new ReactiveVar(false)
+GritsHeatmapLayer.animationPaused = new ReactiveVar(false)
 
 # find the index of the heatmap data matching dateKey and locationID
 #
@@ -162,7 +163,14 @@ GritsHeatmapLayer.createLocation = (dateKey, doc, tokens) ->
 # @param [String] dateKey, the current animation frame
 # @param [Array] documents, the array of GeoJSON documents from mongoDB
 # @param [Array] tokens, the tokens from the filter
-GritsHeatmapLayer.decayLocations = (dateKey, documents, tokens) ->
+GritsHeatmapLayer.decayPreviousLocations = (nextIdx, frames, documents, tokens) ->
+#GritsHeatmapLayer.decayLocations = (dateKey, documents, tokens) ->
+  if nextIdx <= 1
+    return
+  # the previous frame
+  f = frames[nextIdx - 2]
+  dateKey = f.utc().format('MMDDYYYY')
+
   # the GritsMap instance
   map = Template.gritsMap.getInstance()
   heatmapLayerGroup = map.getGritsLayerGroup(GritsConstants.HEATMAP_GROUP_LAYER_ID)
@@ -171,6 +179,23 @@ GritsHeatmapLayer.decayLocations = (dateKey, documents, tokens) ->
   throttleDraw = _.throttle(->
     heatmapLayerGroup.draw()
   , 250)
+
+  # get the documents for this period
+  filteredDocuments = _.filter(documents, (doc) ->
+    d = moment.utc(doc.date)
+    if period == 'years'
+      if d.year() == f.year()
+        return doc
+    if period == 'months'
+      if d.month() == f.month() && d.year() == f.year()
+        return doc
+    if period == 'weeks'
+      if d.weeks() == f.weeks() && d.year() == f.year()
+        return doc
+    if period == 'days'
+      if d.date() == f.date() && d.month() == f.month() && d.year() == f.year()
+        return doc
+  )
 
   async.eachSeries(documents, (doc, next) ->
     if doc == null
@@ -184,15 +209,24 @@ GritsHeatmapLayer.decayLocations = (dateKey, documents, tokens) ->
           count += doc[t] / 1000
       )
       location = _locations[idx]
-      location[2] -= count
+      existing = location[2]
+      if existing - count < 0
+        location[2] = 0
+      else
+        location[2] = existing - count
       throttleDraw()
     async.nextTick(-> next())
   )
+
+# pause the heatmap animation
+GritsHeatmapLayer.pauseAnimation = () ->
+  GritsHeatmapLayer.animationPaused.set(true)
 
 # stop the heatmap animation
 GritsHeatmapLayer.stopAnimation = () ->
   GritsHeatmapLayer.animationCompleted.set(true)
   GritsHeatmapLayer.animationRunning.set(false)
+  GritsHeatmapLayer.animationPaused.set(false)
   async.nextTick ->
     clearInterval(_animation)
     _animation = null
@@ -218,9 +252,9 @@ GritsHeatmapLayer.startAnimation = (startDate, endDate, period, documents, token
     heatmapLayerGroup.reset()
 
   # throttle how many time the heatmap can be drawn
-  throttleDraw = _.throttle((dateKey) ->
+  throttleDraw = _.throttle(->
     heatmapLayerGroup.draw()
-  , 500)
+  , 250)
 
   # throttle how many updates to the global session counter
   throttleCount = _.throttle((count) ->
@@ -237,20 +271,26 @@ GritsHeatmapLayer.startAnimation = (startDate, endDate, period, documents, token
   GritsHeatmapLayer.animationProgress.set(0)
   GritsHeatmapLayer.animationRunning.set(true)
   GritsHeatmapLayer.animationCompleted.set(false)
+  GritsHeatmapLayer.animationPaused.set(false)
 
   # determine the range from the filter, this will drive the animation loop
   range = moment.range(startDate, endDate)
   frames = range.toArray(period)
+  framesLen = frames.length
 
   # the animation is uses setInterval
   processedFrames = 0
   _animation = setInterval(->
-    console.log('processedFrames: ', processedFrames + 1)
-    if processedFrames >= frames.length
+    paused = GritsHeatmapLayer.animationPaused.get()
+    if paused
+      console.log('paused: ', paused)
+      return
+    if processedFrames >= framesLen
       GritsHeatmapLayer.stopAnimation()
       return
     completed = GritsHeatmapLayer.animationCompleted.get()
     if !completed
+      console.log('processedFrames: ', processedFrames + 1)
       # the dateKey is the current animation frame identifier
       f = frames[processedFrames]
       dateKey = f.utc().format('MMDDYYYY')
@@ -287,17 +327,15 @@ GritsHeatmapLayer.startAnimation = (startDate, endDate, period, documents, token
         throttleCount(++processedLocations)
         # allow next iteration of the eachSeries to animate by calling the
         # nextInner() callback
-        next()
+        async.nextTick(-> next())
       , (err) ->
         processedFrames++
         # eachSeries is complete
-        GritsHeatmapLayer.animationProgress.set(processedFrames/frames.length)
+        GritsHeatmapLayer.animationProgress.set(processedFrames/framesLen)
         # do not decay the last frame
-        if (processedFrames) < frames.length
+        if (processedFrames) < framesLen
           # start decaying these locations after the FRAME_INTERVAL
-          setTimeout(->
-            GritsHeatmapLayer.decayLocations(dateKey, filteredDocuments, tokens)
-          , FRAME_INTERVAL)
+          GritsHeatmapLayer.decayPreviousLocations(processedFrames, frames, documents, tokens)
       )
   , FRAME_INTERVAL)
 

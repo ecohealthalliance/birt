@@ -20,10 +20,13 @@ Template.gritsMap.onRendered ->
 
 
 Template.scrubber.onCreated ->
-  Session.setDefault("slider", [20, 80])
+  Session.setDefault("slider", [0, 100])
   @isPlaying = new ReactiveVar(false)
+  @isPaused = new ReactiveVar(false)
+
   Meteor.autorun =>
     @isPlaying.set( GritsHeatmapLayer.animationRunning.get() )
+    @isPaused.set( GritsHeatmapLayer.animationPaused.get() )
 
 Template.scrubber.onRendered ->
   $('#slider').noUiSlider(
@@ -48,6 +51,15 @@ Template.scrubber.helpers
       'pause'
     else
       'play'
+  paused: ->
+    if Template.instance().isPaused.get()
+      'pulse'
+    else
+      ''
+  progress: ->
+    progress = GritsHeatmapLayer.animationProgress.get()
+    return progress * 100 + '%'
+
 
 Template.scrubber.events
   'dblclick .scrubber-container': (event) ->
@@ -55,7 +67,10 @@ Template.scrubber.events
     event.stopPropagation()
   'click .scrubber-play': (event, instance) ->
     isPlaying = instance.isPlaying.get()
+    isPaused = instance.isPaused.get()
     unless isPlaying
-      $('#applyFilter').click()
+      unless isPaused
+        $('#applyFilter').click()
     else
+      GritsHeatmapLayer.animationPaused.set( not isPaused)
       instance.isPlaying.set( not isPlaying )
