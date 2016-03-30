@@ -352,28 +352,6 @@ Template.gritsSearch.onRendered ->
   endDatePicker.data('DateTimePicker').widgetPositioning({vertical: 'bottom', horizontal: 'left'})
   _setEndDatePicker(endDatePicker)
 
-  options = {
-    format: 'MM/DD'
-  }
-  compareDatePicker = $('#compareDateOverPeriod').datetimepicker(options)
-  compareDatePicker.data('DateTimePicker').widgetPositioning({vertical: 'top', horizontal: 'left'})
-  compareDatePicker.data('DateTimePicker').disable()
-  _setCompareDatePicker(compareDatePicker)
-
-  # enable/disable the compareDatePicker and periods 'days', 'weeks', 'months'
-  # when the reactive var enableDateOverPeriod changes.
-  Meteor.autorun ->
-    enable = GritsFilterCriteria.enableDateOverPeriod.get()
-    if enable
-      _compareDatePicker.data('DateTimePicker').enable()
-      GritsFilterCriteria.period.set('years')
-      $('#period').prop('disabled', true)
-    else
-      _compareDatePicker.data('DateTimePicker').disable()
-      _compareDatePicker.data('DateTimePicker').date(null)
-      GritsFilterCriteria.period.set(_lastPeriod)
-      $('#period').prop('disabled', false)
-
   # is the animation running
   Meteor.autorun ->
     running = GritsHeatmapLayer.animationRunning.get()
@@ -439,12 +417,6 @@ _changeLimitHandler = (e) ->
 _changePeriodHandler = (e) ->
   _lastPeriod = $(e.target).val()
   GritsFilterCriteria.period.set(_lastPeriod)
-_changeEnableDateOverPeriodHandler = (e) ->
-  if $(e.target).is(':checked')
-    GritsFilterCriteria.enableDateOverPeriod.set(true)
-  else
-    GritsFilterCriteria.enableDateOverPeriod.set(false)
-  return
 _applyFilter = (e) ->
   if $(e.target).hasClass('disabled')
     return
@@ -509,7 +481,6 @@ Template.gritsSearch.events
     token = e.attrs.label
     return false
   'change #period': _changePeriodHandler
-  'change #enableDateOverPeriod': _changeEnableDateOverPeriodHandler
   'click .historical-view': (e, instance)->
     instance.historicalView.set true
   'click .seasonal-view': (e, instance)->
