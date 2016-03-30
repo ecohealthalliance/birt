@@ -1,5 +1,5 @@
 HEATMAP_INTENSITY_MULTIPLIER = 1
-FRAME_INTERVAL = 250 # milliseconds
+FRAME_INTERVAL = 125 # milliseconds
 _locations = [] # container to store heatmap data
 _animation = null # stores the setInterval id of the animation
 
@@ -287,6 +287,7 @@ GritsHeatmapLayer.startAnimation = (startDate, endDate, period, documents, token
   range = moment.range(startDate, endDate)
   frames = range.toArray(period)
   framesLen = frames.length
+  lastFrame = null
 
   # the animation is uses setInterval
   processedFrames = 0
@@ -298,11 +299,16 @@ GritsHeatmapLayer.startAnimation = (startDate, endDate, period, documents, token
     if processedFrames >= framesLen
       GritsHeatmapLayer.stopAnimation()
       return
+    # guard against frames that take longer to process than the interval
+    if processedFrames == lastFrame
+      return
     completed = GritsHeatmapLayer.animationCompleted.get()
     if !completed
-      console.log('processedFrames: ', processedFrames + 1)
       # the dateKey is the current animation frame identifier
       f = frames[processedFrames]
+      # guard against timing issues from the next setInterval firing before the
+      # current frame is done processing by setting lastFrame
+      lastFrame = processedFrames
       dateKey = f.utc().format('MMDDYYYY')
       # set the ReactiveVar so the UI may listen to changes to the animation frame
       GritsHeatmapLayer.animationFrame.set(dateKey)
@@ -326,10 +332,11 @@ GritsHeatmapLayer.startAnimation = (startDate, endDate, period, documents, token
         )
       , (err) ->
         processedFrames++
-        # final update the global counter
+        console.log('processedFrames: ', processedFrames)
         console.log('processedLocations: ', processedLocations)
+        # final update the global counter
         Session.set(GritsConstants.SESSION_KEY_LOADED_RECORDS, processedLocations)
-        # eachSeries is complete
+        # set progress
         GritsHeatmapLayer.animationProgress.set(processedFrames/framesLen)
         # do not decay the last frame
         if (processedFrames) < framesLen
