@@ -341,7 +341,7 @@ GritsHeatmapLayer.startAnimation = (startDate, endDate, period, documents, token
         # final update the global counter
         Session.set(GritsConstants.SESSION_KEY_LOADED_RECORDS, processedLocations)
         # set progress
-        GritsHeatmapLayer.animationProgress.set(processedFrames + 1 / framesLen)
+        GritsHeatmapLayer.animationProgress.set((processedFrames + 1)/ framesLen)
         # start decaying these locations after the FRAME_INTERVAL, but do not decay the last frame
         if (processedFrames + 1) < framesLen
           GritsHeatmapLayer.decrementPreviousLocations(processedFrames, frames, period, documents, tokens, (err, res) ->
