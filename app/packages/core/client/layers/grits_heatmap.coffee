@@ -188,8 +188,10 @@ GritsHeatmapLayer.filteredDocuments = (f, period, documents) ->
 # @param [String] period, the period determines the number of frames to the animation, 'days', 'weeks', 'months', 'years'
 # @param [Array] documents, the array of GeoJSON documents from mongoDB
 # @param [Array] tokens, the tokens from the filter
-GritsHeatmapLayer.decrementPreviousLocations = (nextIdx, frames, period, documents, tokens) ->
+# @param [Function] done, the callback when done decrementing the filteredLocations
+GritsHeatmapLayer.decrementPreviousLocations = (nextIdx, frames, period, documents, tokens, done) ->
   if nextIdx <= 1
+    done(null, true)
     return
   # the previous frame
   f = frames[nextIdx - 2]
@@ -207,7 +209,7 @@ GritsHeatmapLayer.decrementPreviousLocations = (nextIdx, frames, period, documen
   # get the documents for this period
   filteredDocuments = GritsHeatmapLayer.filteredDocuments(f, period, documents)
 
-  async.eachSeries(documents, (doc, next) ->
+  async.eachSeries(filteredDocuments, (doc, next) ->
     if doc == null
       return
     id = CryptoJS.MD5(JSON.stringify(doc.loc)).toString()
@@ -225,7 +227,11 @@ GritsHeatmapLayer.decrementPreviousLocations = (nextIdx, frames, period, documen
       else
         location[2] = existing - count
       throttleDraw()
-    async.nextTick(-> next())
+    async.nextTick(->
+      next()
+    )
+  , (err) ->
+    done(null, true)
   )
 
 # pause the heatmap animation
@@ -301,6 +307,7 @@ GritsHeatmapLayer.startAnimation = (startDate, endDate, period, documents, token
       return
     # guard against frames that take longer to process than the interval
     if processedFrames == lastFrame
+      console.log('too fast')
       return
     completed = GritsHeatmapLayer.animationCompleted.get()
     if !completed
@@ -331,17 +338,22 @@ GritsHeatmapLayer.startAnimation = (startDate, endDate, period, documents, token
           next()
         )
       , (err) ->
-        processedFrames++
-        console.log('processedFrames: ', processedFrames)
-        console.log('processedLocations: ', processedLocations)
         # final update the global counter
         Session.set(GritsConstants.SESSION_KEY_LOADED_RECORDS, processedLocations)
         # set progress
         GritsHeatmapLayer.animationProgress.set(processedFrames/framesLen)
-        # do not decay the last frame
-        if (processedFrames) < framesLen
-          # start decaying these locations after the FRAME_INTERVAL
-          GritsHeatmapLayer.decrementPreviousLocations(processedFrames, frames, period, documents, tokens)
+        # start decaying these locations after the FRAME_INTERVAL, but do not decay the last frame
+        if (processedFrames + 1) < framesLen
+          GritsHeatmapLayer.decrementPreviousLocations(processedFrames, frames, period, documents, tokens, (err, res) ->
+            # don't allow the animation to proceed until the previous frame has been decremented
+            processedFrames++
+            console.log('processedFrames: ', processedFrames)
+            console.log('processedLocations: ', processedLocations)
+          )
+        else
+          processedFrames++
+          console.log('processedFrames: ', processedFrames)
+          console.log('processedLocations: ', processedLocations)
       )
   , FRAME_INTERVAL)
 
