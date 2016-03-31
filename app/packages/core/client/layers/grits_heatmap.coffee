@@ -72,7 +72,7 @@ class GritsHeatmapLayer extends GritsLayer
 
   _trackTokens: ->
     self = this
-    Tracker.autorun ->
+    Meteor.autorun ->
       tokens = GritsFilterCriteria.tokens.get()
       if tokens.length == 0
         self.clear()

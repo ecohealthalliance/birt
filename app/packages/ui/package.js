@@ -18,16 +18,18 @@ Package.onUse(function(api){
   api.use([
     'templating',
     'minimongo',
-    'session'
+    'session',
+    'mquandalle:jade@0.4.9',
+    'mquandalle:stylus@1.1.1'
   ], 'client');
 
   // client-side only files
   // IMPORTANT: these files are loaded in order
   api.addFiles([
-    'html/moduleSelector.html',
-    'html/birt.html',
+    'templates/moduleSelector.jade',
+    'templates/birt.jade',
 
-    'css/main.css',
+    'stylesheets/main.styl',
 
     'ui.coffee'
   ], 'client');

@@ -16,11 +16,8 @@ Package.onUse(function(api){
     'jagi:astronomy@1.2.5',
     'jagi:astronomy-validators@1.1.1',
     'peerlibrary:async@0.9.2_1',
-    'twbs:bootstrap@3.3.5',
-    'mquandalle:stylus@1.1.1',
     'jparker:crypto-md5@0.1.1',
     'bevanhunt:leaflet@0.3.18',
-    'fortawesome:fontawesome@4.5.0',
     'fourq:typeahead@1.0.0',
     'ajduke:bootstrap-tokenfield@0.5.0',
     'flawless:meteor-toastr@1.0.1',
@@ -40,7 +37,10 @@ Package.onUse(function(api){
     'templating',
     'minimongo',
     'session',
-    'tracker'
+    'mquandalle:jade@0.4.9',
+    'twbs:bootstrap@3.3.5',
+    'mquandalle:stylus@1.1.1',
+    'fortawesome:fontawesome@4.5.0',
   ], 'client');
 
   // both client and server files
@@ -71,19 +71,19 @@ Package.onUse(function(api){
     'client/grits_filter_criteria.coffee',
     'client/layers/grits_layer_group.coffee',
     'client/layers/grits_heatmap.coffee',
-    'client/templates/header.html',
-    'client/templates/grits_dataTable.html',
-    'client/templates/grits_layerSelector.html',
-    'client/templates/grits_map.html',
-    'client/templates/grits_map_sidebar.html',
-    'client/templates/grits_map_table_sidebar.html',
-    'client/templates/grits_search.html',
-    'client/templates/grits_overlay.html',
+    'client/templates/header.jade',
+    'client/templates/grits_dataTable.jade',
     'client/controllers/grits_dataTable.coffee',
+    'client/templates/grits_layerSelector.jade',
     'client/controllers/grits_layerSelector.coffee',
+    'client/templates/grits_map.jade',
+    'client/templates/grits_map_sidebar.jade',
     'client/controllers/grits_map_sidebar.coffee',
+    'client/templates/grits_map_table_sidebar.jade',
     'client/controllers/grits_map.coffee',
+    'client/templates/grits_search.jade',
     'client/controllers/grits_search.coffee',
+    'client/templates/grits_overlay.jade',
     'client/controllers/grits_overlay.coffee'
   ], 'client');
 
