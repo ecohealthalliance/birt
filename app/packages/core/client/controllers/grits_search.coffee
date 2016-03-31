@@ -435,7 +435,9 @@ Template.gritsSearch.events
   'change #searchBar': _changeSearchBarHandler
   'dp.change': _changeDateHandler
   'dp.show': _showDateHandler
-  'click #applyFilter': (event, template) ->
+  'click #applyFilter': (e) ->
+    if $(e.target).hasClass('disabled')
+        return
     GritsFilterCriteria.apply()
     return
   'click #loadMore': ->
