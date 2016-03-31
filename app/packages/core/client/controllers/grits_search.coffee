@@ -5,6 +5,7 @@
 _init = true # flag, set to false when initialization is done
 _initStartDate = null # onCreated will initialize the date through GritsFilterCriteria
 _initEndDate = null # onCreated will initialize the date through GritsFilterCriteria
+_initLimit = null # onCreated will initialize the limt through GritsFilterCriteria
 _searchBar = null # onRendered will set this to a typeahead object
 _endDatePicker = null # onRendered will set this to a datetime picker object
 _startDatePicker = null # onRendered will set this to a datetime picker object
@@ -12,6 +13,7 @@ _compareDatePicker = null # onRendered will set this to a datetime picker object
 _lastPeriod = 'months' # remember the last selected period when enable/disable compare date over interval, defaults to 'months'
 _animationRunning = new ReactiveVar(false)
 _matchSkip = null # the amount to skip during typeahead pagination
+_disableLimit = new ReactiveVar(false) # toggle if we will allow limit/skip
 # the underscore template for the typeahead result
 _suggestionTemplate = _.template('
   <span class="typeahead-code"><%= raw._id %></span><br/>
@@ -245,6 +247,13 @@ Template.gritsSearch.helpers({
     return _initStartDate
   end: ->
     return _initEndDate
+  limit: ->
+    if _init
+      # set inital limit
+      return _initLimit
+    else
+      # reactive var
+      return GritsFilterCriteria.limit.get()
   historicalView: ->
     Template.instance().historicalView.get()
   summer: ->
@@ -260,6 +269,7 @@ Template.gritsSearch.helpers({
 Template.gritsSearch.onCreated ->
   _initStartDate = GritsFilterCriteria.initStart()
   _initEndDate = GritsFilterCriteria.initEnd()
+  _initLimit = GritsFilterCriteria.initLimit()
   _init = false # done initializing initial input values
 
   @season = new ReactiveVar null
@@ -300,6 +310,7 @@ Template.gritsSearch.onCreated ->
   Template.gritsSearch.getEndDatePicker = getEndDatePicker
   Template.gritsSearch.getStartDatePicker = getStartDatePicker
   Template.gritsSearch.getCompareDatePicker = getCompareDatePicker
+  Template.gritsSearch.disableLimit = _disableLimit
 
 # triggered when the 'gritsSearch' template is rendered
 Template.gritsSearch.onRendered ->
@@ -393,6 +404,10 @@ _showDateHandler = (e) ->
     if _.isNull(_compareDatePicker)
       return
   return
+_changeLimitHandler = (e) ->
+  val = parseInt($("#limit").val(), 10)
+  GritsFilterCriteria.limit.set(val)
+  return
 _changePeriodHandler = (e) ->
   _lastPeriod = $(e.target).val()
   GritsFilterCriteria.period.set(_lastPeriod)
@@ -412,6 +427,7 @@ Template.gritsSearch.events
       GritsFilterCriteria.apply()
     return
   'click #applyFilter': _applyFilter
+  'change #limit': _changeLimitHandler
   'change #searchBar': _changeSearchBarHandler
   'dp.change': _changeDateHandler
   'dp.show': _showDateHandler

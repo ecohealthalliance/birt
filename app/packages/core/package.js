@@ -109,6 +109,7 @@ Package.onUse(function(api){
     'Bird',
     'Birds',
     'Migrations',
+    'MiniMigrations',
     'GritsConstants',
     'GritsFilterCriteria',
     'GritsLayer',

@@ -438,6 +438,13 @@ GritsHeatmapLayer.migrationsByDate = (dates, token, limit, offset, done) ->
       GritsHeatmapLayer.animationRunning.set(false)
       return
 
+    MiniMigrations.remove({})
+    i = 0
+    ilen = migrations.length
+    while i < ilen
+      MiniMigrations.insert(migrations[i])
+      i++
+
     # execute the callback to process the migrations
     done(null, migrations)
     return
@@ -452,7 +459,7 @@ GritsHeatmapLayer.migrationsByDate = (dates, token, limit, offset, done) ->
 # @param [Number] limit, the limit from the filter
 # @param [Number] offset, the offset from the filter
 # @param [Function] done, callback when done
-GritsHeatmapLayer.migrationsByDateRange = (startDate, endDate, token, limit, offset, done) ->
+GritsHeatmapLayer.migrationsByDateRange = (startDate, endDate, token, _limit, offset, done) ->
   # show the loading indicator and call the server-side method
   GritsHeatmapLayer.animationRunning.set(true)
   async.auto({
@@ -475,7 +482,7 @@ GritsHeatmapLayer.migrationsByDateRange = (startDate, endDate, token, limit, off
       if totalRecords == 0
         callback(null, [])
         return
-      Meteor.call('migrationsByQuery', startDate, endDate, token, limit, offset, callback)
+      Meteor.call('migrationsByQuery', startDate, endDate, token, 9999, offset, callback)
     ]
   }, (err, result) ->
     if err
@@ -491,6 +498,13 @@ GritsHeatmapLayer.migrationsByDateRange = (startDate, endDate, token, limit, off
       toastr.info(i18n.get('toastMessages.noResults'))
       GritsHeatmapLayer.animationRunning.set(false)
       return
+
+    MiniMigrations.remove({})
+    i = 0
+    ilen = migrations.length
+    while i < ilen
+      MiniMigrations.insert(migrations[i])
+      i++
 
     # execute the callback to process the migrations
     done(null, migrations)
