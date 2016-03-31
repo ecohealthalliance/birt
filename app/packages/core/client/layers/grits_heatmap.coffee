@@ -59,10 +59,9 @@ class GritsHeatmapLayer extends GritsLayer
     # Normalize the intensity
     totalSightings = data.reduce(((sofar, d)-> sofar + d[2]), 0)
     data.forEach((d)-> 100 * d[2] /= totalSightings)
-    self._layer.setData(data)
-    self._perturbMap()
-    self.hasLoaded.set(true)
-    return
+    @_layer.setData(data)
+    @_perturbMap()
+    @hasLoaded.set(true)
 
   # clears the heatmap
   #

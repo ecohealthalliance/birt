@@ -221,6 +221,7 @@ migrationsByDates = (dates, tokens, limit, skip) ->
   return matches
 
 migrationsBySeason = (params)->
+  MAX_RESULTS = 500
   query = switch params.season
     when "autumn" then {
       $and: [{
@@ -259,10 +260,11 @@ migrationsBySeason = (params)->
       }]
     }
     else throw new Meteor.Error("Unknown season:" + season)
-  if params.birds?.length == 0
+  if not params.birds or params.birds.length == 0
     throw new Meteor.Error("An array of birds is required.")
   query['sightings.bird_id'] = {$in: params.birds}
   Migrations.find(query, {
+    limit: MAX_RESULTS
     fields:
       loc: 1
       sightings: 1
@@ -271,6 +273,7 @@ migrationsBySeason = (params)->
       state_province: 1
       county: 1
   }).fetch()
+
 
 # count the total migrations for the specified date range
 #
