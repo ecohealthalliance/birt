@@ -1,3 +1,0 @@
-[submodule "app/packages/flirt-sidebar"]
-	path = app/packages/flirt-sidebar
-	url = git@github.com:ecohealthalliance/flirt-sidebar.git
