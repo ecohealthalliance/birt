@@ -294,13 +294,14 @@ GritsHeatmapLayer.startAnimation = (startDate, endDate, period, documents, token
   frames = range.toArray(period)
   framesLen = frames.length
   lastFrame = null
+  lastScrubber = null
 
   # keep track of processedFrames, check the scrubber first
   processedFrames = 0
-  scrubber = Session.get('scrubber')
-  if scrubber[0] > processedFrames
-    processedFrames = scrubber[0]
-  
+  initialScrubber = Session.get('scrubber')
+  if processedFrames < initialScrubber[0]
+    processedFrames = initialScrubber[0]
+
   # the animation is uses setInterval
   _animation = setInterval(->
     paused = GritsHeatmapLayer.animationPaused.get()
@@ -311,13 +312,31 @@ GritsHeatmapLayer.startAnimation = (startDate, endDate, period, documents, token
       GritsHeatmapLayer.stopAnimation()
       return
     # how is the scrubber set?
-    scrubber = Session.get('scrubber')
-    if processedFrames < scrubber[0]
-      processedFrames = scrubber[0]
+    currentScrubber = Session.get('scrubber')
+    # check if the current scrubber caused the animation to stop
+    if processedFrames > currentScrubber[1]
+      # the end handle of the scrubber was moved left past the current position; effectively a re-wind
+      if lastScrubber != null and currentScrubber[1] < lastScrubber[1]
+        processedFrames = currentScrubber[0]
+        Session.set(GritsConstants.SESSION_KEY_LOADED_RECORDS, 0)
+        lastScrubber = null
+        return
+      # the animation has reached the end handle; stop
+      else
+        GritsHeatmapLayer.stopAnimation()
+        return
+    # check if the current scrubber caused a fast-forward
+    if processedFrames < currentScrubber[0]
+      processedFrames = currentScrubber[0]
+      Session.set(GritsConstants.SESSION_KEY_LOADED_RECORDS, 0)
       return
-    if processedFrames > scrubber[1]
-      GritsHeatmapLayer.stopAnimation()
+    # check if the current scrubber caused a re-wind
+    if lastScrubber != null and currentScrubber[0] < lastScrubber[0]
+      processedFrames = currentScrubber[0]
+      Session.set(GritsConstants.SESSION_KEY_LOADED_RECORDS, 0)
+      lastScrubber = null
       return
+    lastScrubber = currentScrubber
     # guard against frames that take longer to process than the interval
     if processedFrames == lastFrame
       console.log('too fast')
