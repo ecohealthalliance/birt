@@ -1,4 +1,5 @@
-_slider = null #container for the noUiSlider element
+_slider = null #stores reference to the noUiSlider element
+_lastState = null #stores reference to the last state of the range
 
 # determines the current date range of the UI filter
 #
@@ -45,13 +46,15 @@ Template.scrubber.onRendered ->
     @isPaused.set( GritsHeatmapLayer.animationPaused.get() )
 
   @autorun ->
-    # the method _determineRange has reactive vars on the UI filter, for
-    # startDate, endDate, and period. any changes will trigger a recompute
-    range = _determineRange()
+    startDate = GritsFilterCriteria.operatingDateRangeStart.get()
+    endDate = GritsFilterCriteria.operatingDateRangeEnd.get()
+    period = GritsFilterCriteria.period.get()
+    range = moment.range(startDate, endDate).toArray(period)
     if range.length - 1 <= 0
       len = 1
     else
       len = range.length
+
     if _slider == null
       _slider =  document.getElementById('slider')
       noUiSlider.create(_slider,
@@ -72,12 +75,21 @@ Template.scrubber.onRendered ->
           GritsHeatmapLayer.pauseAnimation()
         Session.set('scrubber', [beginIdx, endIdx])
       )
+      _lastState = JSON.stringify([startDate, endDate, period])
     # the _slider exists, update its options
     else
       _slider.noUiSlider.updateOptions(
         range: {min: 0, max: len}
       )
-      _slider.noUiSlider.set([0, len])
+      # determine if the filter values we use have changed state
+      if _lastState == JSON.stringify([startDate, endDate, period])
+        # if state was not changed, update the slider to last know values
+        scrubber = Session.get('scrubber')
+        _slider.noUiSlider.set([scrubber[0], scrubber[1]])
+      else
+        # state was changed, reset to the min and max
+        _slider.noUiSlider.set([0, len])
+        _lastState = JSON.stringify([startDate, endDate, period])
 
 Template.scrubber.helpers
   state: ->
