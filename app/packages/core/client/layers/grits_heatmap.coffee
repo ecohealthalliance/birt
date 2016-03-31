@@ -277,14 +277,10 @@ GritsHeatmapLayer.startAnimation = (startDate, endDate, period, documents, token
     Session.set(GritsConstants.SESSION_KEY_LOADED_RECORDS, count)
   , 250)
 
-  # get the current count, may not be zero in case of a limit/offset
-  count = Session.get(GritsConstants.SESSION_KEY_LOADED_RECORDS)
-
   # reset the locations
   GritsHeatmapLayer.resetLocations()
 
   # reset the reactive vars
-  GritsHeatmapLayer.animationProgress.set(0)
   GritsHeatmapLayer.animationRunning.set(true)
   GritsHeatmapLayer.animationCompleted.set(false)
   GritsHeatmapLayer.animationPaused.set(false)
@@ -301,6 +297,7 @@ GritsHeatmapLayer.startAnimation = (startDate, endDate, period, documents, token
   initialScrubber = Session.get('scrubber')
   if processedFrames < initialScrubber[0]
     processedFrames = initialScrubber[0]
+  GritsHeatmapLayer.animationProgress.set(processedFrames)
 
   # the animation is uses setInterval
   _animation = setInterval(->
