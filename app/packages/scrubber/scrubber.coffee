@@ -1,5 +1,16 @@
-Template.gritsMap.onRendered ->
+_slider = null #container for the noUiSlider element
 
+# determines the current date range of the UI filter
+#
+# @note: has reactive vars, so calling within autorun will trigger a recomputation
+# @return [Object] range, the range with min/max values
+_determineRange = () ->
+  startDate = GritsFilterCriteria.operatingDateRangeStart.get()
+  endDate = GritsFilterCriteria.operatingDateRangeEnd.get()
+  period = GritsFilterCriteria.period.get()
+  return moment.range(startDate, endDate).toArray(period)
+
+Template.gritsMap.onRendered ->
   scrubber = L.control(position: 'bottomleft')
   scrubber.onAdd = (map) ->
     @_div = L.DomUtil.create('div', 'scrubber')
@@ -18,32 +29,55 @@ Template.gritsMap.onRendered ->
       map = Template.gritsMap.getInstance()
       scrubber.addTo(map)
 
-
 Template.scrubber.onCreated ->
-  Session.setDefault("slider", [0, 100])
   @isPlaying = new ReactiveVar(false)
   @isPaused = new ReactiveVar(false)
+  range = _determineRange()
+  if range.length - 1 <= 0
+    len = 1
+  else
+    len = range.length
+  Session.setDefault('scrubber', [0, len])
 
-  Meteor.autorun =>
+Template.scrubber.onRendered ->
+  @autorun =>
     @isPlaying.set( GritsHeatmapLayer.animationRunning.get() )
     @isPaused.set( GritsHeatmapLayer.animationPaused.get() )
 
-Template.scrubber.onRendered ->
-  $('#slider').noUiSlider(
-    start: Session.get('slider')
-    connect: true
-    range:
-      'min': 0
-      'max': 100).on('slide', (ev, val) ->
-    # set real values on 'slide' event
-    Session.set 'slider', val
-  ).on 'change', (ev, val) ->
-    # round off values on 'change' event
-    Session.set 'slider', [
-      Math.round(val[0])
-      Math.round(val[1])
-    ]
-    console.log Session.get('slider')
+  @autorun ->
+    # the method _determineRange has reactive vars on the UI filter, for
+    # startDate, endDate, and period. any changes will trigger a recompute
+    range = _determineRange()
+    if range.length - 1 <= 0
+      len = 1
+    else
+      len = range.length
+    if _slider == null
+      _slider =  document.getElementById('slider')
+      noUiSlider.create(_slider,
+        start: [0, len]
+        connect: true
+        step: 1
+        range: {min: 0, max: len}
+      )
+      _slider.noUiSlider.on('update', (val, handle) ->
+        beginIdx = parseInt(val[0], 10)
+        endIdx = parseInt(val[1], 10)
+        # when dragging the beginning handle, the scrubber-progress bar will
+        # update its percent left to follow
+        percent = (beginIdx/len * 100) + '%'
+        $('.scrubber-progress').css('left', percent)
+        # if the animation is running then pause
+        if GritsHeatmapLayer.animationRunning.get()
+          GritsHeatmapLayer.pauseAnimation()
+        Session.set('scrubber', [beginIdx, endIdx])
+      )
+    # the _slider exists, update its options
+    else
+      _slider.noUiSlider.updateOptions(
+        range: {min: 0, max: len}
+      )
+      _slider.noUiSlider.set([0, len])
 
 Template.scrubber.helpers
   state: ->

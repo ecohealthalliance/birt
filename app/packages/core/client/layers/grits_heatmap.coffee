@@ -295,14 +295,27 @@ GritsHeatmapLayer.startAnimation = (startDate, endDate, period, documents, token
   framesLen = frames.length
   lastFrame = null
 
-  # the animation is uses setInterval
+  # keep track of processedFrames, check the scrubber first
   processedFrames = 0
+  scrubber = Session.get('scrubber')
+  if scrubber[0] > processedFrames
+    processedFrames = scrubber[0]
+  
+  # the animation is uses setInterval
   _animation = setInterval(->
     paused = GritsHeatmapLayer.animationPaused.get()
     if paused
       console.log('paused: ', paused)
       return
     if processedFrames >= framesLen
+      GritsHeatmapLayer.stopAnimation()
+      return
+    # how is the scrubber set?
+    scrubber = Session.get('scrubber')
+    if processedFrames < scrubber[0]
+      processedFrames = scrubber[0]
+      return
+    if processedFrames > scrubber[1]
       GritsHeatmapLayer.stopAnimation()
       return
     # guard against frames that take longer to process than the interval
