@@ -387,6 +387,8 @@ _changeDateHandler = (e) ->
     if _.isNull(_startDatePicker)
       return
     date = _startDatePicker.data('DateTimePicker').date()
+    if date == null
+      return
     GritsFilterCriteria.operatingDateRangeStart.set(date)
     Session.set('dateRangeStart', date.toDate())
     return
@@ -394,14 +396,10 @@ _changeDateHandler = (e) ->
     if _.isNull(_endDatePicker)
       return
     date = _endDatePicker.data('DateTimePicker').date()
+    if date == null
+      return
     GritsFilterCriteria.operatingDateRangeEnd.set(date)
     Session.set('dateRangeEnd', date.toDate())
-    return
-  if id == 'compareDateOverPeriod'
-    if _.isNull(_compareDatePicker)
-      return
-    date = _compareDatePicker.data('DateTimePicker').date()
-    GritsFilterCriteria.compareDateOverPeriod.set(date)
     return
 _showDateHandler = (e) ->
   $target = $(e.target)
