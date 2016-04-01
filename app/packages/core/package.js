@@ -90,6 +90,7 @@ Package.onUse(function(api){
   // static assets
   api.addAssets([
     'public/images/asc.png',
+    'public/images/birt.png',
     'public/images/birt-logo-inline.png',
     'public/images/desc.png',
     'public/images/origin-marker-icon.svg',
