@@ -50,10 +50,8 @@
       color $d-gray
       align-self center
 
-
-
 .scrubber-container
-  width 100%
+  width calc(100% - 60px)
 
 .scrubber-play
   width 60px
@@ -69,3 +67,38 @@
 
 #slider
   width 100%
+
+@-webkit-keyframes pulse_animation
+ 0%
+    -webkit-transform: scale(1)
+ 30%
+    -webkit-transform: scale(1)
+ 40%
+    -webkit-transform: scale(1.08)
+ 50%
+    -webkit-transform: scale(1)
+ 60%
+    -webkit-transform: scale(1)
+ 70%
+    -webkit-transform: scale(1.08)
+ 80%
+    -webkit-transform: scale(1)
+ 100%
+    -webkit-transform: scale(1)
+
+.pulse
+ -webkit-animation-name 'pulse_animation'
+ -webkit-animation-delay 0s
+ -webkit-animation-duration 1500ms
+ -webkit-animation-iteration-count infinite
+ -webkit-animation-timing-function linear
+
+div.scrubber-progress
+  position relative
+  width 5px
+  height 18px
+  background-color red
+  left 0%
+  bottom 18px
+  z-index 1
+  opacity .7

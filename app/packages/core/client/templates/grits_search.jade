@@ -3,15 +3,15 @@ template(name='gritsSearch')
     .bootstrap-datetimepicker-widget table td.day {
     width: 28px;
     }
-    
+
   .filter
     h1#title BIRT
-    
+
     .searchBar
       .tokenized.main
         i#searchIcon.fa.fa-search
         input#searchBar.input-sm.advanced-filter-status(name='searchBar', placeholder='{{_ "gritsSearch.tokenfield-placeholder"}}')
-        
+
     .filter-wrapper
       .filter-row
       ul.nav.nav-tabs
@@ -19,10 +19,10 @@ template(name='gritsSearch')
           a(href='#') Historical View
         li.seasonal-view(role='presentation', class='{{#unless historicalView}} active {{/unless}}')
           a(href='#') Seasonal View
-        
+
       if historicalView
         .filter-row
-        
+
           .filter-group
             label.filter-label {{_ "gritsSearch.start-label"}}
             #startDate.input-group.date
@@ -46,30 +46,20 @@ template(name='gritsSearch')
                 else
                   option(value='{{value}}')= displayName
 
-          .filter-group(style='margin-top: 10px;')
-            label.filter-label {{_ "gritsSearch.compare-label"}}
-            .compare-date-group
-              .col-xs-2.compare-date-checkbox
-                input#enableDateOverPeriod(type='checkbox')
-              #compareDateOverPeriod.col-xs-10.input-group.date
-                input.date-button.form-control.input-sm(type='text')
-                span.input-group-addon
-                  span.glyphicon.glyphicon-calendar
-                  
         .filter-row
           if isAnimationRunning
             button#applyFilter.btn.btn-filter.disabled {{_ "gritsSearch.applyFilterButton" }}
               i.fa.fa-spinner.fa-spin
           else
             button#applyFilter.btn.btn-filter {{_ "gritsSearch.applyFilterButton" }}
-      
-      else      
+
+      else
         .list-group.seasons
           a.list-group-item(href='#', class='{{#if summer}}active{{/if}}') Summer
           a.list-group-item(href='#', class='{{#if autumn}}active{{/if}}') Autumn
           a.list-group-item(href='#', class='{{#if winter}}active{{/if}}') Winter
           a.list-group-item(href='#', class='{{#if spring}}active{{/if}}') Spring
-    
+
     if historicalView
       .filter-footer
         #limitBar.limit-bar
@@ -86,8 +76,8 @@ template(name='gritsSearch')
         .status-bar
           .col.col-xs-2.filter-label {{_ "gritsSearch.status-bar-label" }}
           .col.col-xs-5.text-center
-            span.status-bar-text {{_ "gritsSearch.loaded-records" }} 
+            span.status-bar-text {{_ "gritsSearch.loaded-records" }}
               span.status-bar-val= loadedRecords
           .col.col-xs-5.text-center
-            span.status-bar-text {{_ "gritsSearch.total-records" }}  
+            span.status-bar-text {{_ "gritsSearch.total-records" }}
               span.status-bar-val= totalRecords

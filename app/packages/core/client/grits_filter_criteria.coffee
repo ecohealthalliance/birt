@@ -75,7 +75,7 @@ class GritsFilterCriteria
     self.enableDateOverPeriod = new ReactiveVar(false)
 
     #   period
-    self.period = new ReactiveVar('months')
+    self.period = new ReactiveVar('days')
     self.trackPeriod()
 
     # airportCounts
@@ -111,7 +111,7 @@ class GritsFilterCriteria
   initEnd: ->
     self = this
     #end = moment(@_today).add(7, 'd').toDate()
-    end = new Date(2002, 2, 30)
+    end = new Date(2002, 4, 31)
     self.createOrUpdate('endDate', {key: 'endDate', operator: '$lt', value: end})
     # get the query object
     query = self.getQueryObject()

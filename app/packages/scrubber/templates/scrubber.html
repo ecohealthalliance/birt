@@ -1,6 +1,9 @@
 <template name="scrubber">
   <div class="scrubber-container">
-    <div class="scrubber-play"><i class="fa fa-{{state}}-circle fa-4x"></i></div>
-    <div class="right-slider-container"><div id="slider"></div></div>
+    <div class="scrubber-play"><i class="fa fa-{{state}}-circle fa-4x {{paused}}"></i></div>
+    <div class="right-slider-container">
+      <div id="slider"></div>
+      <div class="scrubber-progress" style="left: {{progress}}"></div>
+    </div>
   </div>
 </template>

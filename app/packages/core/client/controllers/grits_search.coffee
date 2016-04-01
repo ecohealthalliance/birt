@@ -224,7 +224,7 @@ Template.gritsSearch.helpers({
       {value: 'years', displayName: i18n.get('gritsSearch.period-years')}
     ]
   defaultPeriod: (period) ->
-    if period.value == 'months'
+    if period.value == 'days'
       return true
     else
       return false
@@ -234,8 +234,6 @@ Template.gritsSearch.helpers({
     return Session.get(GritsConstants.SESSION_KEY_LOADED_RECORDS)
   totalRecords: ->
     return Session.get(GritsConstants.SESSION_KEY_TOTAL_RECORDS)
-  isSimulatorRunning: ->
-    return GritsFilterCriteria.isSimulatorRunning.get()
   state: ->
     # GritsFilterCriteria.stateChanged is a reactive-var
     state = GritsFilterCriteria.stateChanged.get()
@@ -350,28 +348,6 @@ Template.gritsSearch.onRendered ->
   endDatePicker.data('DateTimePicker').widgetPositioning({vertical: 'bottom', horizontal: 'left'})
   _setEndDatePicker(endDatePicker)
 
-  options = {
-    format: 'MM/DD'
-  }
-  compareDatePicker = $('#compareDateOverPeriod').datetimepicker(options)
-  compareDatePicker.data('DateTimePicker').widgetPositioning({vertical: 'top', horizontal: 'left'})
-  compareDatePicker.data('DateTimePicker').disable()
-  _setCompareDatePicker(compareDatePicker)
-
-  # enable/disable the compareDatePicker and periods 'days', 'weeks', 'months'
-  # when the reactive var enableDateOverPeriod changes.
-  Meteor.autorun ->
-    enable = GritsFilterCriteria.enableDateOverPeriod.get()
-    if enable
-      _compareDatePicker.data('DateTimePicker').enable()
-      GritsFilterCriteria.period.set('years')
-      $('#period').prop('disabled', true)
-    else
-      _compareDatePicker.data('DateTimePicker').disable()
-      _compareDatePicker.data('DateTimePicker').date(null)
-      GritsFilterCriteria.period.set(_lastPeriod)
-      $('#period').prop('disabled', false)
-
   # is the animation running
   Meteor.autorun ->
     running = GritsHeatmapLayer.animationRunning.get()
@@ -407,6 +383,8 @@ _changeDateHandler = (e) ->
     if _.isNull(_startDatePicker)
       return
     date = _startDatePicker.data('DateTimePicker').date()
+    if date == null
+      return
     GritsFilterCriteria.operatingDateRangeStart.set(date)
     Session.set('dateRangeStart', date.toDate())
     return
@@ -414,14 +392,10 @@ _changeDateHandler = (e) ->
     if _.isNull(_endDatePicker)
       return
     date = _endDatePicker.data('DateTimePicker').date()
+    if date == null
+      return
     GritsFilterCriteria.operatingDateRangeEnd.set(date)
     Session.set('dateRangeEnd', date.toDate())
-    return
-  if id == 'compareDateOverPeriod'
-    if _.isNull(_compareDatePicker)
-      return
-    date = _compareDatePicker.data('DateTimePicker').date()
-    GritsFilterCriteria.compareDateOverPeriod.set(date)
     return
 _showDateHandler = (e) ->
   $target = $(e.target)
@@ -437,12 +411,6 @@ _changeLimitHandler = (e) ->
 _changePeriodHandler = (e) ->
   _lastPeriod = $(e.target).val()
   GritsFilterCriteria.period.set(_lastPeriod)
-_changeEnableDateOverPeriodHandler = (e) ->
-  if $(e.target).is(':checked')
-    GritsFilterCriteria.enableDateOverPeriod.set(true)
-  else
-    GritsFilterCriteria.enableDateOverPeriod.set(false)
-  return
 _applyFilter = (e) ->
   if $(e.target).hasClass('disabled')
     return
@@ -463,7 +431,9 @@ Template.gritsSearch.events
   'change #searchBar': _changeSearchBarHandler
   'dp.change': _changeDateHandler
   'dp.show': _showDateHandler
-  'click #applyFilter': (event, template) ->
+  'click #applyFilter': (e) ->
+    if $(e.target).hasClass('disabled')
+        return
     GritsFilterCriteria.apply()
     return
   'click #loadMore': ->
@@ -507,7 +477,6 @@ Template.gritsSearch.events
     token = e.attrs.label
     return false
   'change #period': _changePeriodHandler
-  'change #enableDateOverPeriod': _changeEnableDateOverPeriodHandler
   'click .historical-view': (e, instance)->
     instance.historicalView.set true
   'click .seasonal-view': (e, instance)->
