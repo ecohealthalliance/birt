@@ -55,10 +55,13 @@ class GritsHeatmapLayer extends GritsLayer
   draw: ->
     # An extra point with no intensity is added because passing in an empty
     # array causes a bug where the previous heatmap is frozen in view.
-    this._layer.setData(_locations.concat([[0.0, 0.0, 0.0]]))
-    this._perturbMap()
-    this.hasLoaded.set(true)
-    return
+    data = _locations.concat([[0.0, 0.0, 0]])
+    # Normalize the intensity
+    totalSightings = data.reduce(((sofar, d)-> sofar + d[2]), 0)
+    data.forEach((d)-> 100 * d[2] /= totalSightings)
+    @_layer.setData(data)
+    @_perturbMap()
+    @hasLoaded.set(true)
 
   # clears the heatmap
   #
@@ -138,11 +141,12 @@ GritsHeatmapLayer.resetLocations = ->
 # @param [Array] tokens, the tokens from the filter
 GritsHeatmapLayer.createLocation = (dateKey, doc, tokens) ->
   id = CryptoJS.MD5(JSON.stringify(doc.loc)).toString()
-  count = 0
-  _.map(tokens, (t) ->
-    if doc.hasOwnProperty(t)
-      count += doc[t] / 1000
-  )
+  count = doc.sightings.reduce((sofar, sighting)->
+    if _.contains(tokens, sighting.bird_id)
+      sofar + (sighting?.count or 0)
+    else
+      sofar
+  , 0)
   idx = GritsHeatmapLayer.findIndex(dateKey, id)
   if idx < 0
     location = [] # create new location if undefined
@@ -178,11 +182,12 @@ GritsHeatmapLayer.decayLocations = (dateKey, documents, tokens) ->
     id = CryptoJS.MD5(JSON.stringify(doc.loc)).toString()
     idx = GritsHeatmapLayer.findIndex(dateKey, id)
     if idx >= 0
-      count = 0
-      _.map(tokens, (t) ->
-        if doc.hasOwnProperty(t)
-          count += doc[t] / 1000
-      )
+      count = doc.sightings.reduce((sofar, sighting)->
+        if _.contains(tokens, sighting.bird_id)
+          sofar + (sighting?.count or 0)
+        else
+          sofar
+      , 0)
       location = _locations[idx]
       location[2] -= count
       throttleDraw()

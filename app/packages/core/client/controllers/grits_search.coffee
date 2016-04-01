@@ -284,21 +284,17 @@ Template.gritsSearch.onCreated ->
   @autorun =>
     season = @season.get()
     tokens = GritsFilterCriteria.tokens.get()
-    if tokens.length > 0
-      # TODO Other places in the app allow only a single bird name token
-      # so I'm only using the first one for now.
-      token = tokens[0]
     if season
       params =
         season: season
-        birds: [token]
+        birds: tokens
       Template.gritsOverlay.show()
       Meteor.call 'migrationsBySeason', params, (err, result)->
         Template.gritsOverlay.hide()
         if err
           console.log err
           alert("Server error while computing migrations for season.")
-        console.log('result: ', result)
+          return
         map = Template.gritsMap.getInstance()
         # reset the historical heatmap
         heatmapLayerGroup = map.getGritsLayerGroup(GritsConstants.HEATMAP_GROUP_LAYER_ID)
@@ -307,7 +303,7 @@ Template.gritsSearch.onCreated ->
           GritsHeatmapLayer.createLocation(
             season,
             doc,
-            token)
+            tokens)
         heatmapLayerGroup.draw()
   # Public API
   # Currently we declare methods above for documentation purposes then assign
