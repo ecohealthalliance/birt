@@ -106,7 +106,7 @@ migrationsByQuery = (startDate, endDate, tokens, limit, skip) ->
     },
     $or: []
   }
-  fields = {date: 1, country: 1, state_province: 1, county: 1, loc: 1}
+  fields = {date: 1, country: 1, state_province: 1, county: 1, loc: 1, sightings: 1}
   _.each(tokens, (t) ->
     obj = {}
     obj[t] = {$gte: 1}

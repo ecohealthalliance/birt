@@ -142,12 +142,13 @@ GritsHeatmapLayer.resetLocations = ->
 # @param [Array] tokens, the tokens from the filter
 GritsHeatmapLayer.createLocation = (dateKey, doc, tokens) ->
   id = CryptoJS.MD5(JSON.stringify(doc.loc)).toString()
-  count = doc.sightings.reduce((sofar, sighting)->
+  count = doc.sightings?.reduce((sofar, sighting)->
     if _.contains(tokens, sighting.bird_id)
       sofar + (sighting?.count or 0)
     else
       sofar
   , 0)
+
   idx = GritsHeatmapLayer.findIndex(dateKey, id)
   if idx < 0
     location = [] # create new location if undefined
