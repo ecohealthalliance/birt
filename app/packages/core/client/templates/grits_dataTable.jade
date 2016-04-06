@@ -19,7 +19,7 @@ template(name='gritsDataTable')
                   td= country
                   td= state_province
                   td {{format date}}
-                  td
+                  td {{currentBird this}}
             else
               tr
                 td(colspan='12')
