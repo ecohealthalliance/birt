@@ -1,5 +1,4 @@
-birt-data.tar.gz
+*.tar.gz
 
 *.bson
 *.metadata.json
-
