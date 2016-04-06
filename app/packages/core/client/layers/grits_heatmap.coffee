@@ -57,8 +57,8 @@ class GritsHeatmapLayer extends GritsLayer
     # array causes a bug where the previous heatmap is frozen in view.
     data = _locations.concat([[0.0, 0.0, 0]])
     # Normalize the intensity
-    totalSightings = data.reduce(((sofar, d)-> sofar + d[2]), 0)
-    data.forEach((d)-> 100 * d[2] /= totalSightings)
+    totalSightings = data.reduce(((sofar, d) -> sofar + d[2]), 0)
+    data.forEach((d) -> 100 * d[2] /= totalSightings)
     @_layer.setData(data)
     @_perturbMap()
     @hasLoaded.set(true)
@@ -142,7 +142,7 @@ GritsHeatmapLayer.resetLocations = ->
 # @param [Array] tokens, the tokens from the filter
 GritsHeatmapLayer.createLocation = (dateKey, doc, tokens) ->
   id = CryptoJS.MD5(JSON.stringify(doc.loc)).toString()
-  count = doc.sightings?.reduce((sofar, sighting)->
+  count = doc.sightings?.reduce((sofar, sighting) ->
     if _.contains(tokens, sighting.bird_id)
       sofar + (sighting?.count or 0)
     else
@@ -220,7 +220,7 @@ GritsHeatmapLayer.decrementPreviousLocations = (nextIdx, frames, period, documen
     id = CryptoJS.MD5(JSON.stringify(doc.loc)).toString()
     idx = GritsHeatmapLayer.findIndex(dateKey, id)
     if idx >= 0
-      count = doc.sightings.reduce((sofar, sighting)->
+      count = doc.sightings?.reduce((sofar, sighting) ->
         if _.contains(tokens, sighting.bird_id)
           sofar + (sighting?.count or 0)
         else
@@ -241,11 +241,11 @@ GritsHeatmapLayer.decrementPreviousLocations = (nextIdx, frames, period, documen
   )
 
 # pause the heatmap animation
-GritsHeatmapLayer.pauseAnimation = () ->
+GritsHeatmapLayer.pauseAnimation = ->
   GritsHeatmapLayer.animationPaused.set(true)
 
 # stop the heatmap animation
-GritsHeatmapLayer.stopAnimation = () ->
+GritsHeatmapLayer.stopAnimation = ->
   GritsHeatmapLayer.animationCompleted.set(true)
   GritsHeatmapLayer.animationRunning.set(false)
   GritsHeatmapLayer.animationPaused.set(false)
@@ -376,7 +376,7 @@ GritsHeatmapLayer.startAnimation = (startDate, endDate, period, documents, token
         # final update the global counter
         Session.set(GritsConstants.SESSION_KEY_LOADED_RECORDS, processedLocations)
         # set progress
-        GritsHeatmapLayer.animationProgress.set((processedFrames + 1)/ framesLen)
+        GritsHeatmapLayer.animationProgress.set((processedFrames + 1) / framesLen)
         # start decaying these locations after the FRAME_INTERVAL, but do not decay the last frame
         if (processedFrames + 1) < framesLen
           GritsHeatmapLayer.decrementPreviousLocations(processedFrames, frames, period, documents, tokens, (err, res) ->
@@ -438,6 +438,13 @@ GritsHeatmapLayer.migrationsByDate = (dates, token, limit, offset, done) ->
       GritsHeatmapLayer.animationRunning.set(false)
       return
 
+    MiniMigrations.remove({})
+    i = 0
+    ilen = migrations.length
+    while i < ilen
+      MiniMigrations.insert(migrations[i])
+      i++
+
     # execute the callback to process the migrations
     done(null, migrations)
     return
@@ -452,7 +459,7 @@ GritsHeatmapLayer.migrationsByDate = (dates, token, limit, offset, done) ->
 # @param [Number] limit, the limit from the filter
 # @param [Number] offset, the offset from the filter
 # @param [Function] done, callback when done
-GritsHeatmapLayer.migrationsByDateRange = (startDate, endDate, token, limit, offset, done) ->
+GritsHeatmapLayer.migrationsByDateRange = (startDate, endDate, token, _limit, offset, done) ->
   # show the loading indicator and call the server-side method
   GritsHeatmapLayer.animationRunning.set(true)
   async.auto({
@@ -475,7 +482,7 @@ GritsHeatmapLayer.migrationsByDateRange = (startDate, endDate, token, limit, off
       if totalRecords == 0
         callback(null, [])
         return
-      Meteor.call('migrationsByQuery', startDate, endDate, token, limit, offset, callback)
+      Meteor.call('migrationsByQuery', startDate, endDate, token, 9999, offset, callback)
     ]
   }, (err, result) ->
     if err
@@ -491,6 +498,13 @@ GritsHeatmapLayer.migrationsByDateRange = (startDate, endDate, token, limit, off
       toastr.info(i18n.get('toastMessages.noResults'))
       GritsHeatmapLayer.animationRunning.set(false)
       return
+
+    MiniMigrations.remove({})
+    i = 0
+    ilen = migrations.length
+    while i < ilen
+      MiniMigrations.insert(migrations[i])
+      i++
 
     # execute the callback to process the migrations
     done(null, migrations)

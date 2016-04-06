@@ -287,7 +287,7 @@ Template.gritsSearch.onCreated ->
         season: season
         birds: tokens
       Template.gritsOverlay.show()
-      Meteor.call 'migrationsBySeason', params, (err, result)->
+      Meteor.call 'migrationsBySeason', params, (err, result) ->
         Template.gritsOverlay.hide()
         if err
           console.log err
@@ -297,7 +297,7 @@ Template.gritsSearch.onCreated ->
         # reset the historical heatmap
         heatmapLayerGroup = map.getGritsLayerGroup(GritsConstants.HEATMAP_GROUP_LAYER_ID)
         heatmapLayerGroup.reset()
-        result.forEach (doc)->
+        result.forEach (doc) ->
           GritsHeatmapLayer.createLocation(
             season,
             doc,
@@ -433,7 +433,7 @@ Template.gritsSearch.events
   'dp.show': _showDateHandler
   'click #applyFilter': (e) ->
     if $(e.target).hasClass('disabled')
-        return
+      return
     GritsFilterCriteria.apply()
     return
   'click #loadMore': ->
@@ -477,10 +477,10 @@ Template.gritsSearch.events
     token = e.attrs.label
     return false
   'change #period': _changePeriodHandler
-  'click .historical-view': (e, instance)->
+  'click .historical-view': (e, instance) ->
     instance.historicalView.set true
-  'click .seasonal-view': (e, instance)->
+  'click .seasonal-view': (e, instance) ->
     instance.historicalView.set false
-  'click .seasons a': (e, instance)->
+  'click .seasons a': (e, instance) ->
     console.log $(e.target).text().toLowerCase()
     instance.season.set $(e.target).text().toLowerCase()

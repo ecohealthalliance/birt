@@ -29,7 +29,7 @@ Package.onUse(function(api){
     'kevbuk:moment-range@2.2.2',
     'andrei:tablesorter@0.0.1',
     'okgrow:analytics@1.0.4',
-    'grits:flirt-sidebar@0.0.1'
+    'birt:sidebar@0.0.1'
   ]);
 
   // client only packages
@@ -109,6 +109,7 @@ Package.onUse(function(api){
     'Bird',
     'Birds',
     'Migrations',
+    'MiniMigrations',
     'GritsConstants',
     'GritsFilterCriteria',
     'GritsLayer',

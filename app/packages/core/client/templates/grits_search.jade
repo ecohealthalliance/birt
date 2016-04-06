@@ -62,17 +62,6 @@ template(name='gritsSearch')
 
     if historicalView
       .filter-footer
-        #limitBar.limit-bar
-          .limit.col-xs-12
-            .limitSearchTitle
-              span.filter-label {{_ "gritsSearch.limit-label"}}
-            .limitInput
-              input#limit.form-control.input-sm.advanced-filter-status(type='number', value=limit)
-            div
-              button#loadMore.btn.btn-sm.btn-default.pull-right(disabled='true')
-                span.filter-label(style='font-size: smaller;') {{_ "gritsSearch.more-button"}}
-                img#moreLoading(src='/packages/{{ GritsConstants.PACKAGE_NAME }}/public/images/ajax-loader.gif', style='display: none;')
-
         .status-bar
           .col.col-xs-2.filter-label {{_ "gritsSearch.status-bar-label" }}
           .col.col-xs-5.text-center

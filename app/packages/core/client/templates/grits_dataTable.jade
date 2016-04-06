@@ -16,10 +16,10 @@ template(name='gritsDataTable')
             with migrations
               each migrations
                 tr.pathTableRow(data-id=this._id)
-                  td
-                  td
-                  td
-                  td
+                  td= country
+                  td= state_province
+                  td {{format date}}
+                  td {{currentBird this}}
             else
               tr
                 td(colspan='12')
