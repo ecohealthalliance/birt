@@ -3,16 +3,9 @@
 BIRT is a geospatial bird migration analysis tool.  Users may search for a bird species and identify migrations patterns over a period of time.
 [http://birt.eha.io](http://birt.eha.io)
 
-## Pre-requisites
-
-### 1. Setup the database
-BIRT uses MongoDB and data from [eBird](http://ebird.org/content/ebird/).  The `birt-consume` [README.md](https://github.com/ecohealthalliance/birt-consumer/blob/master/README.md) provides instructions on parsing the eBird data and populating the database.
-
-### 2. Install submodules
-BIRT uses GNU `make` to install git submodules.  In a unix-like environment, change directories to the `app\` directory and run the `make install` command.
-
-### (Optional) Update submodules
-Once installed, it may be necessary to update the git submodule dependencies by issuing the command `make update`.
+## Setup the database
+BIRT uses MongoDB and data from [eBird](http://ebird.org/content/ebird/).
+The `birt-consume` [README.md](https://github.com/ecohealthalliance/birt-consumer/blob/master/README.md) provides instructions on parsing the eBird data and populating the database.
 
 ## Run
 The run command can be issued by calling `make run`.  However, Meteor will need the `MONGO_URL` environment set.  This can be accomplished in one or two ways:
