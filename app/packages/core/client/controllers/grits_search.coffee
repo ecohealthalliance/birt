@@ -219,10 +219,11 @@ Template.gritsSearch.helpers({
   periods: ->
     return [
       {value: 'days', displayName: i18n.get('gritsSearch.period-days')},
-      {value: 'weeks', displayName: i18n.get('gritsSearch.period-weeks')},
-      {value: 'months', displayName: i18n.get('gritsSearch.period-months')},
-      {value: 'years', displayName: i18n.get('gritsSearch.period-years')}
     ]
+    #  {value: 'weeks', displayName: i18n.get('gritsSearch.period-weeks')},
+    #  {value: 'months', displayName: i18n.get('gritsSearch.period-months')},
+    #  {value: 'years', displayName: i18n.get('gritsSearch.period-years')}
+    #]
   defaultPeriod: (period) ->
     if period.value == 'days'
       return true
