@@ -51,18 +51,21 @@
       align-self center
 
 .scrubber-container
-  width calc(100% - 60px)
+  width calc(100% - 120px)
 
-.scrubber-play
-  width 60px
+.scrubber-play, .scrubber-stop
+  width 50px
   float left
   overflow hidden
+
+.scrubber-stop-disabled
+  opacity .25
 
 .right-slider-container
   position relative
   margin-top 15px
   height 50px
-  left 60px
+  left 130px
   width calc(100% - 60px)
 
 #slider
@@ -86,7 +89,7 @@
  100%
     -webkit-transform: scale(1)
 
-.pulse
+.scrubber-paused
  -webkit-animation-name 'pulse_animation'
  -webkit-animation-delay 0s
  -webkit-animation-duration 1500ms

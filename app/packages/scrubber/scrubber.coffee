@@ -49,6 +49,7 @@ Template.scrubber.onRendered ->
     startDate = GritsFilterCriteria.operatingDateRangeStart.get()
     endDate = GritsFilterCriteria.operatingDateRangeEnd.get()
     period = GritsFilterCriteria.period.get()
+    currentState = JSON.stringify([startDate, endDate, period])
     range = moment.range(startDate, endDate).toArray(period)
     if range.length - 1 <= 0
       len = 1
@@ -63,7 +64,7 @@ Template.scrubber.onRendered ->
         step: 1
         range: {min: 0, max: len}
       )
-      _slider.noUiSlider.on('update', (val, handle) ->
+      _slider.noUiSlider.on('slide', (val, handle) ->
         beginIdx = parseInt(val[0], 10)
         endIdx = parseInt(val[1], 10)
         # when dragging the beginning handle, the scrubber-progress bar will
@@ -82,7 +83,7 @@ Template.scrubber.onRendered ->
         range: {min: 0, max: len}
       )
       # determine if the filter values we use have changed state
-      if _lastState == JSON.stringify([startDate, endDate, period])
+      if _lastState == currentState
         # if state was not changed, update the slider to last know values
         scrubber = Session.get('scrubber')
         _slider.noUiSlider.set([scrubber[0], scrubber[1]])
@@ -99,13 +100,17 @@ Template.scrubber.helpers
       'play'
   paused: ->
     if Template.instance().isPaused.get()
-      'pulse'
+      'scrubber-paused'
     else
       ''
+  stopDisabled: ->
+    if Template.instance().isPlaying.get()
+      ''
+    else
+      'scrubber-stop-disabled'
   progress: ->
     progress = GritsHeatmapLayer.animationProgress.get()
     return progress * 100 + '%'
-
 
 Template.scrubber.events
   'dblclick .scrubber-container': (event) ->
@@ -118,5 +123,10 @@ Template.scrubber.events
       unless isPaused
         $('#applyFilter').click()
     else
-      GritsHeatmapLayer.animationPaused.set( not isPaused)
+      GritsHeatmapLayer.animationPaused.set( not isPaused )
       instance.isPlaying.set( not isPlaying )
+  'click .scrubber-stop': (event, instance) ->
+    if ($(event.target).hasClass('.scrubber-stop-disabled'))
+      return
+    instance.isPlaying.set(false)
+    GritsHeatmapLayer.stopAnimation()
