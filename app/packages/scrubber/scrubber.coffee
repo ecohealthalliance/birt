@@ -94,7 +94,7 @@ Template.scrubber.onRendered ->
 
 Template.scrubber.helpers
   state: ->
-    if Template.instance().isPlaying.get()
+    if GritsHeatmapLayer.animationRunning.get()
       'pause'
     else
       'play'
@@ -119,12 +119,11 @@ Template.scrubber.events
   'click .scrubber-play': (event, instance) ->
     isPlaying = instance.isPlaying.get()
     isPaused = instance.isPaused.get()
+    GritsHeatmapLayer.animationPaused.set( not isPaused )
+    GritsHeatmapLayer.animationRunning.set( not isPlaying )
     unless isPlaying
       unless isPaused
         $('#applyFilter').click()
-    else
-      GritsHeatmapLayer.animationPaused.set( not isPaused )
-      instance.isPlaying.set( not isPlaying )
   'click .scrubber-stop': (event, instance) ->
     if ($(event.target).hasClass('.scrubber-stop-disabled'))
       return
