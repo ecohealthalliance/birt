@@ -288,22 +288,25 @@ Template.gritsSearch.onCreated ->
         season: season
         birds: tokens
       Template.gritsOverlay.show()
-      Meteor.call 'migrationsBySeason', params, (err, result) ->
+      if params.birds.length
+        Meteor.call 'migrationsBySeason', params, (err, result) ->
+          Template.gritsOverlay.hide()
+          if err
+            console.log err
+            alert("Server error while computing migrations for season.")
+            return
+          map = Template.gritsMap.getInstance()
+          # reset the historical heatmap
+          heatmapLayerGroup = map.getGritsLayerGroup(GritsConstants.HEATMAP_GROUP_LAYER_ID)
+          heatmapLayerGroup.reset()
+          result.forEach (doc) ->
+            GritsHeatmapLayer.createLocation(
+              season,
+              doc,
+              tokens)
+          heatmapLayerGroup.draw()
+      else
         Template.gritsOverlay.hide()
-        if err
-          console.log err
-          alert("Server error while computing migrations for season.")
-          return
-        map = Template.gritsMap.getInstance()
-        # reset the historical heatmap
-        heatmapLayerGroup = map.getGritsLayerGroup(GritsConstants.HEATMAP_GROUP_LAYER_ID)
-        heatmapLayerGroup.reset()
-        result.forEach (doc) ->
-          GritsHeatmapLayer.createLocation(
-            season,
-            doc,
-            tokens)
-        heatmapLayerGroup.draw()
   # Public API
   # Currently we declare methods above for documentation purposes then assign
   # to the Template.gritsSearch as a global export
