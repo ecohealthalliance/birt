@@ -269,6 +269,11 @@ GritsHeatmapLayer.startAnimation = (startDate, endDate, period, documents, token
   heatmapLayerGroup = map.getGritsLayerGroup(GritsConstants.HEATMAP_GROUP_LAYER_ID)
   heatmapLayerGroup.add()
 
+  # Fit map to bounds of all locations
+  locations = _.map documents, (doc) ->
+    [doc.loc.coordinates[1], doc.loc.coordinates[0]]
+  map.fitBounds(L.latLngBounds(locations))
+
   # if the offset is equal to zero, clear the layers
   if offset == 0
     heatmapLayerGroup.reset()
@@ -306,7 +311,7 @@ GritsHeatmapLayer.startAnimation = (startDate, endDate, period, documents, token
   GritsHeatmapLayer.animationProgress.set(processedFrames)
 
   # the animation is uses setInterval
-  _animation = setInterval(->
+  _animation = setInterval ->
     paused = GritsHeatmapLayer.animationPaused.get()
     if paused
       return
@@ -356,7 +361,7 @@ GritsHeatmapLayer.startAnimation = (startDate, endDate, period, documents, token
       # get the documents for this period
       filteredDocuments = GritsHeatmapLayer.filteredDocuments(f, period, documents)
       processedLocations = Session.get(GritsConstants.SESSION_KEY_LOADED_RECORDS)
-      async.eachSeries(filteredDocuments, (doc, next) ->
+      async.eachSeries filteredDocuments, (doc, next) ->
         if doc == null
           # we expect the null case for when there are no documents for the
           # date range.  call the next callback of the series and return.
@@ -368,9 +373,8 @@ GritsHeatmapLayer.startAnimation = (startDate, endDate, period, documents, token
         throttleDraw()
         # update the global counter
         throttleCount(++processedLocations)
-        async.nextTick(->
+        async.nextTick ->
           next()
-        )
       , (err) ->
         # final update the global counter
         Session.set(GritsConstants.SESSION_KEY_LOADED_RECORDS, processedLocations)
@@ -378,14 +382,12 @@ GritsHeatmapLayer.startAnimation = (startDate, endDate, period, documents, token
         GritsHeatmapLayer.animationProgress.set((processedFrames + 1) / framesLen)
         # start decaying these locations after the FRAME_INTERVAL, but do not decay the last frame
         if (processedFrames + 1) < framesLen
-          GritsHeatmapLayer.decrementPreviousLocations(processedFrames, frames, period, documents, tokens, (err, res) ->
+          GritsHeatmapLayer.decrementPreviousLocations processedFrames, frames, period, documents, tokens, (err, res) ->
             # don't allow the animation to proceed until the previous frame has been decremented
             processedFrames++
-          )
         else
           processedFrames++
-      )
-  , FRAME_INTERVAL)
+  , FRAME_INTERVAL
 
 # get mirgations from mongo by an array of dates and token from the UI filter
 #
