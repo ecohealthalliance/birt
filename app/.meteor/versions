@@ -67,7 +67,6 @@ mongo-id@1.0.1
 mongo-livedata@1.0.9
 mquandalle:jade@0.4.9
 mquandalle:jade-compiler@0.4.5
-mquandalle:stylus@1.1.1
 npm-mongo@1.4.39_1
 observe-sequence@1.0.7
 okgrow:analytics@1.0.4

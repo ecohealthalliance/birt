@@ -1,17 +1,17 @@
 template(name='gritsDataTable')
   ul.nav.nav-tabs.table-tabs
     li.active
-      a#pathTab(href='#paths' data-toggle='tab') {{_ "gritsDataTable.explore.title"}}
+      a#pathTab(href='#paths' data-toggle='tab') {{_ "dataTable.explore.title"}}
   .tab-content.dataTableContent
     #paths.tab-pane.active
       .pathsTableContainer
         table#exploreTable.table.dataTable
           thead
             tr
-              th {{_ "gritsDataTable.explore.col1-heading"}}
-              th {{_ "gritsDataTable.explore.col2-heading"}}
-              th {{_ "gritsDataTable.explore.col3-heading"}}
-              th {{_ "gritsDataTable.explore.col4-heading"}}
+              th {{_ "dataTable.explore.col1-heading"}}
+              th {{_ "dataTable.explore.col2-heading"}}
+              th {{_ "dataTable.explore.col3-heading"}}
+              th {{_ "dataTable.explore.col4-heading"}}
           tbody
             with migrations
               each migrations

@@ -20,7 +20,7 @@ Package.onUse(function(api){
     'minimongo',
     'session',
     'mquandalle:jade@0.4.9',
-    'mquandalle:stylus@1.1.1'
+    'stylus'
   ], 'client');
 
   // client-side only files

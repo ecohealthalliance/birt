@@ -38,7 +38,7 @@ Package.onUse(function(api){
     'session',
     'mquandalle:jade@0.4.9',
     'twbs:bootstrap@3.3.5',
-    'mquandalle:stylus@1.1.1',
+    'stylus',
     'fortawesome:fontawesome@4.5.0',
     'sidebar-main',
     'sidebar-tabular'
@@ -53,11 +53,8 @@ Package.onUse(function(api){
   // client-side only files
   // IMPORTANT: these files are loaded in order
   api.addFiles([
-    'client/stylesheets/variables.import.styl',
     'client/stylesheets/mixins.import.styl',
     'client/stylesheets/globals.import.styl',
-    'client/stylesheets/sidebar.import.styl',
-    'client/stylesheets/sidebar_table.import.styl',
     'client/stylesheets/birt.import.styl',
     'client/stylesheets/main.styl',
     'client/stylesheets/overlay.styl',
@@ -78,9 +75,6 @@ Package.onUse(function(api){
     'client/templates/grits_layerSelector.jade',
     'client/controllers/grits_layerSelector.coffee',
     'client/templates/grits_map.jade',
-    'client/templates/grits_map_sidebar.jade',
-    'client/controllers/grits_map_sidebar.coffee',
-    'client/templates/grits_map_table_sidebar.jade',
     'client/controllers/grits_map.coffee',
     'client/templates/grits_search.jade',
     'client/controllers/grits_search.coffee',

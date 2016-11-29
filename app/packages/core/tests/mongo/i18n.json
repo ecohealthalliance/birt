@@ -2,21 +2,21 @@
 { "_id" : "yoJkQL5LomzucHrYW" , "key" : "gritsLegend.path-throughput" , "en" : [ "Flight Seat Count"]}
 { "_id" : "2pCBFuLuGNivsWb7E" , "key" : "gritsLegend.node-throughput" , "en" : [ "Airport Seat Count"]}
 { "_id" : "nRjAiYHkmSbXYi386" , "key" : "gritsLegend.source" , "en" : [ "Flight and Airport seat count is normalized based on the current filter."]}
-{ "_id" : "gZBHNr2C6KHd5pGaA" , "key" : "gritsDataTable.tab-1.title" , "en" : [ "Flights"]}
-{ "_id" : "qCyKpBCdR6eRBNeM9" , "key" : "gritsDataTable.tab-1.origin-heading" , "en" : [ "Origin"]}
-{ "_id" : "MYkF74kDFaSTjgdXs" , "key" : "gritsDataTable.tab-1.destination-heading" , "en" : [ "Destination"]}
-{ "_id" : "K2iwuj8iTxRHsckJc" , "key" : "gritsDataTable.tab-1.occurances-heading" , "en" : [ "Occurrences"]}
-{ "_id" : "pvEFTD8m9MH2yQEk3" , "key" : "gritsDataTable.tab-1.throughput-heading" , "en" : [ "Total Seats"]}
-{ "_id" : "X6FkGudixbav4EtdA" , "key" : "gritsDataTable.tab-2.title" , "en" : [ "Airports"]}
-{ "_id" : "wiZwQvP3GNNkBELbn" , "key" : "gritsDataTable.tab-2.code-heading" , "en" : [ "Code"]}
-{ "_id" : "g5HmPYdBQDy9bBvhu" , "key" : "gritsDataTable.tab-2.incoming-heading" , "en" : [ "Incoming"]}
-{ "_id" : "CoZzchv2YciqKbRmJ" , "key" : "gritsDataTable.tab-2.outgoing-heading" , "en" : [ "Outgoing"]}
-{ "_id" : "W6rEkRQpXSsLj2Hed" , "key" : "gritsDataTable.tab-2.total-heading" , "en" : [ "Total Seats"]}
-{ "_id" : "QRSK9nSpeScxhiZZ9" , "key" : "gritsDataTable.tab-3.title" , "en" : [ "Heatmap"]}
-{ "_id" : "Pwcd4Fm7xyNDzXXka" , "key" : "gritsDataTable.tab-3.code-heading" , "en" : [ "Code"]}
-{ "_id" : "jenPFsTCDCXbkw2gp" , "key" : "gritsDataTable.tab-3.latitude-heading" , "en" : [ "Incoming"]}
-{ "_id" : "Hd4SgNjQFdMnSWv8x" , "key" : "gritsDataTable.tab-3.longitude-heading" , "en" : [ "Outgoing"]}
-{ "_id" : "Tc28WbRLY5nMitGnr" , "key" : "gritsDataTable.tab-3.intensity-heading" , "en" : [ "Intensity"]}
+{ "_id" : "gZBHNr2C6KHd5pGaA" , "key" : "dataTable.tab-1.title" , "en" : [ "Flights"]}
+{ "_id" : "qCyKpBCdR6eRBNeM9" , "key" : "dataTable.tab-1.origin-heading" , "en" : [ "Origin"]}
+{ "_id" : "MYkF74kDFaSTjgdXs" , "key" : "dataTable.tab-1.destination-heading" , "en" : [ "Destination"]}
+{ "_id" : "K2iwuj8iTxRHsckJc" , "key" : "dataTable.tab-1.occurances-heading" , "en" : [ "Occurrences"]}
+{ "_id" : "pvEFTD8m9MH2yQEk3" , "key" : "dataTable.tab-1.throughput-heading" , "en" : [ "Total Seats"]}
+{ "_id" : "X6FkGudixbav4EtdA" , "key" : "dataTable.tab-2.title" , "en" : [ "Airports"]}
+{ "_id" : "wiZwQvP3GNNkBELbn" , "key" : "dataTable.tab-2.code-heading" , "en" : [ "Code"]}
+{ "_id" : "g5HmPYdBQDy9bBvhu" , "key" : "dataTable.tab-2.incoming-heading" , "en" : [ "Incoming"]}
+{ "_id" : "CoZzchv2YciqKbRmJ" , "key" : "dataTable.tab-2.outgoing-heading" , "en" : [ "Outgoing"]}
+{ "_id" : "W6rEkRQpXSsLj2Hed" , "key" : "dataTable.tab-2.total-heading" , "en" : [ "Total Seats"]}
+{ "_id" : "QRSK9nSpeScxhiZZ9" , "key" : "dataTable.tab-3.title" , "en" : [ "Heatmap"]}
+{ "_id" : "Pwcd4Fm7xyNDzXXka" , "key" : "dataTable.tab-3.code-heading" , "en" : [ "Code"]}
+{ "_id" : "jenPFsTCDCXbkw2gp" , "key" : "dataTable.tab-3.latitude-heading" , "en" : [ "Incoming"]}
+{ "_id" : "Hd4SgNjQFdMnSWv8x" , "key" : "dataTable.tab-3.longitude-heading" , "en" : [ "Outgoing"]}
+{ "_id" : "Tc28WbRLY5nMitGnr" , "key" : "dataTable.tab-3.intensity-heading" , "en" : [ "Intensity"]}
 { "_id" : "ef65KPycnE4MGGAaA" , "key" : "gritsFilter.tokenfield-placeholder" , "en" : [ "Type to search originations"]}
 { "_id" : "CJgriPLX8iH8sornG" , "key" : "gritsFilter.title" , "en" : [ "Advanced Filter"]}
 { "_id" : "t7MbZ6haLgBag7Qmi" , "key" : "gritsFilter.limit-label" , "en" : [ "Limit"]}
@@ -54,7 +54,7 @@
 { "_id" : "RuLorRzdL8GSqKnmb" , "key" : "gritsElementDetails.tab-2.country-label" , "en" : [ "Country"]}
 { "_id" : "AbmCDr2CR5pcbGQFm" , "key" : "gritsElementDetails.tab-2.region-label" , "en" : [ "Region"]}
 { "_id" : "ZJ8BykisCQotZLjZF" , "key" : "gritsElementDetails.tab-2.normalized-label" , "en" : [ "Normalized"]}
-{ "_id" : "3r7oaDscL7uXokSwD" , "key" : "gritsDataTable.tab-1.occurrences-heading" , "en" : [ "Occurrences"]}
+{ "_id" : "3r7oaDscL7uXokSwD" , "key" : "dataTable.tab-1.occurrences-heading" , "en" : [ "Occurrences"]}
 { "_id" : "hZ8C4yAY6w4XB74YT" , "key" : "gritsElementDetails.tab-2.incoming-label" , "en" : [ "Incoming Seats"]}
 { "_id" : "dxdi53Z5shAMwR3qR" , "key" : "gritsElementDetails.tab-2.outgoing-label" , "en" : [ "Outgoing Seats"]}
 { "_id" : "JWhFpPGSqbiCJaMMj" , "key" : "gritsElementDetails.tab-2.total-throughput-label" , "en" : [ "Total Seats"]}

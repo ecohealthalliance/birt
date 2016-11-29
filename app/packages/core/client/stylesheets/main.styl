@@ -82,6 +82,9 @@ body
 .leaflet-bottom.leaflet-right
   z-index 1001
 
+.leaflet-bottom.leaflet-right
+  bottom $play-controls-height
+
 p.intro
   line-height 1.5
   margin 5px 0 35px 0
@@ -127,27 +130,21 @@ p.intro
 .leaflet-heatmap-layer
   z-index -1
 
-.leaflet-control-zoom
-  clear none // allows horizontal stacking with filter
-
-.filter-control
-  clear none // allows horizontal stacking with zoom
-
 .searchBar
   position relative
   width 100%
   border-left 0
   border-right 0
   background $ll-gray
-  border-top 4px solid $blue
-  border-bottom 1px solid $blue
+  border-top 4px solid $primary
+  border-bottom 1px solid $primary
   font-size 1em
 
 #searchIcon
   verticallyCenter()
   left 10px
   font-size 1.4em
-  color $blue
+  color $primary
 
 .twitter-typeahead
   position static !important // Overides typeahead's inline styling
@@ -211,31 +208,6 @@ p.intro
   strong
     color #000
 
-#title
-  background url("/packages/birt_core/public/images/birt-logo-inline.png")
-  background-size 300px 100px
-  background-position center center
-  width 300px
-  height 100px
-  margin 0px
-  text-indent -9999px
-  background-repeat no-repeat
-
-#loadMore
-  margin-right 0px
-
-#sidebar-question-tab
-  position absolute
-  bottom 0px
-
-#sidebar-search-tab
-  position absolute
-  top 140px
-
-#sidebar-layer-tab
-  position absolute
-  top 260px
-
 .tt-input
   height 30px
   font-weight 20px
@@ -254,23 +226,6 @@ p.intro
   font-size 16px
   margin-top 2px
   margin-bottom 0
-
-.sidebar-tabs > li:hover
-  color #333
-
-.limit
-  > div
-    display inline-block
-    vertical-align middle
-
-.limitSearchTitle
-  padding 0
-  margin 0px 10px 0px 0px
-
-.limitInput
-  width 84px
-  padding-left 0
-  padding-right 10px
 
 .leaflet-control-layers-base
 .leaflet-control-layers-overlays
@@ -296,11 +251,11 @@ p.intro
 .datatable-heading
   padding 5px
   font-size 18px
-  color $blue
+  color $primary
   font-weight bold
 
 .datatable-hr
-  border-bottom 2px solid $blue
+  border-bottom 2px solid $primary
 
 .filter
   display table;
@@ -319,13 +274,6 @@ p.intro
 .filter-group
   white-space nowrap
   padding 2px
-
-.filter-footer
-  @extend .sidebar-footer
-  width 305px /* the Flirt logo is 305px so setting to filter-container-width() will leave 5px white space between footer and blue sidebar */
-  display table-footer-group
-  padding-top 10px
-  font-size .8em
 
 .filter-wrapper
   margin-left 25px

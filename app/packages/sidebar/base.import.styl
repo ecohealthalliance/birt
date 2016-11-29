@@ -6,7 +6,6 @@ $sidebar-border-width = 3px
   left 0
   top 0
   bottom 0
-  overflow hidden
   z-index $sidebar-z-index
   height 100vh
   width $sidebar-main-width
@@ -58,10 +57,10 @@ if $sidebar-main-menu-width == 0
       align-self flex-end
     &.push-to-top
       align-self flex-start
-    &:hover
-      color alpha(@color, 100%)
-    &.active
-      color alpha(@color, 100%)
+    // &:hover
+    //   color alpha($inactive-btn, 100%)
+    // &.active
+    //   color alpha($inactive-btn, 100%)
 
 .sidebar--content
   height 100vh
@@ -97,7 +96,7 @@ if $sidebar-main-menu-width == 0
 
 .zoom-control
   position absolute
-  bottom 15px
+  bottom $play-controls-height + 10px
   left $sidebar-main-menu-width + 10px
 
 .zoom-control--in

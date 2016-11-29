@@ -41,11 +41,7 @@ Template.gritsMap.onRendered ->
       map = new GritsMap(element, options, baseLayers)
 
       # Add the default controls to the map.
-      Template.gritsMap.addDefaultControls(map)
-
-      # initialize the sidebar-v2
-      L.control.sidebar('sidebar').addTo(map)
-      L.control.sidebar('tableSidebar').addTo(map)
+      # Template.gritsMap.addDefaultControls(map)
 
       # Add test control
       Meteor.call('isTestEnvironment', (err, result) ->

@@ -1,0 +1,8 @@
+template(name='scrubber')
+  .scrubber-play(class='{{paused}}')
+    i.fa.fa-4x(class='fa-{{state}}-circle')
+  .scrubber-stop(class='{{stopDisabled}}')
+    i.fa.fa-stop-circle.fa-4x
+  .right-slider-container
+    #slider
+    .scrubber-progress(style='left: {{progress}}')
