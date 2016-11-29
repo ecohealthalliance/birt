@@ -1,6 +1,6 @@
 <template name="scrubber">
   <div class="scrubber-container">
-    <div class="scrubber-play {{paused}}"><i class="fa fa-{{state}}-circle fa-4x"></i></div>
+    <div class="scrubber-play {{paused}} {{playDisabled}}"><i class="fa fa-{{state}}-circle fa-4x"></i></div>
     <div class="scrubber-stop {{stopDisabled}}"><i class="fa fa-stop-circle fa-4x"></i></div>
     <div class="right-slider-container">
       <div id="slider"></div>
