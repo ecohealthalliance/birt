@@ -53,10 +53,21 @@
 .scrubber-container
   width calc(100% - 120px)
 
-.scrubber-play, .scrubber-stop
+.scrubber-play
+.scrubber-stop
   width 50px
   float left
   overflow hidden
+  cursor pointer
+
+.scrubber-play
+  &:hover
+    color $green
+
+.scrubber-stop
+  &:not(.scrubber-stop-disabled)
+    &:hover
+      color darken($delete, 10%)
 
 .scrubber-stop-disabled
   opacity .25
