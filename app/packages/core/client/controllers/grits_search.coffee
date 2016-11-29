@@ -47,6 +47,24 @@ _typeaheadFooter = _.template('
     </div>
   </div>')
 
+_topSpecies = [
+  "puffinus_griseus",
+  "anas_clypeata",
+  "icteridae_sp",
+  "phalacrocorax_auritus",
+  "progne_subis",
+  "turdus_migratorius",
+  "anas_platyrhynchos",
+  "fulica_americana",
+  "larus_delawarensis",
+  "quiscalus_quiscula",
+  "sturnus_vulgaris",
+  "branta_canadensis",
+  "tachycineta_bicolor",
+  "chen_caerulescens",
+  "agelaius_phoeniceus"
+]
+
 # returns the typeahead object for the '#searchBar' input
 #
 # @see: http://sliptree.github.io/bootstrap-tokenfield/#methods
@@ -334,7 +352,9 @@ Template.gritsSearch.onRendered ->
     }]
   })
   _setSearchBar(searchBar)
-
+  speciesLength = _topSpecies.length - 1
+  species = _topSpecies[Math.floor(Math.random() * speciesLength)]
+  $('#searchBar').tokenfield('createToken',species);
   # Toast notification options
   toastr.options = {
     positionClass: 'toast-bottom-center',
@@ -486,5 +506,4 @@ Template.gritsSearch.events
   'click .seasonal-view': (e, instance) ->
     instance.historicalView.set false
   'click .seasons a': (e, instance) ->
-    console.log $(e.target).text().toLowerCase()
     instance.season.set $(e.target).text().toLowerCase()
