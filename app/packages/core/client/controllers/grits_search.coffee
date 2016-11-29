@@ -353,10 +353,7 @@ Template.gritsSearch.onRendered ->
   })
   _setSearchBar(searchBar)
   species = _topSpecies[Math.floor(Math.random() * 14)]
-  _suggestionGenerator species,0, (data) ->
-  # $("#searchBar-tokenfield").val(species)
   $('#searchBar').tokenfield('createToken',species);
-  # _changeSearchBarHandler()
   # Toast notification options
   toastr.options = {
     positionClass: 'toast-bottom-center',
