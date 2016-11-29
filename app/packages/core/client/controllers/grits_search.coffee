@@ -352,7 +352,8 @@ Template.gritsSearch.onRendered ->
     }]
   })
   _setSearchBar(searchBar)
-  species = _topSpecies[Math.floor(Math.random() * 14)]
+  speciesLength = _topSpecies.length - 1
+  species = _topSpecies[Math.floor(Math.random() * speciesLength)]
   $('#searchBar').tokenfield('createToken',species);
   # Toast notification options
   toastr.options = {
