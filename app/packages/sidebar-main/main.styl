@@ -1,0 +1,69 @@
+@import 'nib'
+@import '{styles-base}/tooltips'
+@import '{styles-base}/variables'
+
+.logo
+  background url("../../../images/logo.svg") no-repeat
+  background-size 100%
+  background-position center center
+  width 80%
+  min-height 65px
+  margin 0
+  text-indent -9999px
+  background-repeat no-repeat
+  padding 30px 0
+  margin-right auto
+  margin-left auto
+
+.searchBar
+  border-top 0
+  .form-control
+    &:focus
+    &.focus
+      outline 0
+      box-shadow none
+      background $ll-gray
+
+#mode-toggle
+  display flex
+  border-top 2px solid $primary
+  border-bottom 2px solid $primary
+  label
+    flex 1 0 0
+    flex-direction row
+    flex-wrap nowrap
+    border-radius 0
+    color $primary
+    box-shadow none
+    border 0
+    float none
+    white-space normal
+    &:hover
+      background darken(#f9f9f9, 5%)
+    &.active
+      background $primary
+      color white
+    &.focus
+    &:focus
+    &.active:focus
+      outline 0
+
+.token-input
+  font-size 1.2em !important
+
+.tokenized
+  &.main
+    max-width 100%
+
+.btn-filter
+  width 100%
+  border-radius 2px
+  color $dd-gray
+  background-color $secondary
+  border-color darken(@background-color, 25%)
+  font-weight bold
+  &:hover
+    background darken(@background-color, 15%)
+  &:focus
+    outline 0
+    border-color darken(@background-color, 50%)

@@ -29,7 +29,6 @@ Package.onUse(function(api){
     'kevbuk:moment-range@2.2.2',
     'andrei:tablesorter@0.0.1',
     'okgrow:analytics@1.0.4',
-    'birt:sidebar@0.0.1'
   ]);
 
   // client only packages
@@ -41,6 +40,8 @@ Package.onUse(function(api){
     'twbs:bootstrap@3.3.5',
     'mquandalle:stylus@1.1.1',
     'fortawesome:fontawesome@4.5.0',
+    'sidebar-main',
+    'sidebar-tabular'
   ], 'client');
 
   // both client and server files

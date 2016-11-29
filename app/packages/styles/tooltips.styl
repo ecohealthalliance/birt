@@ -1,0 +1,33 @@
+@import '{styles-base}/variables'
+$tooltip-BG = alpha($tabs-bg, 95%)
+
+.hint:after
+[data-hint]::after
+  background $tooltip-BG
+  text-shadow 0 1px 0px alpha($primary-d, 70%)
+  box-shadow none
+
+.hint:before
+.hint:after
+[data-hint]:before
+[data-hint]:after
+  transition: 0.15s ease-in-out
+
+.hint:before
+[data-hint]::before
+  border-right-color $tooltip-BG
+
+.hint--right:before
+  margin-left -12px
+
+.hint--right:before
+.hint--right:after
+  left calc(100% + 4px)
+
+.hint--left:before
+.hint--left:after
+  right calc(100% + 4px)
+
+.hint--left:before
+  margin-right -6px
+  border-left-color $tooltip-BG

@@ -1,0 +1,10 @@
+template(name='tabularSidebar')
+  #tableSidebar.sidebar-tabular(class="{{#unless open}} off-canvas {{/unless}}")
+    .sidebar--table--tab(class="{{#unless open}} off-canvas {{/unless}}")
+      span(
+        class="{{#unless open}} hint--left hint--rounded hint-tabular {{/unless}}"
+        data-hint="Tabular Data")
+      i.fa.fa-angle-double-left.fa-white-arrow
+      i.fa.fa-table.fa-white-table
+    .sidebar--content
+      #sidebar-table.sidebar-pane
