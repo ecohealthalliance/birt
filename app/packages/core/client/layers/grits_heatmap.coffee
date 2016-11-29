@@ -309,7 +309,6 @@ GritsHeatmapLayer.startAnimation = (startDate, endDate, period, documents, token
   _animation = setInterval(->
     paused = GritsHeatmapLayer.animationPaused.get()
     if paused
-      console.log('paused: ', paused)
       return
     if processedFrames >= framesLen
       GritsHeatmapLayer.stopAnimation()
@@ -382,13 +381,9 @@ GritsHeatmapLayer.startAnimation = (startDate, endDate, period, documents, token
           GritsHeatmapLayer.decrementPreviousLocations(processedFrames, frames, period, documents, tokens, (err, res) ->
             # don't allow the animation to proceed until the previous frame has been decremented
             processedFrames++
-            console.log('processedFrames: ', processedFrames)
-            console.log('processedLocations: ', processedLocations)
           )
         else
           processedFrames++
-          console.log('processedFrames: ', processedFrames)
-          console.log('processedLocations: ', processedLocations)
       )
   , FRAME_INTERVAL)
 

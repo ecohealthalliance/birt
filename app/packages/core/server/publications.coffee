@@ -29,7 +29,6 @@ typeahead = (name, search, skip) ->
   if typeof skip == 'undefined'
     skip = 0
   fields = []
-
   models = {'birds': Bird}
   model = models[name.toLowerCase()]
   collections = {'birds': Birds}
@@ -113,7 +112,6 @@ migrationsByQuery = (startDate, endDate, tokens, limit, skip) ->
     query.$or.push(obj)
     fields[t] = 1
   )
-  console.log('query: %j', query)
 
   matches = []
   if _useAggregation
@@ -198,7 +196,6 @@ migrationsByDates = (dates, tokens, limit, skip) ->
     query.$or.push(obj)
     fields[t] = 1
   )
-  console.log('query: %j', query)
 
   _.each(tokens, (t) -> )
 
