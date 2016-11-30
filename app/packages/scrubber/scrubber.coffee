@@ -101,12 +101,11 @@ Template.scrubber.helpers
   paused: ->
     if Template.instance().isPaused.get()
       'scrubber-paused'
-    else
-      ''
+  playDisabled: ->
+    if not GritsFilterCriteria.tokens.get().length
+      'scrubber-play-disabled'
   stopDisabled: ->
-    if Template.instance().isPlaying.get()
-      ''
-    else
+    if not Template.instance().isPlaying.get()
       'scrubber-stop-disabled'
   progress: ->
     progress = GritsHeatmapLayer.animationProgress.get()
@@ -117,6 +116,8 @@ Template.scrubber.events
     event.stopImmediatePropagation()
     event.stopPropagation()
   'click .scrubber-play': (event, instance) ->
+    if ($(event.currentTarget).hasClass('scrubber-play-disabled'))
+      return
     isPlaying = instance.isPlaying.get()
     isPaused = instance.isPaused.get()
     GritsHeatmapLayer.animationPaused.set( not isPaused )
