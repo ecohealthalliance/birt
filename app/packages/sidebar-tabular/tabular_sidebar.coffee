@@ -1,12 +1,9 @@
 if Meteor.isClient
-  Template.tabularSidebar.onCreated ->
-    @sidebarOpen = @data.sidebarOpen
-
   Template.tabularSidebar.helpers
     open: ->
-      Template.instance().sidebarOpen.get()
+      Session.get('tabularSidebarOpen')
 
   Template.tabularSidebar.events
     'click .sidebar--table--tab': (event, instance) ->
-      state = instance.sidebarOpen
-      state.set not state.get()
+      state = Session.get('tabularSidebarOpen')
+      Session.set('tabularSidebarOpen', not state)

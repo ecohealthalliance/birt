@@ -1,0 +1,29 @@
+$widthWithoutBothSidebars = $sidebar-main-width + $sidebar-tabular-width
+$tabularSidebarAndMainSidebarMenu = $sidebar-tabular-width + $sidebar-main-menu-width
+
+#grits-map
+  transition $transition-time $transition-easing
+  height 100%
+  width 'calc(100% - %s)' % $widthWithoutBothSidebars
+  top 0
+  bottom 0
+  right $sidebar-tabular-width
+  left $sidebar-main-width
+
+.tabular-sidebar-closed
+  &.main-sidebar-closed
+    #grits-map
+      width 'calc(100% - %s)' % $sidebar-main-menu-width
+      left $sidebar-main-menu-width
+      right 0
+
+.main-sidebar-closed
+  #grits-map
+    width 'calc(100% - %s)' % $tabularSidebarAndMainSidebarMenu
+    left $sidebar-main-menu-width
+    right $sidebar-tabular-width
+
+.tabular-sidebar-closed
+  #grits-map
+    width 'calc(100% - %s)' % $sidebar-main-width
+    right 0

@@ -6,6 +6,8 @@ Meteor.startup ->
   Session.set(GritsConstants.SESSION_KEY_LOADED_RECORDS, 0)
   Session.set(GritsConstants.SESSION_KEY_TOTAL_RECORDS, 0)
   Session.set(GritsConstants.SESSION_KEY_IS_READY, false) # the map will not be displayed until isReady is set to true
+  Session.set('mainSidebarOpen', true)
+  Session.set('tabularSidebarOpen', false)
 
   # async flow control so we can set grits-net-meteor:isReady true when done
   if Meteor.gritsUtil.debug
