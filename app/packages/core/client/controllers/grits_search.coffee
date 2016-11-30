@@ -365,7 +365,8 @@ Template.gritsSearch.onRendered ->
 
   # initialize the DateTimePickers
   options = {
-    format: 'MM/DD/YY'
+    format: 'MM/DD/YYYY',
+    maxDate: '12/31/2012'
   }
   startDatePicker = $('#startDate').datetimepicker(options)
   startDatePicker.data('DateTimePicker').widgetPositioning({vertical: 'bottom', horizontal: 'left'})
@@ -496,6 +497,20 @@ Template.gritsSearch.events
     $target = $(e.target)
     tokens = $target.tokenfield('getTokens')
     token = e.attrs.label
+    # TODO: this will override existing date and replace with
+    # recommended_dates from the bird collection. Also, seems redundant to
+    # have the ReactiveVar and Session variable.
+    Meteor.call 'findBird', token.trim(), (err, res) ->
+      if err
+        toastr.error(err.message)
+        return
+      if res and res.recommended_dates
+        startDate = moment(res.recommended_dates.startDate, 'YYYY-MM-DD')
+        endDate = moment(res.recommended_dates.endDate, 'YYYY-MM-DD')
+        GritsFilterCriteria.operatingDateRangeStart.set(startDate)
+        GritsFilterCriteria.operatingDateRangeEnd.set(endDate)
+        Session.set('dateRangeStart', startDate.toDate())
+        Session.set('dateRangeEnd', endDate.toDate())
     return false
   'tokenfield:removedtoken': (e) ->
     $target = $(e.target)
