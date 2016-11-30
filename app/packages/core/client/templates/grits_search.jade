@@ -1,6 +1,4 @@
 template(name='gritsSearch')
-  h1.logo BIRT
-
   .searchBar
     .tokenized.main
       i#searchIcon.fa.fa-search
@@ -52,9 +50,9 @@ template(name='gritsSearch')
         a.list-group-item(href='#', class='{{#if winter}}active{{/if}}') Winter
         a.list-group-item(href='#', class='{{#if spring}}active{{/if}}') Spring
 
-  if historicalView
+  if showResults
     .filter-footer
-      .status-bar
+      .status-bar.clearfix
         .col.col-xs-2.filter-label {{_ "gritsSearch.status-bar-label" }}
         .col.col-xs-5.text-center
           span.status-bar-text {{_ "gritsSearch.loaded-records" }}

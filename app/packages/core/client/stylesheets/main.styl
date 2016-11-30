@@ -1,5 +1,5 @@
 @import '{styles-base}/variables'
-@import 'mixins.import'
+@import '{styles-base}/mixins'
 @import 'globals.import'
 @import 'birt.import'
 
@@ -22,17 +22,6 @@ body
 .date > span.input-group-addon
   background-color #ddd
 
-#filterContainer
-  font-size small
-  background-color white
-  padding 0px
-  border-radius 5px
-  filter-container-width()
-
-#sidebar-layer
-  layer-container-width()
-  box-shadow 0 0px 0px rgba(0,0,0,0)
-
 .applyFilter
   padding 5px
 
@@ -47,11 +36,11 @@ body
   font-size 1em
 
 .status-bar
-  border-top solid 2px #b7b7b7
-  background-color #d7d7d7
-  line-height 42px
-  height 42px
-  margin-bottom: 0px
+  border-top solid 2px darken($tabs-bg, 10%)
+  background-color lighten($primary, 70%)
+  margin-bottom 0px
+  padding-top 1em
+  padding-bottom 1em
 
 .status-bar-text
   padding-right 0
@@ -136,7 +125,6 @@ p.intro
   border-left 0
   border-right 0
   background $ll-gray
-  border-top 4px solid $primary
   border-bottom 1px solid $primary
   font-size 1em
 

@@ -12,6 +12,11 @@
 #tableSidebar
   .sidebar--content
     margin-right 0
+  &:not(.collapsed)
+    .sidebar-tabs.right
+      background linear-gradient(to right, rgba(255,0,0,0) 90% , $primary-transparent 10%)
+    #sidebar-table-tab
+      right 10%
 
 #sidebar-table
   height 100%
@@ -66,36 +71,19 @@
       display block
 
 .table-tabs
-  display block
+  flexTabs($whiteBG, $primary-transparent, $l-gray, true)
+  flex-shrink 0
   font-size 1.1em
   letter-spacing .02em
   border-bottom 3px solid $tabs-bg
   background none
-  > li
-    float none
-    > a
-      margin-right 0
-  &.nav-tabs
-    > li
-      > a
-        padding 15px
-        border-radius 0
-        border 0
-        &:hover
-        &:focus
-          border 0
-      &.active
-        > a
-          background alpha($tabs-bg, 90%)
-
-#dataTableContainer
-  font-size small
 
 .dataTableContent
   flex 1 100%
   position relative
   overflow-y scroll
   overflow-x hidden
+  background alpha($whiteBG, 95%)
 
 .pathsTableContainer
   bottom 0px
@@ -108,7 +96,8 @@
     background $ll-gray
     color #333
 
-.nodeTableRow, .heatmapTableRow
+.nodeTableRow
+.heatmapTableRow
   width 350px
   text-align center
 

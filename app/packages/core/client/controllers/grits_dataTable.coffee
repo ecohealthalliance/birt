@@ -11,8 +11,10 @@ Template.gritsDataTable.events
 Template.gritsDataTable.helpers
   migrations: ->
     MiniMigrations.find()
+
   format: (date) ->
     moment.utc( date ).format('MM/DD/YYYY')
+
   currentBird: (record) ->
     bird = $("#searchBar").tokenfield('getTokens')[0].label
     record[bird] || 0

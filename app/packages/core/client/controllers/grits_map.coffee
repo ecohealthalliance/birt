@@ -34,4 +34,4 @@ Template.gritsMap.onCreated ->
   # to the Template.gritsSearch as a global export
   Template.gritsMap.getInstance = getInstance
   Template.gritsMap.setInstance = setInstance
-  # Template.gritsMap.addDefaultControls = addDefaultControls
+  Template.gritsMap.addDefaultControls = addDefaultControls

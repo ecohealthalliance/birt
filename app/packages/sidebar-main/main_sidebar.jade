@@ -17,8 +17,8 @@ template(name='mainSidebar')
           i.fa.fa-search
 
         li.pane-control.hint--right.hint--rounded(
-          class="{{#if tabActive 4}} active {{/if}}"
-          data-tab="4"
+          class="{{#if tabActive 2}} active {{/if}}"
+          data-tab="2"
           data-hint="Map Options")
           i.fa.fa-map-o
 
@@ -31,4 +31,6 @@ template(name='mainSidebar')
 
     // Tab panes
     .sidebar--content
-      +gritsSearch
+      h1.logo BIRT
+      #sidebar-search.sidebar--pane(class="{{#if paneActive 1}} active {{/if}}")
+      #sidebar-layer.sidebar--pane(class="{{#if paneActive 2}} active {{/if}}")

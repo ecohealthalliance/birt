@@ -275,6 +275,8 @@ Template.gritsSearch.helpers({
       return GritsFilterCriteria.limit.get()
   historicalView: ->
     Template.instance().historicalView.get()
+  showResults: ->
+    Template.instance().historicalView.get() and Session.get(GritsConstants.SESSION_KEY_TOTAL_RECORDS)
   summer: ->
     Template.instance().season.get() == "summer"
   autumn: ->

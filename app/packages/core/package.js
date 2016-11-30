@@ -53,7 +53,6 @@ Package.onUse(function(api){
   // client-side only files
   // IMPORTANT: these files are loaded in order
   api.addFiles([
-    'client/stylesheets/mixins.import.styl',
     'client/stylesheets/globals.import.styl',
     'client/stylesheets/birt.import.styl',
     'client/stylesheets/main.styl',
