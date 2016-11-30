@@ -38,15 +38,11 @@ class GritsHeatmapLayer extends GritsLayer
     self._trackTokens()
     return
 
-  # The heatmap library's gradient doesn't load until the map moves
-  # so this moves the map slightly to make it load.
+  # This is a workaround for a bug where the heatmap library's gradient doesn't
+  # load in chrome sometimes.
   _perturbMap: ->
-    currentCenter = @_map.getCenter()
-    @_map.setView(
-      lat: currentCenter.lat + 1
-      lng: currentCenter.lng + 1
-    )
-    @_map.setView(currentCenter)
+    _.defer =>
+      @_layer.update()
 
   # draws the heatmap
   #
