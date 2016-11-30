@@ -11,24 +11,24 @@ Meteor.startup ->
   if Meteor.gritsUtil.debug
     start = new Date()
     console.log('start sync [i18n]')
-  async.auto(
+  async.auto
     'i18n': (callback, result) ->
       # string externalization/i18n
       Template.registerHelper('_', i18n.get)
-      i18n.loadAll( ->
+      i18n.loadAll ->
         i18n.setLanguage('en')
         if Meteor.gritsUtil.debug
           console.log('done i18n')
         callback(null, true)
-      )
+
   , (err, result) ->
     if err
       console.error(err)
       return
     if Meteor.gritsUtil.debug
       console.log('end sync [i18n] (ms): ', new Date() - start)
+
     # Hide the gritsOverlay indicator
     Template.gritsOverlay.hide()
     # Mark the app ready
     Session.set GritsConstants.SESSION_KEY_IS_READY, true
-  )

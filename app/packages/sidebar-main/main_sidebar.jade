@@ -1,0 +1,36 @@
+template(name='mainSidebar')
+  #sidebar.sidebar(class="{{#unless sideBarOpen}} off-canvas {{/unless}}")
+    // Nav tabs
+    .sidebar--tab-container
+      ul.sidebar--tabs.list-unstyled
+        li.sidebar--collapse.large.hint--right.hint--rounded(
+          class="{{#unless sideBarOpen}} off-canvas {{/unless}}"
+          role='tab'
+          data-hint="{{#if sideBarOpen}}Close {{else}} Open {{/if}} Menu")
+          i.fa.fa-chevron-circle-left
+
+        li.pane-control.hint--right.hint--rounded(
+          class="{{#if tabActive 1}} active {{/if}}"
+          role='tab'
+          data-tab="1"
+          data-hint="Search")
+          i.fa.fa-search
+
+        li.pane-control.hint--right.hint--rounded(
+          class="{{#if tabActive 2}} active {{/if}}"
+          data-tab="2"
+          data-hint="Map Options")
+          i.fa.fa-map-o
+
+        //- li.help-toggle.large.push-to-btm
+        //-   +helpLink helpTemplate='userGuide' showGuide=true classNames='help-link--sidebar'
+
+      .zoom-control
+        button.zoom-control--in.fa.fa-plus.btn.btn-sm
+        button.zoom-control--out.fa.fa-minus.btn.btn-sm
+
+    // Tab panes
+    .sidebar--content
+      h1.logo BIRT
+      #sidebar-search.sidebar--pane(class="{{#if paneActive 1}} active {{/if}}")
+      #sidebar-layer.sidebar--pane(class="{{#if paneActive 2}} active {{/if}}")

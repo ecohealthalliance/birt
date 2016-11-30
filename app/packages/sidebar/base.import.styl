@@ -1,0 +1,110 @@
+$sidebar-main-content-width = $sidebar-main-width - $sidebar-main-menu-width
+$sidebar-border-width = 3px
+
+.sidebar
+  position absolute
+  left 0
+  top 0
+  bottom 0
+  z-index $sidebar-z-index
+  height 100vh
+  width $sidebar-main-width
+  transition .3s
+  background-color $content-bg
+  &.off-canvas
+    transform translate($sidebar-main-content-width * -1, 0)
+    li
+      &.active
+        color $inactive-btn
+
+.sidebar--tab-container
+  position absolute
+  top 0
+  bottom 0
+  right 0
+  width $sidebar-main-menu-width
+  background-color $tabs-bg
+  display flex
+  align-items flex-start
+  justify-content center
+  border-left $sidebar-border-width solid darken($tabs-bg, 10%)
+
+if $sidebar-main-menu-width == 0
+  .sidebar
+    border-right $sidebar-border-width solid darken($tabs-bg, 10%)
+  .sidebar--tab-container
+    display none
+
+.sidebar--tabs
+  display flex
+  min-height 100%
+  flex-direction column
+  border 0
+  > li
+    flex 1 1 0
+    flex-grow 0
+    margin-bottom 20px
+    color $inactive-btn
+    font-size $tab-font-size
+    transition all .2s
+    cursor pointer
+    text-align center
+    &:first-of-type
+      margin-bottom 60px
+    &.large
+      font-size $tab-font-size + .4
+    &.push-to-btm
+      align-self flex-end
+    &.push-to-top
+      align-self flex-start
+    &:hover
+      color alpha(@color, 100%)
+    &.active
+      color alpha(@color, 100%)
+
+.sidebar--content
+  height 100vh
+  margin-right $sidebar-main-menu-width
+
+.sidebar--pane
+  display none
+  &.active
+    display block
+
+.sidebar--collapse
+  margin-top 20px
+  &.off-canvas
+    i
+      transition .2s ease-in-out
+      transform rotate(180deg)
+
+.filter-footer
+  position absolute
+  bottom 0
+  z-index 100
+  width 'calc(100% - %s)' % $sidebar-main-menu-width
+
+.help-toggle
+  position absolute
+  bottom 0
+  left 50%
+  transform translate(-50%, 0)
+
+.sidebar-footer
+  background alpha($l-gray, 95%)
+  border-top 3px solid $border-gray
+
+.zoom-control
+  position absolute
+  bottom $play-controls-height + 10px
+  left $sidebar-main-menu-width + 10px
+
+.zoom-control--in
+.zoom-control--out
+  color $inactive-btn
+  background $tabs-bg
+  margin-bottom 5px
+  min-height 35px
+  width 35px
+  &:hover
+    color $active-btn

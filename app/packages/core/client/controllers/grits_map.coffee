@@ -22,12 +22,10 @@ setInstance = (map) ->
     return
   _instance = map
 
-# adds the default controls to the map specified
-#
 # @param [GritsMap] map - map to apply the default controls
 addDefaultControls = (map) ->
   Blaze.render(Template.gritsSearch, $('#sidebar-search')[0])
-  Blaze.render(Template.gritsDataTable, $('#sidebar-collapse')[0])
+  Blaze.render(Template.gritsDataTable, $('#sidebar-table')[0])
   Blaze.render(Template.gritsLayerSelector, $('#sidebar-layer')[0])
 
 Template.gritsMap.onCreated ->

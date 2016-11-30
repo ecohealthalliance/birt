@@ -2,7 +2,7 @@
     "window-title": {
         "en": "BIRT"
     },
-    "gritsDataTable": {
+    "dataTable": {
         "explore": {
             "title" : {
                "en": "Migrations"

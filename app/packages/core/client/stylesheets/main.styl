@@ -1,8 +1,6 @@
-@import 'variables.import'
-@import 'mixins.import'
+@import '{styles-base}/variables'
+@import '{styles-base}/mixins'
 @import 'globals.import'
-@import 'sidebar.import'
-@import 'sidebar_table.import'
 @import 'birt.import'
 
 body
@@ -24,17 +22,6 @@ body
 .date > span.input-group-addon
   background-color #ddd
 
-#filterContainer
-  font-size small
-  background-color white
-  padding 0px
-  border-radius 5px
-  filter-container-width()
-
-#sidebar-layer
-  layer-container-width()
-  box-shadow 0 0px 0px rgba(0,0,0,0)
-
 .applyFilter
   padding 5px
 
@@ -49,11 +36,11 @@ body
   font-size 1em
 
 .status-bar
-  border-top solid 2px #b7b7b7
-  background-color #d7d7d7
-  line-height 42px
-  height 42px
-  margin-bottom: 0px
+  border-top solid 2px darken($tabs-bg, 10%)
+  background-color lighten($primary, 70%)
+  margin-bottom 0px
+  padding-top 1em
+  padding-bottom 1em
 
 .status-bar-text
   padding-right 0
@@ -84,56 +71,53 @@ body
 .leaflet-bottom.leaflet-right
   z-index 1001
 
+.leaflet-bottom.leaflet-right
+  bottom $play-controls-height
+
 p.intro
-	line-height 1.5
-	margin 5px 0 35px 0
-	font-size larger
+  line-height 1.5
+  margin 5px 0 35px 0
+  font-size larger
 
 #container
-	width 100%
-	height 100%
+  width 100%
+  height 100%
 
 .title
-	margin-top 0
-	margin-bottom 10px
-	text-align center
+  margin-top 0
+  margin-bottom 10px
+  text-align center
 
 .notice
-	margin 10px 0 5px 0
-	line-height 1.5
-	text-align center
+  margin 10px 0 5px 0
+  line-height 1.5
+  text-align center
 
 .info
-	padding 6px 8px
-	font 14px/16px fonts
-	background white
-	background rgba(white, 1)
-	box-shadow 0 0 15px rgba(black, 0.2)
-	border-radius 5px
+  padding 6px 8px
+  font 14px/16px fonts
+  background white
+  background rgba(white, 1)
+  box-shadow 0 0 15px rgba(black, 0.2)
+  border-radius 5px
 
 @media all and (max-width: 480px)
-	/* styles for iPhone/Android landscape (and really narrow browser windows) */
-	.notice
-		font-size 11px
+  /* styles for iPhone/Android landscape (and really narrow browser windows) */
+  .notice
+    font-size 11px
 
 @media all and (max-width: 320px)
-	/* styles for iPhone/Android portrait */
-	.notice
-		font-size 11px
+  /* styles for iPhone/Android portrait */
+  .notice
+    font-size 11px
 
 @media all and (max-width: 240px)
-	/* styles for smaller devices */
-	.notice
-		font-size 11px
+  /* styles for smaller devices */
+  .notice
+    font-size 11px
 
 .leaflet-heatmap-layer
   z-index -1
-
-.leaflet-control-zoom
-  clear none // allows horizontal stacking with filter
-
-.filter-control
-  clear none // allows horizontal stacking with zoom
 
 .searchBar
   position relative
@@ -141,15 +125,14 @@ p.intro
   border-left 0
   border-right 0
   background $ll-gray
-  border-top 4px solid $blue
-  border-bottom 1px solid $blue
+  border-bottom 1px solid $primary
   font-size 1em
 
 #searchIcon
   verticallyCenter()
   left 10px
   font-size 1.4em
-  color $blue
+  color $primary
 
 .twitter-typeahead
   position static !important // Overides typeahead's inline styling
@@ -213,31 +196,6 @@ p.intro
   strong
     color #000
 
-#title
-  background url("/packages/birt_core/public/images/birt-logo-inline.png")
-  background-size 300px 100px
-  background-position center center
-  width 300px
-  height 100px
-  margin 0px
-  text-indent -9999px
-  background-repeat no-repeat
-
-#loadMore
-  margin-right 0px
-
-#sidebar-question-tab
-  position absolute
-  bottom 0px
-
-#sidebar-search-tab
-  position absolute
-  top 140px
-
-#sidebar-layer-tab
-  position absolute
-  top 260px
-
 .tt-input
   height 30px
   font-weight 20px
@@ -256,23 +214,6 @@ p.intro
   font-size 16px
   margin-top 2px
   margin-bottom 0
-
-.sidebar-tabs > li:hover
-  color #333
-
-.limit
-  > div
-    display inline-block
-    vertical-align middle
-
-.limitSearchTitle
-  padding 0
-  margin 0px 10px 0px 0px
-
-.limitInput
-  width 84px
-  padding-left 0
-  padding-right 10px
 
 .leaflet-control-layers-base
 .leaflet-control-layers-overlays
@@ -298,11 +239,11 @@ p.intro
 .datatable-heading
   padding 5px
   font-size 18px
-  color $blue
+  color $primary
   font-weight bold
 
 .datatable-hr
-  border-bottom 2px solid $blue
+  border-bottom 2px solid $primary
 
 .filter
   display table;
@@ -321,13 +262,6 @@ p.intro
 .filter-group
   white-space nowrap
   padding 2px
-
-.filter-footer
-  @extend .sidebar-footer
-  width 305px /* the Flirt logo is 305px so setting to filter-container-width() will leave 5px white space between footer and blue sidebar */
-  display table-footer-group
-  padding-top 10px
-  font-size .8em
 
 .filter-wrapper
   margin-left 25px

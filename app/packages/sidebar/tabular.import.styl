@@ -1,0 +1,165 @@
+.sidebar-tabular
+  position absolute
+  right 0
+  top 0
+  bottom 0
+  width $sidebar-tabular-width
+  z-index 2000
+  transition transform .3s ease-in-out
+  &.off-canvas
+    transform translate($sidebar-tabular-width - 3px, 0)
+
+#tableSidebar
+  .sidebar--content
+    margin-right 0
+  &:not(.collapsed)
+    .sidebar-tabs.right
+      background linear-gradient(to right, rgba(255,0,0,0) 90% , $primary-transparent 10%)
+    #sidebar-table-tab
+      right 10%
+
+#sidebar-table
+  height 100%
+  width 100%
+  display flex
+  flex-flow column
+  border-left 3px solid $tabs-bg
+  .tab-content
+    background $content-bg
+
+.sidebar--table--tab
+  background $tabs-bg
+  line-height 40px
+  position absolute
+  display flex
+  align-content center
+  justify-content center
+  align-items center
+  height 100px
+  width 25px
+  left -25px
+  top 50%
+  min-width 25px
+  transform translate(0, -50%)
+
+  border-top-left-radius 4px
+  border-bottom-left-radius 4px
+  border-top-right-radius 0
+  border-bottom-right-radius 0
+
+  cursor pointer
+  font-size 1.25em
+  color white
+  transition .2s
+  .fa
+    &:first-of-type
+      transform rotate(180deg)
+  .fa-white-table
+    display none
+
+  &.off-canvas
+    height 60px
+    left -50px
+    width 50px
+    min-width 50px
+    .fa
+      margin 0 3px
+      &:first-of-type
+        transform rotate(0deg)
+        margin-left 5px
+    .fa-white-table
+      display block
+
+.table-tabs
+  flexTabs($whiteBG, $primary-transparent, $l-gray, true)
+  flex-shrink 0
+  font-size 1.1em
+  letter-spacing .02em
+  border-bottom 3px solid $tabs-bg
+  background none
+
+.dataTableContent
+  flex 1 100%
+  position relative
+  overflow-y scroll
+  overflow-x hidden
+  background alpha($whiteBG, 95%)
+
+.pathsTableContainer
+  bottom 0px
+
+.pathTableRow
+  width 350px
+  text-align center
+  cursor pointer
+  &:hover
+    background $ll-gray
+    color #333
+
+.nodeTableRow
+.heatmapTableRow
+  width 350px
+  text-align center
+
+.activeRow
+  color white
+  background-color alpha($primary, 90%)
+  &:hover
+    background-color @background-color
+    color #333
+
+.tablesorter
+  cursor pointer
+  th
+    border solid 1px $border-gray
+    position relative
+    &:hover
+      background $l-gray
+    &:focus
+      background lighten($m-gray, 20%)
+      outline none
+
+  &.table
+    > thead
+      > tr
+        > th
+          padding-right 20px
+    > tbody
+      > tr
+        > td
+          border-color $l-gray
+
+  .tablesorter-headerDesc
+    sortingIcon('\f107') // angle down icon
+
+  .tablesorter-headerAsc
+    sortingIcon('\f106') // angle up icon
+
+.sidebarRightFooter
+  flex-shrink 0
+  padding 20px 10px 20px 30px
+  @extend .sidebar-footer
+  height auto
+  .export
+    padding 0
+    display flex
+    justify-content center
+    align-items center
+    i
+    button
+      flex 1 100%
+      flex-grow 1
+      margin-right 5px
+      &:last-of-type
+        margin-right 0
+    &:first-child
+      flex 0
+      margin-right 20px
+  .downloadIcon
+    margin 0
+    padding 0
+    font-size 2em
+    margin-top 2px
+
+  .exportData
+    margin 0

@@ -8,7 +8,8 @@ Package.onUse(function(api){
   api.use([
     'templating',
     'coffeescript',
-    'mquandalle:stylus@1.1.1',
+    'stylus',
+    'mquandalle:jade@0.4.9',
     'momentjs:moment@2.10.6',
     'kevbuk:moment-range@2.2.2',
     'crystalhelix:nouislider@1.0.1',
@@ -17,7 +18,7 @@ Package.onUse(function(api){
 
   api.addFiles([
     'stylesheets/scrubber.styl',
-    'templates/scrubber.html',
+    'templates/scrubber.jade',
     'scrubber.coffee'
   ], 'client');
 
