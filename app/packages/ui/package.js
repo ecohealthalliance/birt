@@ -26,11 +26,10 @@ Package.onUse(function(api){
   // client-side only files
   // IMPORTANT: these files are loaded in order
   api.addFiles([
-    'templates/moduleSelector.jade',
+    'templates/layout.jade',
     'templates/birt.jade',
-
     'stylesheets/main.styl',
-
-    'ui.coffee'
+    'controllers/ui.coffee',
+    'controllers/layout.coffee'
   ], 'client');
 });
