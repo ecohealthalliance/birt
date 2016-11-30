@@ -84,7 +84,8 @@ Package.onUse(function(api){
     'client/templates/grits_search.jade',
     'client/controllers/grits_search.coffee',
     'client/templates/grits_overlay.jade',
-    'client/controllers/grits_overlay.coffee'
+    'client/controllers/grits_overlay.coffee',
+    'client/postMessageHandler.coffee'
   ], 'client');
 
   // static assets
