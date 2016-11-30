@@ -4,6 +4,8 @@
 # 'meteor add' and 'meteor remove' will edit this file for you,
 # but you can also edit it by hand.
 
+ecosturmer:nojs-banner
+
 # Mandatory
 meteor-base             # Packages every Meteor app needs to have
 mobile-experience       # Packages for a great mobile UX
