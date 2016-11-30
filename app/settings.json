@@ -2,7 +2,9 @@
   "public": {
     "analyticsSettings": {
       "Google Analytics" : {"trackingId": "UA-XXXXXXXX"}
-    },
-    "runAnnualSightings": false
+    }
+  },
+  "private": {
+    "runAnnualSightings": true
   }
 }

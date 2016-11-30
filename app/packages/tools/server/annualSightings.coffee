@@ -117,7 +117,7 @@ setRecommendedDates = (max, done) ->
 
 
 Meteor.startup ->
-  if Meteor.settings.public.runAnnualSightings
+  if Meteor.settings.private.runAnnualSightings
     if DEBUG
       START_TIME = new Date().getTime()
       console.log "Started setting recommended dates for species"
