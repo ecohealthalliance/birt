@@ -1,4 +1,5 @@
 $sidebar-main-content-width = $sidebar-main-width - $sidebar-main-menu-width
+$sidebar-main-content-width-small = $sidebar-main-width-small - $sidebar-main-menu-width-small
 $sidebar-border-width = 3px
 
 .sidebar
@@ -11,11 +12,15 @@ $sidebar-border-width = 3px
   width $sidebar-main-width
   transition $transition-time $transition-easing
   background-color $content-bg
+  +below(3)
+    width $sidebar-main-width-small
   &.off-canvas
     transform translate($sidebar-main-content-width * -1, 0)
     li
       &.active
         color $inactive-btn
+    +below(3)
+      transform translate($sidebar-main-content-width-small * -1, 0)
 
 .sidebar--tab-container
   position absolute
@@ -28,6 +33,8 @@ $sidebar-border-width = 3px
   align-items flex-start
   justify-content center
   border-left $sidebar-border-width solid darken($tabs-bg, 10%)
+  +below(3)
+    width $sidebar-main-menu-width-small
 
 if $sidebar-main-menu-width == 0
   .sidebar
@@ -49,10 +56,14 @@ if $sidebar-main-menu-width == 0
     transition all .2s
     cursor pointer
     text-align center
+    +below(3)
+      font-size $tab-font-size - .4
     &:first-of-type
       margin-bottom 60px
     &.large
       font-size $tab-font-size + .4
+      +below(3)
+        font-size $tab-font-size
     &.push-to-btm
       align-self flex-end
     &.push-to-top
@@ -65,6 +76,8 @@ if $sidebar-main-menu-width == 0
 .sidebar--content
   height 100vh
   margin-right $sidebar-main-menu-width
+  +below(3)
+    margin-right $sidebar-main-menu-width-small
 
 .sidebar--pane
   display none
@@ -83,6 +96,8 @@ if $sidebar-main-menu-width == 0
   bottom 0
   z-index 100
   width 'calc(100% - %s)' % $sidebar-main-menu-width
+  +below(3)
+    width 'calc(100% - %s)' % $sidebar-main-menu-width-small
 
 .help-toggle
   position absolute
@@ -98,13 +113,23 @@ if $sidebar-main-menu-width == 0
   position absolute
   bottom $play-controls-height + 10px
   left $sidebar-main-menu-width + 10px
+  +below(3)
+    bottom $play-controls-height + 5px
+    left $sidebar-main-menu-width
 
 .zoom-control--in
 .zoom-control--out
   color $inactive-btn
   background $tabs-bg
   margin-bottom 5px
-  min-height 35px
+  height 35px
   width 35px
+  display flex
+  align-items center
+  justify-content center
+  +below(3)
+    height 25px
+    width 25px
+    font-size .8em
   &:hover
     color $active-btn

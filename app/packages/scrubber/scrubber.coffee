@@ -100,13 +100,13 @@ Template.scrubber.helpers
       'play'
   paused: ->
     if Template.instance().isPaused.get()
-      'scrubber-paused'
+      'scrubber--button-controls--paused'
   playDisabled: ->
     if not GritsFilterCriteria.tokens.get().length
-      'scrubber-play-disabled'
+      'scrubber--button-controls--play--disabled'
   stopDisabled: ->
     if not Template.instance().isPlaying.get()
-      'scrubber-stop-disabled'
+      'scrubber--button-controls--stop--disabled'
   progress: ->
     progress = GritsHeatmapLayer.animationProgress.get()
     return progress * 100 + '%'
@@ -115,8 +115,8 @@ Template.scrubber.events
   'dblclick .scrubber-container': (event) ->
     event.stopImmediatePropagation()
     event.stopPropagation()
-  'click .scrubber-play': (event, instance) ->
-    if ($(event.currentTarget).hasClass('scrubber-play-disabled'))
+  'click .scrubber--button-controls--play': (event, instance) ->
+    if ($(event.currentTarget).hasClass('scrubber--button-controls--play--disabled'))
       return
     isPlaying = instance.isPlaying.get()
     isPaused = instance.isPaused.get()
@@ -125,8 +125,8 @@ Template.scrubber.events
     unless isPlaying
       unless isPaused
         $('#applyFilter').click()
-  'click .scrubber-stop': (event, instance) ->
-    if ($(event.target).hasClass('.scrubber-stop-disabled'))
+  'click .scrubber--button-controls--stop': (event, instance) ->
+    if ($(event.target).hasClass('scrubber--button-controls--stop--disabled'))
       return
     instance.isPlaying.set(false)
     GritsHeatmapLayer.stopAnimation()

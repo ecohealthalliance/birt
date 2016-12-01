@@ -6,8 +6,12 @@
   width $sidebar-tabular-width
   z-index 2000
   transition transform $transition-time $transition-easing
+  +below(3)
+    width $sidebar-tabular-width-small
   &.off-canvas
     transform translate($sidebar-tabular-width - 3px, 0)
+    +below(3)
+      transform translate($sidebar-tabular-width-small - 3px, 0)
 
 #tableSidebar
   .sidebar--content
