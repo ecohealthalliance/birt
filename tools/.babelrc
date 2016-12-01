@@ -1,0 +1,4 @@
+{
+  "presets": ["latest"],
+  "plugins": ["syntax-async-functions","transform-regenerator"]
+}
