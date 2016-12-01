@@ -5,22 +5,20 @@ _state = null # keeps track of the query string state
 # local/private minimongo collection
 _Collection = new (Mongo.Collection)(null)
 # local/private Astronomy model for maintaining filter criteria
-_Filter = Astro.Class(
+_Filter = Astro.Class
   name: 'FilterCriteria'
   collection: _Collection
   transform: true
   fields: ['key', 'operator', 'value']
-  validators: {
+  validators:
     key: [
-        Validators.required(),
-        Validators.string()
+      Validators.required(),
+      Validators.string()
     ],
     operator: [
-        Validators.choice(_validOperators)
+      Validators.choice(_validOperators)
     ],
     value: Validators.required()
-  }
-)
 
 # GritsFilterCriteria, this object provides the interface for
 # accessing the UI filter box. The setter methods may be called
@@ -84,7 +82,6 @@ class GritsFilterCriteria
 
     # is the simulation running?
     self.isSimulatorRunning = new ReactiveVar(false)
-    return
   # initialize the start date of the filter 'discontinuedDate'
   #
   # @return [String] dateString, formatted MM/DD/YY
@@ -104,7 +101,7 @@ class GritsFilterCriteria
     yearStr = year.toString().slice(2,4)
     self.operatingDateRangeStart.set(start)
     Session.setDefault('dateRangeStart', start)
-    return "#{month}/#{date}/#{yearStr}"
+    "#{month}/#{date}/#{yearStr}"
   # initialize the end date through the 'effectiveDate' filter
   #
   # @return [String] dateString, formatted MM/DD/YY
@@ -124,7 +121,7 @@ class GritsFilterCriteria
     yearStr = year.toString().slice(2,4)
     self.operatingDateRangeEnd.set(end)
     Session.setDefault('dateRangeEnd', end)
-    return "#{month}/#{date}/#{yearStr}"
+    "#{month}/#{date}/#{yearStr}"
   # initialize the limit through the 'effectiveDate' filter
   #
   # @return [Integer] limit
@@ -133,7 +130,7 @@ class GritsFilterCriteria
     initLimit = self.limit.get()
     self.setLimit(initLimit)
     self._baseState = JSON.stringify(self.getQueryObject())
-    return initLimit
+    initLimit
   # Creates a new filter criteria and adds it to the collection or updates
   # the collection if it already exists
   #
@@ -156,7 +153,7 @@ class GritsFilterCriteria
       if obj.validate() == false
         throw new Error(_.values(obj.getValidationErrors()))
       obj.save()
-      return obj
+      obj
   # removes a FilterCriteria from the collection
   #
   # @param [String] id, the name of the filter criteria
@@ -168,9 +165,9 @@ class GritsFilterCriteria
       obj.remove(cb)
       return
     if obj
-      return obj.remove()
+      obj.remove()
     else
-      return 0
+      0
   # returns the query object used to filter the server-side collection
   #
   # @return [Object] query, a mongoDB query object
@@ -178,7 +175,7 @@ class GritsFilterCriteria
     self = this
     criteria = _Collection.find({})
     result = {}
-    criteria.forEach((filter) ->
+    criteria.forEach (filter) ->
       value = {}
       k = filter.get('key')
       o = filter.get('operator')
@@ -188,15 +185,14 @@ class GritsFilterCriteria
       else
         value[o] = v
       result[k] = value
-    )
-    return result
+    result
   # compares the current state vs. the original/previous state
   compareStates: ->
     self = this
     # postone execution to avoid 'flash' for the fast draw case.  this happens
     # when the user clicks a node or presses enter on the search and the
     # draw completes faster than the debounce timeout
-    async.nextTick( ->
+    async.nextTick ->
       current = self.getCurrentState()
       if current != _state
         # do not notifiy on an empty query or the base state
@@ -209,8 +205,6 @@ class GritsFilterCriteria
           $('#loadMore').prop('disabled', true)
       else
         self.stateChanged.set(false)
-    )
-    return
   # gets the current state of the filter
   #
   # @return [String] the query object JSON.strigify
@@ -229,7 +223,6 @@ class GritsFilterCriteria
     self = this
     query = self.getQueryObject()
     _state = JSON.stringify(query)
-    return
   # process the results of the remote meteor method
   #
   # @param [Array] documents, an Array of mongoDB documents to process
@@ -241,7 +234,6 @@ class GritsFilterCriteria
     period = self.period.get()
     # start the heatmap animation
     GritsHeatmapLayer.startAnimation(startDate, endDate, period, documents, tokens, offset)
-    return
   # applies the filter but does not reset the offset
   #
   # @param [Function] cb, the callback function
@@ -265,10 +257,9 @@ class GritsFilterCriteria
     offset = self.offset.get()
 
     # remove the ignoreFields from the query
-    _.each(_ignoreFields, (field) ->
+    _.each _ignoreFields, (field) ->
       if query.hasOwnProperty(field)
         delete query[field]
-    )
 
     startDate = moment.utc(query.startDate.$gte)
     endDate = moment.utc(query.endDate.$lt)
@@ -291,23 +282,21 @@ class GritsFilterCriteria
       month = compareDate.month()
       dates = _.map(years, (m) -> moment.utc(Date.UTC(m.year(), month, date)).toISOString())
 
-      GritsHeatmapLayer.migrationsByDate(dates, tokens, limit, offset, (err, migrations) ->
+      GritsHeatmapLayer.migrationsByDate dates, tokens, limit, offset, (err, migrations) ->
         if err
           return
         self.process(migrations, tokens, offset)
         # call the original callback function if its defined
         if cb && _.isFunction(cb)
           cb(null, migrations)
-      )
     else
-      GritsHeatmapLayer.migrationsByDateRange(startDate.toISOString(), endDate.toISOString(), tokens, limit, offset, (err, migrations) ->
+      GritsHeatmapLayer.migrationsByDateRange startDate.toISOString(), endDate.toISOString(), tokens, limit, offset, (err, migrations) ->
         if err
           return
         self.process(migrations, tokens, offset)
         # call the original callback function if its defined
         if cb && _.isFunction(cb)
           cb(null, migrations)
-      )
 
   # applies the filter; resets the offset, loadedRecords, and totalRecords
   #
@@ -316,7 +305,7 @@ class GritsFilterCriteria
     self = this
     self.offset.set(0)
     # allow the reactive var to be set before continue
-    async.nextTick( ->
+    async.nextTick ->
       # reset the loadedRecords and totalRecords
       Session.set(GritsConstants.SESSION_KEY_LOADED_RECORDS, 0)
       Session.set(GritsConstants.SESSION_KEY_TOTAL_RECORDS, 0)
@@ -325,8 +314,6 @@ class GritsFilterCriteria
         self.more(cb)
       else
         self.more()
-    )
-    return
   # sets the 'start' date from the filter and updates the filter criteria
   #
   # @param [Object] date, Date object or null to clear the criteria
@@ -356,16 +343,13 @@ class GritsFilterCriteria
     else
       startDatePicker.data('DateTimePicker').date(date)
       self.operatingDateRangeStart.set(date)
-    return
   trackOperatingDateRangeStart: ->
     self = this
     Meteor.autorun ->
       obj = self.operatingDateRangeStart.get()
       self.setOperatingDateRangeStart(obj)
-      async.nextTick( ->
+      async.nextTick ->
         self.compareStates()
-      )
-    return
   # sets the 'end' date from the filter and updates the filter criteria
   #
   # @param [Object] date, Date object or null to clear the criteria
@@ -395,16 +379,13 @@ class GritsFilterCriteria
     else
       endDatePicker.data('DateTimePicker').date(date)
       self.operatingDateRangeEnd.set(date)
-    return
   trackOperatingDateRangeEnd: ->
     self = this
     Meteor.autorun ->
       obj = self.operatingDateRangeEnd.get()
       self.setOperatingDateRangeEnd(obj)
-      async.nextTick( ->
+      async.nextTick ->
         self.compareStates()
-      )
-    return
 
   # set the compare date over period input
   setCompareDateOverPeriod: (date) =>
@@ -431,7 +412,6 @@ class GritsFilterCriteria
     else
       compareDatePicker.data('DateTimePicker').date(date)
       self.compareDateOverPeriod.set(date)
-    return
 
   # set the period dropdown
   setPeriod: (period) ->
@@ -457,16 +437,13 @@ class GritsFilterCriteria
     else
       $('#period').val(period)
       self.period.set(period)
-    return
   trackPeriod: ->
     self = this
     Meteor.autorun ->
       obj = self.period.get()
       self.setPeriod(obj)
-      async.nextTick( ->
+      async.nextTick ->
         self.compareStates()
-      )
-    return
   trackTokens: ->
     self = this
     Meteor.autorun ->
@@ -481,7 +458,6 @@ class GritsFilterCriteria
             # clears the sub-layers and resets the layer group
             if heatmapLayerGroup != null
               heatmapLayerGroup.reset()
-    return
   # sets the limit input on the UI to the 'value'
   # specified, as well as, updating the underlying FilterCriteria.
   #
@@ -507,19 +483,16 @@ class GritsFilterCriteria
         self.createOrUpdate('limit', {key: 'limit', operator: '$eq', value: val})
     else
       self.limit.set(value)
-    return
   trackLimit: ->
     self = this
     Meteor.autorun ->
       obj = self.limit.get()
       try
         self.setLimit(obj)
-        async.nextTick( ->
+        async.nextTick ->
           self.compareStates()
-        )
       catch e
         Meteor.gritsUtil.errorHandler(e)
-    return
   # sets the offest as calculated by the current query that has more results
   # than the limit
   #
@@ -537,6 +510,5 @@ class GritsFilterCriteria
       self.offset.set(loadedRecords)
     else
       self.offset.set(0)
-    return
 
 GritsFilterCriteria = new GritsFilterCriteria() # exports as a singleton

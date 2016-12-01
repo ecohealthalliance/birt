@@ -244,37 +244,11 @@ Template.gritsSearch.helpers
     else
       false
 
-  GritsConstants: ->
-    GritsConstants
-
   loadedRecords: ->
     Session.get(GritsConstants.SESSION_KEY_LOADED_RECORDS)
 
   totalRecords: ->
     Session.get(GritsConstants.SESSION_KEY_TOTAL_RECORDS)
-
-  state: ->
-    # GritsFilterCriteria.stateChanged is a reactive-var
-    state = GritsFilterCriteria.stateChanged.get()
-    if _.isNull(state)
-      return
-    if state
-      true
-    else
-      false
-
-  start: ->
-    _initStartDate
-
-  end: ->
-    _initEndDate
-
-  limit: ->
-    if _init
-      # set inital limit
-      _initLimit
-    else
-      GritsFilterCriteria.limit.get()
 
   historicalView: ->
     Template.instance().historicalView.get()
@@ -293,7 +267,6 @@ Template.gritsSearch.helpers
 
   spring: ->
     Template.instance().season.get() == "spring"
-
 
 Template.gritsSearch.onCreated ->
   _initStartDate = GritsFilterCriteria.initStart()
