@@ -1,6 +1,6 @@
 InvalidBirds = new Mongo.Collection('invalid_birds')
 LIMIT = 100000
-DEBUG = true
+DEBUG = false
 FIRST_YEAR = 1887
 LAST_YEAR = 2012
 MIN_INSERTION_COUNT = 100
@@ -117,7 +117,8 @@ setRecommendedDates = (max, done) ->
 
 
 Meteor.startup ->
-  if Meteor.settings.private.runAnnualSightings
+  numRecommendataions = Birds.find({recommended_dates: {$exists: true}}).count()
+  if Meteor.settings.private.runAnnualSightings and numRecommendataions <= 0
     if DEBUG
       START_TIME = new Date().getTime()
       console.log "Started setting recommended dates for species"
