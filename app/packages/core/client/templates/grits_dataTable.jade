@@ -10,16 +10,25 @@ template(name='gritsDataTable')
             tr
               th {{_ "dataTable.explore.col1-heading"}}
               th {{_ "dataTable.explore.col2-heading"}}
-              th {{_ "dataTable.explore.col3-heading"}}
-              th {{_ "dataTable.explore.col4-heading"}}
           tbody
-            with migrations
-              each migrations
-                tr.pathTableRow(data-id=this._id)
-                  td= country
-                  td= state_province
+            with groupedMigrations
+              each groupedMigrations
+                tr.pathTableRow(data-cat=this._id)
                   td {{format date}}
-                  td {{currentBird this}}
+                  td {{groupedMigrationsCount this}}
+                tr.pathData(id=this._id)
+                  td(colspan="2")
+                    each data
+                      table#detailTable
+                        tbody
+                          tr
+                            td
+                              p {{format date}} 
+                            td 
+                              p {{state_province}} 
+                            td 
+                              p {{currentBird this}}
+
             else
               tr
                 td(colspan='12')

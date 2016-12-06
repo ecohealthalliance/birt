@@ -302,6 +302,7 @@ countMigrationsByDates = (dates, tokens) ->
     recordProfile('countMigrationsByDateRange', new Date() - start)
   return count
 
+
 # Public API
 Meteor.methods
   typeahead: typeahead
@@ -311,3 +312,4 @@ Meteor.methods
   migrationsByDates: migrationsByDates
   countMigrationsByDates: countMigrationsByDates
   migrationsBySeason: migrationsBySeason
+
