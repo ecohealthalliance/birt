@@ -17,7 +17,7 @@
           padding-right 2em
     tr
       td
-        border-bottom-color $primary-ll
+        border-color lighten($primary-ll, 25%)
   > thead
     > th
       > td
@@ -26,9 +26,12 @@
     > tbody
       > tr
         &:not(.selected)
-          opacity .3
+          td
+            opacity .3
+            border-color transparent
           &:hover
-            opacity 1
+            td
+              opacity 1
   tbody
     tr
       td
