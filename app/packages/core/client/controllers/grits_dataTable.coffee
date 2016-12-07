@@ -41,8 +41,17 @@ Template.gritsDataTable.helpers
     _.reduce sightings, (a, b) ->
       a + b
 
+  formatedLocationName: ->
+    @state_province.replace(/_/, ' ')
+
   groupsSelected: ->
     Template.instance().selectedGroupedMigrations.get()
 
   selected: ->
     @_id is Template.instance().selectedGroupedMigrations.get()
+
+  sightingReports: ->
+    _.chain(@data)
+      .sortBy (report) -> report.state_province
+      .sortBy (report) -> report.date
+      .value()

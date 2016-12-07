@@ -24,10 +24,10 @@ template(name='gritsDataTable')
                         th {{_ "dataTable.explore.col5-heading"}}
                         th {{_ "dataTable.explore.col2-heading"}}
                     tbody
-                      each data
+                      each sightingReports
                         tr
                           td {{format date}}
-                          td= state_province
+                          td= formatedLocationName
                           td= dailySightings
             else
               tr
