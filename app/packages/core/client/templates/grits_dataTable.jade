@@ -5,30 +5,30 @@ template(name='gritsDataTable')
   .tab-content.dataTableContent
     #paths.tab-pane.active
       .pathsTableContainer
-        table#exploreTable.table.dataTable
+        table#exploreTable.migrations.table.dataTable(class="{{#if groupsSelected}} group-is-selected {{/if}}")
           thead
             tr
               th {{_ "dataTable.explore.col1-heading"}}
               th {{_ "dataTable.explore.col2-heading"}}
           tbody
-            with groupedMigrations
-              each groupedMigrations
-                tr.pathTableRow(data-cat=this._id)
-                  td {{format date}}
-                  td {{groupedMigrationsCount this}}
-                tr.pathData(id=this._id)
-                  td(colspan="2")
-                    each data
-                      table#detailTable
-                        tbody
-                          tr
-                            td
-                              p {{format date}} 
-                            td 
-                              p {{state_province}} 
-                            td 
-                              p {{currentBird this}}
-
+            each groupedMigrations
+              tr.pathTableRow(class="{{#if selected}} selected {{/if}}")
+                td {{format date}}
+                td= groupedMigrationsCount
+              tr.pathData(class="{{#if selected}} selected {{/if}}")
+                td.weekly-migrations(colspan="2")
+                  table#detailTable.table.weekly-migrations-detail
+                    thead
+                      tr
+                        th {{_ "dataTable.explore.col3-heading"}}
+                        th {{_ "dataTable.explore.col5-heading"}}
+                        th {{_ "dataTable.explore.col2-heading"}}
+                    tbody
+                      each data
+                        tr
+                          td {{format date}}
+                          td= state_province
+                          td= dailySightings
             else
               tr
                 td(colspan='12')

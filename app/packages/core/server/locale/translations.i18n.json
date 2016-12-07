@@ -18,8 +18,11 @@
             },
             "col4-heading": {
                 "en": "Occurrences"
+            },
+            "col5-heading": {
+                "en": "Location"
             }
-        }
+        },
     },
     "gritsSearch": {
         "tokenfield-placeholder": {
