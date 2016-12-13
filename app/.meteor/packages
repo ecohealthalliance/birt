@@ -22,3 +22,5 @@ birt:ui
 birt:info
 birt:scrubber
 eha:nojs-banner
+meteorhacks:aggregate
+simple:reactive-method
