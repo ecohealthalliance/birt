@@ -17,6 +17,12 @@ recordProfile = (methodName, elapsedTime) ->
 isTestEnvironment = ->
   return process.env.hasOwnProperty('VELOCITY_MAIN_APP_PATH')
 
+# finds a bird
+#
+# @param [String] id, the bird id
+findBird = (id) ->
+  return Birds.findOne({_id:id})
+
 # finds documents that match the search
 #
 # @param [String] name, the collection name to search
@@ -42,13 +48,13 @@ typeahead = (name, search, skip) ->
   matches = []
   if _useAggregation
     pipeline = [
-      {$match: {$or: fields}},
+      {$match: {$or: fields, recommended_dates: {$exists: true}}},
       {$skip: skip},
       {$limit: 10}
     ]
     matches = collection.aggregate(pipeline)
   else
-    query = { $or: fields }
+    query = { $or: fields, recommended_dates: {$exists: true}}
     matches = collection.find(query, {limit: 10, skip: skip, transform: null}).fetch()
 
   if _profile
@@ -69,7 +75,7 @@ countTypeaheadBirds = (search) ->
     field[fieldName] = {$regex: new RegExp(matcher.regexSearch({search: search}), matcher.regexOptions)}
     fields.push(field)
 
-  query = { $or: fields }
+  query = { $or: fields, recommended_dates: {$exists: true}}
   count = Birds.find(query, {transform: null}).count()
 
   if _profile
@@ -312,4 +318,4 @@ Meteor.methods
   migrationsByDates: migrationsByDates
   countMigrationsByDates: countMigrationsByDates
   migrationsBySeason: migrationsBySeason
-
+  findBird: findBird

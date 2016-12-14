@@ -12,6 +12,7 @@ Bird = Astro.Class(
     'subfamily_name': 'string'
     'genus_name': 'string'
     'species_name': 'string'
+    'recommended_dates': 'object'
   events: {}
   methods: {})
 
