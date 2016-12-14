@@ -31,4 +31,4 @@ if Meteor.isClient
       tab = $(event.currentTarget).data('tab')
       instance.activeTab.set tab
       instance.activePane.set tab
-      instance.open.set true
+      Session.set('mainSidebarOpen', true)
