@@ -35,3 +35,6 @@ Template.gritsMap.onCreated ->
   Template.gritsMap.getInstance = getInstance
   Template.gritsMap.setInstance = setInstance
   Template.gritsMap.addDefaultControls = addDefaultControls
+
+
+#http://stackoverflow.com/questions/33267232/how-to-retrieve-and-group-by-week-my-meteor-mongo-data

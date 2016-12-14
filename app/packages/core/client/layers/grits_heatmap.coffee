@@ -393,6 +393,7 @@ GritsHeatmapLayer.startAnimation = (startDate, endDate, period, documents, token
 # @param [Number] offset, the offset from the filter
 # @param [Function] done, callback when done
 GritsHeatmapLayer.migrationsByDate = (dates, token, limit, offset, done) ->
+  console.log('migrations by date')
   # show the loading indicator and call the server-side method
   GritsHeatmapLayer.animationRunning.set(true)
   async.auto({
@@ -431,6 +432,19 @@ GritsHeatmapLayer.migrationsByDate = (dates, token, limit, offset, done) ->
       GritsHeatmapLayer.animationRunning.set(false)
       return
 
+    groupedResults = _.groupBy(migrations, (result) ->
+      moment(result['date']).startOf 'isoWeek'
+    )
+ 
+    # Grouped by Week
+    GroupedMigrations.remove({})
+    i = 0
+    ilen = groupedResults.length
+    while i < ilen
+      GroupedMigrations.insert(groupedResults[i])
+      i++
+
+    debugger
     MiniMigrations.remove({})
     i = 0
     ilen = migrations.length
@@ -453,6 +467,7 @@ GritsHeatmapLayer.migrationsByDate = (dates, token, limit, offset, done) ->
 # @param [Number] offset, the offset from the filter
 # @param [Function] done, callback when done
 GritsHeatmapLayer.migrationsByDateRange = (startDate, endDate, token, _limit, offset, done) ->
+  console.log('migrations by date range')
   # show the loading indicator and call the server-side method
   GritsHeatmapLayer.animationRunning.set(true)
   async.auto({
@@ -492,6 +507,20 @@ GritsHeatmapLayer.migrationsByDateRange = (startDate, endDate, token, _limit, of
       GritsHeatmapLayer.animationRunning.set(false)
       return
 
+    groupedResults = _.groupBy(migrations, (result) ->
+      moment(result['date']).startOf 'isoWeek'
+    )
+    groupedResults = _.toArray groupedResults
+
+    # Grouped by Week
+    GroupedMigrations.remove({})
+    i = 0
+    ilen = groupedResults.length
+    while i < ilen
+      GroupedMigrations.insert({date: groupedResults[i][0].date, data: groupedResults[i] })
+      i++
+
+    # Not grouped, flat daily
     MiniMigrations.remove({})
     i = 0
     ilen = migrations.length
