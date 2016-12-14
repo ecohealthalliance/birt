@@ -23,3 +23,5 @@ birt:info
 birt:scrubber
 eha:nojs-banner
 birt:tools
+meteorhacks:aggregate
+simple:reactive-method

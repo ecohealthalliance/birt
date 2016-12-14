@@ -12,4 +12,5 @@ Package.onUse(function(api) {
   api.addFiles('variables.styl', 'client', {isImport: true});
   api.addFiles('mixins.styl', 'client', {isImport: true});
   api.addFiles('tooltips.styl', 'client', {isImport: true});
+  api.addFiles('rupture.styl', 'client', {isImport: true});
 });

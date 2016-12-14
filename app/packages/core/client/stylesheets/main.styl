@@ -1,15 +1,21 @@
+@import '{styles-base}/rupture'
 @import '{styles-base}/variables'
 @import '{styles-base}/mixins'
 @import 'globals.import'
 @import 'birt.import'
 @import 'map.import'
 @import 'overlay.import'
+@import 'tables.import'
 
 body
 html
 .page-wrapper
   height 100%
   width 100%
+
+.page-wrapper
+  position relative
+  overflow hidden
 
 body
   primaryFont()

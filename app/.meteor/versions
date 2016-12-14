@@ -29,7 +29,7 @@ deps@1.0.9
 diff-sequence@1.0.1
 ecmascript@0.1.6
 ecmascript-runtime@0.2.6
-eha:nojs-banner@1.0.7
+eha:nojs-banner@1.1.0
 ejson@1.0.7
 es5-shim@4.1.14
 fastclick@1.0.7
@@ -84,6 +84,7 @@ session@1.1.1
 sidebar@0.0.1
 sidebar-main@0.0.1
 sidebar-tabular@0.0.1
+simple:reactive-method@1.0.2
 spacebars@1.0.7
 spacebars-compiler@1.0.7
 standard-minifiers@1.0.2

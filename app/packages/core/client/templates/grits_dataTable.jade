@@ -5,21 +5,30 @@ template(name='gritsDataTable')
   .tab-content.dataTableContent
     #paths.tab-pane.active
       .pathsTableContainer
-        table#exploreTable.table.dataTable
+        table#exploreTable.migrations.table.dataTable(class="{{#if groupsSelected}} group-is-selected {{/if}}")
           thead
             tr
               th {{_ "dataTable.explore.col1-heading"}}
               th {{_ "dataTable.explore.col2-heading"}}
-              th {{_ "dataTable.explore.col3-heading"}}
-              th {{_ "dataTable.explore.col4-heading"}}
           tbody
-            with migrations
-              each migrations
-                tr.pathTableRow(data-id=this._id)
-                  td= country
-                  td= state_province
-                  td {{format date}}
-                  td {{currentBird this}}
+            each groupedMigrations
+              tr.pathTableRow(class="{{#if selected}} selected {{/if}}")
+                td {{format date}}
+                td= groupedMigrationsCount
+              tr.pathData(class="{{#if selected}} selected {{/if}}")
+                td.weekly-migrations(colspan="2")
+                  table#detailTable.table.weekly-migrations-detail
+                    thead
+                      tr
+                        th {{_ "dataTable.explore.col3-heading"}}
+                        th {{_ "dataTable.explore.col5-heading"}}
+                        th {{_ "dataTable.explore.col2-heading"}}
+                    tbody
+                      each sightingReports
+                        tr
+                          td {{format date}}
+                          td= formatedLocationName
+                          td= dailySightings
             else
               tr
                 td(colspan='12')
