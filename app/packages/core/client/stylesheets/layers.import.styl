@@ -1,0 +1,51 @@
+.leaflet-control-layers-base
+.leaflet-control-layers-overlays
+  label
+    position relative
+    margin-bottom 0
+    border-bottom 1px solid $border-primary
+    cursor pointer
+    font-weight normal
+    span
+      display block
+      padding .75em 25px
+      color $primary
+      letter-spacing .03em
+      &:hover
+        background $primary-ll
+        &::after
+          content '\f058'
+      &::after
+        position absolute
+        right 20px
+        top 50%
+        transform translate(0, -50%)
+        content '\f10c'
+        font-family FontAwesome
+        font-size 1.3em
+        color $primary-l
+    input
+      position absolute
+      left -9999px
+      &:checked + span
+        background $list-selected
+        text-shadow 0 1px 0px rgba(0,0,0,.2)
+        &::after
+          content '\f058'
+          color white
+          font-size 1.4em
+        &
+        &:hover
+          color white
+
+.leaflet-control-layers-overlays
+  margin-top 2em
+  &:not(:empty)
+    border-top 1px solid $border-primary
+
+.leaflet-control-layers
+  .leaflet-control-layers-separator
+    display none
+
+.leaflet-control-layers-selector
+  top -2px

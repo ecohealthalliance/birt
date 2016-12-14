@@ -12,24 +12,26 @@
     margin 0
     text-align center
     border-right 1px solid $primary
+    text-transform uppercase
     &:hover
     &:focus
       background lighten($primary, 90%)
     &:last-of-type
       border 0
     &.active
-      background $tab-selected
       a
         letter-spacing .05em
         color white
-        &:hover
+        &
         &:focus
-          background $primary
+        &:focus:hover
+          background $tab-selected
   a
     flex 1
     margin 0
     color $body-text
-    padding 1em
+    padding .75em
+    font-size 1.1em
     &:focus
     &:hover
       box-shadow none
