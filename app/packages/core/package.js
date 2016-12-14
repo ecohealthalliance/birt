@@ -61,6 +61,7 @@ Package.onUse(function(api){
     'client/stylesheets/tables.import.styl',
     'client/stylesheets/tokens.import.styl',
     'client/stylesheets/toasts.import.styl',
+    'client/stylesheets/lists.import.styl',
     'client/lib/tableExport.min.js',
     'client/lib/webgl-heatmap.js',
     'client/lib/webgl-heatmap-leaflet.js',

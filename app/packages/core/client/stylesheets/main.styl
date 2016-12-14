@@ -10,6 +10,7 @@
 @import 'tables.import'
 @import 'tokens.import'
 @import 'toasts.import'
+@import 'lists.import'
 
 body
 html
@@ -258,7 +259,7 @@ p.intro
   border-bottom 2px solid $primary
 
 .filter
-  display table;
+  display table
   height 100%
 
 .filter-header
@@ -272,18 +273,14 @@ p.intro
   font-weight bold
 
 .filter-group
+  margin-right 25px
+  margin-left 25px
   white-space nowrap
   margin-bottom 1em
-
-.filter-wrapper
-  margin-left 25px
-  margin-right 25px
-
-.filter-row
-  display inline-block
-  width 100%
-  margin-top 10px
-  margin-bottom 10px
+  &:first-of-type
+    margin-top 1em
+  &:last-of-type
+    margin-top 2em
 
 .limit-bar
   display inline-block

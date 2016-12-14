@@ -27,17 +27,21 @@ template(name='gritsSearch')
           span.input-group-addon
             span.glyphicon.glyphicon-calendar
 
-      .filter-row
+      .filter-group
         button#applyFilter.btn.btn-success.btn-block {{_ "gritsSearch.applyFilterButton" }}
           if isAnimationRunning
             i.fa.fa-spinner.fa-spin
 
     else
-      .list-group.seasons
-        a.list-group-item(href='#', class='{{#if summer}}active{{/if}}') Summer
-        a.list-group-item(href='#', class='{{#if autumn}}active{{/if}}') Autumn
-        a.list-group-item(href='#', class='{{#if winter}}active{{/if}}') Winter
-        a.list-group-item(href='#', class='{{#if spring}}active{{/if}}') Spring
+      ul.seasons.list-unstyled
+        li
+          a(href='#', class='{{#if summer}}active{{/if}}') Summer
+        li
+          a(href='#', class='{{#if autumn}}active{{/if}}') Autumn
+        li
+          a(href='#', class='{{#if winter}}active{{/if}}') Winter
+        li
+          a(href='#', class='{{#if spring}}active{{/if}}') Spring
 
   if showResults
     .filter-footer

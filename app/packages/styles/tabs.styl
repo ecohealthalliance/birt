@@ -2,7 +2,7 @@
   display flex
   align-items stretch
   justify-content space-around
-  margin 0 -25px 20px -35px
+  margin-bottom 0
   border-top 1px solid $primary
   border-bottom 2px solid $primary
   li
@@ -18,8 +18,9 @@
     &:last-of-type
       border 0
     &.active
-      background $primary
+      background $tab-selected
       a
+        letter-spacing .05em
         color white
         &:hover
         &:focus
