@@ -59,6 +59,8 @@ Package.onUse(function(api){
     'client/stylesheets/map.import.styl',
     'client/stylesheets/overlay.import.styl',
     'client/stylesheets/tables.import.styl',
+    'client/stylesheets/tokens.import.styl',
+    'client/stylesheets/toasts.import.styl',
     'client/lib/tableExport.min.js',
     'client/lib/webgl-heatmap.js',
     'client/lib/webgl-heatmap-leaflet.js',

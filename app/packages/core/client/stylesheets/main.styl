@@ -1,11 +1,15 @@
 @import '{styles-base}/rupture'
 @import '{styles-base}/variables'
 @import '{styles-base}/mixins'
+@import '{styles-base}/tabs'
+@import '{styles-base}/buttons'
 @import 'globals.import'
 @import 'birt.import'
 @import 'map.import'
 @import 'overlay.import'
 @import 'tables.import'
+@import 'tokens.import'
+@import 'toasts.import'
 
 body
 html
@@ -269,7 +273,7 @@ p.intro
 
 .filter-group
   white-space nowrap
-  padding 2px
+  margin-bottom 1em
 
 .filter-wrapper
   margin-left 25px
@@ -286,17 +290,6 @@ p.intro
   width 100%
   margin-top 10px
   margin-bottom 10px
-
-.btn-filter
-  width 100%
-  border-radius 0px
-  color #333
-  background-color #38B678
-  border-color #318f80
-  font-weight bold
-
-.btn-filter:hover
-  color #eee
 
 .leaflet-control-layers
   box-shadow none
@@ -316,10 +309,3 @@ p.intro
 
 .dtHidden
   display none
-
-.toast-error, .toast-info, .toast-warning, .toast-success
-  width 70% !important
-  min-width 300px !important
-
-.toast-message
-  text-align center !important
