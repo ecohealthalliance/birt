@@ -9,18 +9,18 @@ numeric = /[^0-9]/g
 ###
 # locationsComparator is a custom comparator to sort alphanumeric MD5 hash
 # of a location.
-# @param [Array] a, the left location array
-# @param [Array] b, the right location array
+# @param [Array] a, the mid element from the location array
+# @param [String] b, the id we are searching for
 # @note postion 4 of the array is the hash, this can be seen in GritsHeatmapLayer.createLocation
 ###
 locationsComparator = (a, b) ->
   if typeof a == 'undefined' || typeof b == 'undefined'
     return -1
   aAlpha = a[4].replace(alpha, '')
-  bAlpha = b[4].replace(alpha, '')
+  bAlpha = b.replace(alpha, '')
   if aAlpha == bAlpha
     aNumeric = parseInt(a[4].replace(numeric, ''), 10)
-    bNumeric = parseInt(b[4].replace(numeric, ''), 10)
+    bNumeric = parseInt(b.replace(numeric, ''), 10)
     if aNumeric == bNumeric
       return 0
     else if aNumeric > bNumeric
@@ -37,7 +37,7 @@ locationsComparator = (a, b) ->
 # binarySearch
 #
 # @param [Array] array, the sorted array to search
-# @param [Array] el, the element to search
+# @param [Array] value, the element to search
 # @return [Number] idx, the index or the position to insert
 ###
 binarySearch = (array, value, cmp) ->
@@ -168,9 +168,11 @@ GritsHeatmapLayer.animationPaused = new ReactiveVar(false)
 
 # find the index of the heatmap data matching the id
 #
-# @param [String] dateKey, the animation frame id
+# @param [String] id, the animation frame id
+# @return [Number] idx, if positive it is the index of the matching element.
+#   if negative, it is the sorted insertion point of a new element.
 GritsHeatmapLayer.findIndex = (id) ->
-  return binarySearch(_locations, [0,0,0,0,id], locationsComparator)
+  return binarySearch(_locations, id, locationsComparator)
 
 # resets the array of locations
 GritsHeatmapLayer.resetLocations = ->
