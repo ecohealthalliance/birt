@@ -3,6 +3,60 @@ FRAME_INTERVAL = 125 # milliseconds
 _locations = [] # container to store heatmap data
 _animation = null # stores the setInterval id of the animation
 
+
+alpha = /[^a-zA-Z]/g
+numeric = /[^0-9]/g
+###
+# locationsComparator is a custom comparator to sort alphanumeric MD5 hash
+# of a location.
+# @param [Array] a, the left location array
+# @param [Array] b, the right location array
+# @note postion 4 of the array is the hash, this can be seen in GritsHeatmapLayer.createLocation
+###
+locationsComparator = (a, b) ->
+  if typeof a == 'undefined' || typeof b == 'undefined'
+    return -1
+  aAlpha = a[4].replace(alpha, '')
+  bAlpha = b[4].replace(alpha, '')
+  if aAlpha == bAlpha
+    aNumeric = parseInt(a[4].replace(numeric, ''), 10)
+    bNumeric = parseInt(b[4].replace(numeric, ''), 10)
+    if aNumeric == bNumeric
+      return 0
+    else if aNumeric > bNumeric
+      return 1
+    else
+      return -1
+  else
+    if aAlpha > bAlpha
+      return 1
+    else
+      return -1
+
+###
+# binarySearch
+#
+# @param [Array] array, the sorted array to search
+# @param [Array] el, the element to search
+# @return [Number] idx, the index or the position to insert
+###
+binarySearch = (array, value, cmp) ->
+  if cmp == undefined
+    throw new Error('Comparator function is required.')
+  low = 0
+  high = array.length - 1
+  while low <= high
+    mid = Math.floor(low + ((high - low) / 2))
+    c = cmp(array[mid], value)
+    if c > 0
+      high = mid - 1
+    else if c < 0
+      low = mid + 1
+    else
+      return mid
+  return -low - 1
+
+
 # Creates an instance of a GritsHeatmapLayer, extends  GritsLayer
 #
 # @param [Object] map, an instance of GritsMap
@@ -105,7 +159,6 @@ class GritsHeatmapLayer extends GritsLayer
 
 
 # static methods
-
 # Reactive vars to keep track of the animation
 GritsHeatmapLayer.animationRunning = new ReactiveVar(false)
 GritsHeatmapLayer.animationProgress = new ReactiveVar(0)
@@ -113,20 +166,12 @@ GritsHeatmapLayer.animationFrame = new ReactiveVar(null)
 GritsHeatmapLayer.animationCompleted = new ReactiveVar(false)
 GritsHeatmapLayer.animationPaused = new ReactiveVar(false)
 
-# find the index of the heatmap data matching dateKey and locationID
+# find the index of the heatmap data matching the id
 #
 # @param [String] dateKey, the animation frame id
-GritsHeatmapLayer.findIndex = (dateKey, locationID) ->
-  idx = -1
-  i = 0
-  len = _locations.length
-  while (i < len)
-    d = _locations[i]
-    if d[3] == dateKey && d[4] == locationID
-      idx = i
-      break
-    i++
-  return idx
+GritsHeatmapLayer.findIndex = (id) ->
+  return binarySearch(_locations, [0,0,0,0,id], locationsComparator)
+
 # resets the array of locations
 GritsHeatmapLayer.resetLocations = ->
   _locations = []
@@ -145,7 +190,7 @@ GritsHeatmapLayer.createLocation = (dateKey, doc, tokens) ->
       sofar
   , 0)
 
-  idx = GritsHeatmapLayer.findIndex(dateKey, id)
+  idx = GritsHeatmapLayer.findIndex(id)
   if idx < 0
     location = [] # create new location if undefined
     location.push(doc.loc.coordinates[1])
@@ -153,7 +198,8 @@ GritsHeatmapLayer.createLocation = (dateKey, doc, tokens) ->
     location.push(count) # the count for this date
     location.push(dateKey)
     location.push(id)
-    _locations.push(location)
+    # binarySearch will give us the insertion point as -idx
+    _locations.splice(Math.abs(idx), 0, location)
   else
     # do we have a count for this date?
     location = _locations[idx]
@@ -214,7 +260,7 @@ GritsHeatmapLayer.decrementPreviousLocations = (nextIdx, frames, period, documen
     if doc == null
       return
     id = CryptoJS.MD5(JSON.stringify(doc.loc)).toString()
-    idx = GritsHeatmapLayer.findIndex(dateKey, id)
+    idx = GritsHeatmapLayer.findIndex(id)
     if idx >= 0
       count = doc.sightings?.reduce((sofar, sighting) ->
         if _.contains(tokens, sighting.bird_id)
@@ -435,7 +481,7 @@ GritsHeatmapLayer.migrationsByDate = (dates, token, limit, offset, done) ->
     groupedResults = _.groupBy(migrations, (result) ->
       moment(result['date']).startOf 'isoWeek'
     )
- 
+
     # Grouped by Week
     GroupedMigrations.remove({})
     i = 0
