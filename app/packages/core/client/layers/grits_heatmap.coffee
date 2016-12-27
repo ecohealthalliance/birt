@@ -56,7 +56,6 @@ binarySearch = (array, value, cmp) ->
       return mid
   return -low - 1
 
-
 # Creates an instance of a GritsHeatmapLayer, extends  GritsLayer
 #
 # @param [Object] map, an instance of GritsMap
@@ -105,7 +104,11 @@ class GritsHeatmapLayer extends GritsLayer
   draw: ->
     # An extra point with no intensity is added because passing in an empty
     # array causes a bug where the previous heatmap is frozen in view.
+    #if _locations.length <= 0
     data = _locations.concat([[0.0, 0.0, 0]])
+    #else
+    #  data = _locations
+
     # Normalize the intensity
     totalSightings = data.reduce(((sofar, d) -> sofar + d[2]), 0)
     data.forEach((d) -> 100 * d[2] /= totalSightings)
@@ -137,7 +140,7 @@ class GritsHeatmapLayer extends GritsLayer
     self = this
     if _.isEmpty(_locations)
       return []
-    return self._locations
+    return _locations
 
   # binds to the Tracker.gritsMap.getInstance() map event listener .on
   # 'overlyadd' and 'overlayremove' methods
@@ -176,15 +179,17 @@ GritsHeatmapLayer.findIndex = (id) ->
 
 # resets the array of locations
 GritsHeatmapLayer.resetLocations = ->
-  _locations = []
+  _locations.length = 0
   return
+
 # creates a migration location element based on a mongodb document
 #
 # @param [String] dateKey, the current animation frame
 # @param [Array] doc, the GeoJSON mongoDB document
 # @param [Array] tokens, the tokens from the filter
 GritsHeatmapLayer.createLocation = (dateKey, doc, tokens) ->
-  id = CryptoJS.MD5(JSON.stringify(doc.loc)).toString()
+  #id = CryptoJS.MD5("#{JSON.stringify(doc.loc)}#{dateKey}").toString()
+  id = CryptoJS.MD5("#{JSON.stringify(doc.loc)}").toString()
   count = doc.sightings?.reduce((sofar, sighting) ->
     if _.contains(tokens, sighting.bird_id)
       sofar + (sighting?.count or 0)
@@ -206,29 +211,6 @@ GritsHeatmapLayer.createLocation = (dateKey, doc, tokens) ->
     # do we have a count for this date?
     location = _locations[idx]
     location[2] += count # increment by the count
-
-# filter migration records by dateKey
-#
-# @param [Date] f, the current animation frame date
-# @param [String] period, the interval/period from the UI 'days', 'months', 'weeks', 'years'
-# @param [Array] documents, the array of documents to be filtered
-# @return [Array] filteredDocuments, an array of filtered documents base on date
-GritsHeatmapLayer.filteredDocuments = (f, period, documents) ->
-  return _.filter(documents, (doc) ->
-    d = moment(doc.date)
-    if period == 'years'
-      if d.year() == f.year()
-        return doc
-    if period == 'months'
-      if d.month() == f.month() && d.year() == f.year()
-        return doc
-    if period == 'weeks'
-      if d.weeks() == f.weeks() && d.year() == f.year()
-        return doc
-    if period == 'days'
-      if d.date() == f.date() && d.month() == f.month() && d.year() == f.year()
-        return doc
-  )
 
 # decrements the value of the locations
 #
@@ -253,10 +235,11 @@ GritsHeatmapLayer.decrementPreviousLocations = (nextIdx, frames, period, documen
   # throttle how many time the heatmap can be drawn
   throttleDraw = _.throttle(->
     heatmapLayerGroup.draw()
-  , 250)
+  , 750)
 
   # get the documents for this period
-  filteredDocuments = GritsHeatmapLayer.filteredDocuments(f, period, documents)
+  #filteredDocuments = GritsHeatmapLayer.filteredDocuments(f, period, documents)
+  filteredDocuments = documents[dateKey]
 
   async.eachSeries(filteredDocuments, (doc, next) ->
     if doc == null
@@ -307,14 +290,14 @@ GritsHeatmapLayer.stopAnimation = ->
 # @param [Array] documents, the array of GeoJSON documents from mongoDB
 # @param [Array] tokens, the tokens from the filter
 # @param [Number] offset, the offset from the filter
-GritsHeatmapLayer.startAnimation = (startDate, endDate, period, documents, tokens, offset) ->
+GritsHeatmapLayer.startAnimation = (startDate, endDate, period, flatMigrations, documents, tokens, offset) ->
   # the GritsMap instance
   map = Template.gritsMap.getInstance()
   heatmapLayerGroup = map.getGritsLayerGroup(GritsConstants.HEATMAP_GROUP_LAYER_ID)
   heatmapLayerGroup.add()
 
   # Fit map to bounds of all locations
-  locations = _.map documents, (doc) ->
+  locations = _.map flatMigrations, (doc) ->
     [doc.loc.coordinates[1], doc.loc.coordinates[0]]
   map.fitBounds(L.latLngBounds(locations))
 
@@ -403,7 +386,7 @@ GritsHeatmapLayer.startAnimation = (startDate, endDate, period, documents, token
       # set the ReactiveVar so the UI may listen to changes to the animation frame
       GritsHeatmapLayer.animationFrame.set(dateKey)
       # get the documents for this period
-      filteredDocuments = GritsHeatmapLayer.filteredDocuments(f, period, documents)
+      filteredDocuments = documents[dateKey]
       processedLocations = Session.get(GritsConstants.SESSION_KEY_LOADED_RECORDS)
       async.eachSeries filteredDocuments, (doc, next) ->
         if doc == null
@@ -440,7 +423,7 @@ GritsHeatmapLayer.startAnimation = (startDate, endDate, period, documents, token
 # @param [Number] limit, the limit from the filter
 # @param [Number] offset, the offset from the filter
 # @param [Function] done, callback when done
-GritsHeatmapLayer.migrationsByDate = (dates, token, limit, offset, done) ->
+GritsHeatmapLayer.migrationsByDate = (dates, token, limit, offset, period, done) ->
   console.log('migrations by date')
   # show the loading indicator and call the server-side method
   GritsHeatmapLayer.animationRunning.set(true)
@@ -474,6 +457,7 @@ GritsHeatmapLayer.migrationsByDate = (dates, token, limit, offset, done) ->
     # if there hasn't been any errors, getCount and getMigrations will
     # have completed
     migrations = result.getMigrations
+
     # check if migrations is undefiend or empty
     if _.isUndefined(migrations) || _.isEmpty(migrations)
       toastr.info(i18n.get('toastMessages.noResults'))
@@ -514,7 +498,7 @@ GritsHeatmapLayer.migrationsByDate = (dates, token, limit, offset, done) ->
 # @param [Number] limit, the limit from the filter
 # @param [Number] offset, the offset from the filter
 # @param [Function] done, callback when done
-GritsHeatmapLayer.migrationsByDateRange = (startDate, endDate, token, _limit, offset, done) ->
+GritsHeatmapLayer.migrationsByDateRange = (startDate, endDate, token, limit, offset, period, done) ->
   console.log('migrations by date range')
   # show the loading indicator and call the server-side method
   GritsHeatmapLayer.animationRunning.set(true)
@@ -538,7 +522,7 @@ GritsHeatmapLayer.migrationsByDateRange = (startDate, endDate, token, _limit, of
       if totalRecords == 0
         callback(null, [])
         return
-      Meteor.call('migrationsByQuery', startDate, endDate, token, 9999, offset, callback)
+      Meteor.call('migrationsByQuery', startDate, endDate, token, limit, offset, period, callback)
     ]
   }, (err, result) ->
     if err
@@ -549,13 +533,20 @@ GritsHeatmapLayer.migrationsByDateRange = (startDate, endDate, token, _limit, of
     # if there hasn't been any errors, getCount and getMigrations will
     # have completed
     migrations = result.getMigrations
+
     # check if migrations is undefiend or empty
     if _.isUndefined(migrations) || _.isEmpty(migrations)
       toastr.info(i18n.get('toastMessages.noResults'))
       GritsHeatmapLayer.animationRunning.set(false)
       return
 
-    groupedResults = _.groupBy(migrations, (result) ->
+    # server is preprocessing the documents into frames, this concats this
+    # object back into an array for ...
+    flatMigrations = _.reduce(migrations, (frame, nextFrame) ->
+      return frame.concat(nextFrame)
+    , [])
+
+    groupedResults = _.groupBy(flatMigrations, (result) ->
       moment(result['date']).startOf 'isoWeek'
     )
     groupedResults = _.toArray groupedResults
@@ -573,11 +564,11 @@ GritsHeatmapLayer.migrationsByDateRange = (startDate, endDate, token, _limit, of
     i = 0
     ilen = migrations.length
     while i < ilen
-      MiniMigrations.insert(migrations[i])
+      MiniMigrations.insert(flatMigrations[i])
       i++
 
     # execute the callback to process the migrations
-    done(null, migrations)
+    done(null, {flatMigrations: flatMigrations, migrations: migrations})
     return
   )
   return

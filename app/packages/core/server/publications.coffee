@@ -76,13 +76,43 @@ countTypeaheadBirds = (search) ->
     recordProfile('countTypeaheadAirports', new Date() - start)
   return count
 
+# filter migration records by dateKey
+#
+# @param [Date] f, the current animation frame date
+# @param [String] period, the interval/period from the UI 'days', 'months', 'weeks', 'years'
+# @param [Array] documents, the array of documents to be filtered
+# @return [Array] filteredDocuments, an array of filtered documents base on date
+filteredMigrations = (f, period, documents) ->
+  return _.filter(documents, (doc) ->
+    d = moment(doc.date)
+    if period == 'years'
+      if d.year() == f.year()
+        return doc
+    if period == 'months'
+      if d.month() == f.month() && d.year() == f.year()
+        return doc
+    if period == 'weeks'
+      if d.weeks() == f.weeks() && d.year() == f.year()
+        return doc
+    if period == 'days'
+      if d.date() == f.date() && d.month() == f.month() && d.year() == f.year()
+        return doc
+  )
+
+preprocessFrames = (frames, period, documents) ->
+  preprocessed = {}
+  frames.forEach (frame) ->
+    key = frame.utc().format('MMDDYYYY')
+    preprocessed[key] = filteredMigrations(frame, period, documents)
+  return preprocessed
+
 # find migrations with an optional limit and offset
 #
 # @param [Object] query, a mongodb query object
 # @param [Integer] limit, the amount of records to limit
 # @param [Integer] skip, the amount of records to skip
 # @return [Array] an array of documents
-migrationsByQuery = (startDate, endDate, tokens, limit, skip) ->
+migrationsByQuery = (startDate, endDate, tokens, limit, skip, period) ->
   if _profile
     start = new Date()
 
@@ -127,9 +157,13 @@ migrationsByQuery = (startDate, endDate, tokens, limit, skip) ->
   else
     matches = Migrations.find(query, {fields: fields, limit: limit, skip: skip, sort: {date: 1}, transform: null}).fetch()
 
+  range = moment.range(startDate, endDate)
+  frames = range.toArray(period)
+  preprocessed = preprocessFrames(frames, period, matches)
+
   if _profile
     recordProfile('migrationsByQuery', new Date() - start)
-  return matches
+  return preprocessed
 
 # count the total migrations for the specified date range
 #
@@ -312,4 +346,3 @@ Meteor.methods
   migrationsByDates: migrationsByDates
   countMigrationsByDates: countMigrationsByDates
   migrationsBySeason: migrationsBySeason
-
