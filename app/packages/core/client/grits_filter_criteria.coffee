@@ -234,13 +234,13 @@ class GritsFilterCriteria
   #
   # @param [Array] documents, an Array of mongoDB documents to process
   # @param [Integer] offset, the offset of the query
-  process: (flat, documents, tokens, offset) ->
+  process: (migrations, frames, tokens, offset) ->
     self = this
     startDate = moment.utc(self.operatingDateRangeStart.get())
     endDate = moment.utc(self.operatingDateRangeEnd.get())
     period = self.period.get()
     # start the heatmap animation
-    GritsHeatmapLayer.startAnimation(startDate, endDate, period, flat, documents, tokens, offset)
+    GritsHeatmapLayer.startAnimation(startDate, endDate, period, migrations, frames, tokens, offset)
     return
   # applies the filter but does not reset the offset
   #
@@ -303,10 +303,10 @@ class GritsFilterCriteria
       GritsHeatmapLayer.migrationsByDateRange(startDate.toISOString(), endDate.toISOString(), tokens, limit, offset, period, (err, result) ->
         if err
           return
-        self.process(result.flatMigrations, result.migrations, tokens, offset)
+        self.process(result.migrations, result.frames, tokens, offset)
         # call the original callback function if its defined
         if cb && _.isFunction(cb)
-          cb(null, result.flatMigrations)
+          cb(null, result.migrations)
       )
 
   # applies the filter; resets the offset, loadedRecords, and totalRecords

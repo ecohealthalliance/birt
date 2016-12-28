@@ -69,12 +69,12 @@ class GritsLayerGroup #extends L.layerGroup
     self = this
     return self._layers[GritsConstants.HEATMAP_LAYER_ID]
 
-  draw: ->
+  draw: (data) ->
     self = this
     Object.keys(self._layers).map((key) ->
       layer = self._layers[key]
       if typeof layer.draw == 'function'
-        layer.draw()
+        layer.draw(data)
     )
     return
 
