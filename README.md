@@ -17,7 +17,7 @@ The run command can be issued by calling `make run`.  However, Meteor will need 
   ```
 ### b. Inline prior to executing `run`
  ```
- MONGO_URL=mondodb://localhost/birt make run
+ MONGO_URL=mongodb://localhost/birt make run
  ```
 
 ## Launch client
