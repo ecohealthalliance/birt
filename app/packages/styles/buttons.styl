@@ -1,0 +1,124 @@
+$success-btn-color = desaturate(lighten($positive, 45%), 20%)
+$warning-btn-color = lighten($warning, 50%)
+
+$btn-types = {
+  '.btn-default': {
+    text: darken($border-primary, 30%)
+    text-hover: $primary
+    border: lighten($border-primary, 50%)
+    bg: white
+    bg-hover: $border-primary-light
+  },
+  '.btn-primary': {
+    text: $primary-dark
+    border: $border-btn
+    bg: $primary-light
+    bg-hover: lighten($secondary, 10%)
+  },
+  '.btn-success': {
+    text: $primary-dark
+    text-hover: white
+    border: darken($positive, 10%)
+    bg: $success-btn-color
+    bg-hover: darken($success-btn-color, 25%)
+  }
+  '.btn-danger': {
+    text: $primary-dark
+    text-hover: white
+    border: darken($delete, 30%)
+    bg: lighten($delete, 60%)
+    bg-hover: darken($delete, 10%)
+  }
+  '.btn-warning': {
+    text: $primary
+    border: darken($warning, 30%)
+    bg: $warning-btn-color
+    bg-hover: darken($warning-btn-color, 25%)
+  }
+}
+
+$buttons()
+  for $btn-type, $btn-type-props  in $btn-types
+    $text = $btn-type-props.text
+    $text-hover = $btn-type-props.text-hover or $text
+    $bg = $btn-type-props.bg
+    $bg-hover = $btn-type-props.bg-hover or lighten($bg, 40%)
+    $border = $btn-type-props.border or $border-btn
+    {$btn-type}
+      background $bg
+      color $text
+      border-color $border
+      &:hover
+        background $bg-hover
+        color $text-hover
+        border-color darken($bg-hover, 20%)
+      &:focus
+        border-color darken($border, 20%)
+        background saturate(darken($bg, 10%), 20%)
+        color $text
+      &:focus
+      &:active
+      &:active:focus
+        outline 0
+        box-shadow none
+      &:active
+      &:active:focus
+        color $text
+        background darken($bg, 20%)
+      &.disabled
+        &:hover
+          background $bg
+          border-color lighten($border, 10%)
+
+$buttons()
+
+.btn
+  padding-top .5em
+  padding-bottom .5em
+  padding-left 1.25em
+  padding-right 1.25em
+  font-size 1em
+  font-weight 400
+  letter-spacing .03em
+  .fa
+    margin-right .25em
+
+.btn-xs
+  font-size .75em
+  padding .5em 1.5em
+
+.btn-delete
+  @extend .btn-danger
+
+.btn-confirm
+  @extend .btn-success
+
+.btn-spacious
+  padding-top .75em
+  padding-bottom .75em
+  font-size 1.25em
+
+.btn-action
+.btn-shouting
+  text-transform uppercase
+
+.btn-wide
+  padding-left 2em
+  padding-right 2em
+
+.btn-featured
+  padding 1em 5em
+
+.btn-centered
+  display block
+  margin 10px auto
+
+.btn-sm
+  padding-top .25em
+  padding-bottom .25em
+  text-transform none
+  font-size .95em
+
++mobile()
+  .btn-featured
+    width 100%
