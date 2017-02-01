@@ -79,7 +79,8 @@ function getAnnualCounts(collections, done) {
     function processMigration(err, migration) {
       if (err || migration == null) {
         if (err) console.warn('err: ', err);
-        if (DEBUG) console.log('processed: ', ++processed, ' of ', years.length);
+        processed++;
+        if (DEBUG) console.log('processed: ', processed, ' of ', years.length);
         if (years.length == processed) {
           done(null, annual);
         }
