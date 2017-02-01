@@ -6,9 +6,8 @@ _redrawLayerList = _.debounce( ->
 , 250)
 
 Template.gritsLayerSelector.onRendered ->
-  window.addEventListener('mapper.addOverlayControl', (e) ->
+  window.addEventListener 'mapper.addOverlayControl', (e) ->
     $('.leaflet-control-layers-toggle').hide()
     _redrawLayerList()
-  )
   $('.leaflet-control-layers-toggle').hide()
   _redrawLayerList()

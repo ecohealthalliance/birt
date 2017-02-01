@@ -56,7 +56,7 @@
   overflow hidden
   cursor pointer
   margin-right 1em
-  color $secondary-d
+  color darken($secondary-d, 10%)
   &:hover
     transform scale(1.1)
   +below(3)
@@ -64,7 +64,7 @@
 
 .scrubber--button-controls--play
   &:hover
-    color darken($secondary-d, 10%)
+    color darken($secondary-d, 20%)
 
 .scrubber--button-controls--stop
   color $delete
@@ -75,6 +75,9 @@
 .scrubber--button-controls--play--disabled
 .scrubber--button-controls--stop--disabled
   opacity .25
+  cursor default
+  &:hover
+    transform none
 
 .scrubber--right-slider-container
   position relative

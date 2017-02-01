@@ -1,0 +1,48 @@
+.tabs
+  display flex
+  align-items stretch
+  justify-content space-around
+  margin-bottom 0
+  border-top 1px solid $primary
+  border-bottom 2px solid $primary
+  li
+    flex 1
+    display flex
+    align-items center
+    margin 0
+    text-align center
+    border-right 1px solid $primary
+    text-transform uppercase
+    &:hover
+    &:focus
+      background lighten($primary, 90%)
+    &:last-of-type
+      border 0
+    &.active
+      a
+        letter-spacing .05em
+        color white
+        &
+        &:focus
+        &:focus:hover
+          background $tab-selected
+  a
+    flex 1
+    margin 0
+    color $body-text
+    padding .75em
+    font-size 1.1em
+    &:focus
+    &:hover
+      box-shadow none
+      outline 0
+      background lighten($primary, 90%)
+      text-decoration none
+  span
+    letter-spacing .03em
+  .tab--label
+    font-weight bold
+    font-size 1em
+  .tab--sub-label
+    display block
+    font-size .85em
