@@ -12,7 +12,7 @@
   "dependencies": {
     "kerberos": "0.0.22",
     "mongodb": "^2.2.0 ",
-    "yargs": "^6.4.0",
+    "yargs": "^6.4.0"
   },
   "devDependencies": {
     "babel-cli": "^6.18.0",
