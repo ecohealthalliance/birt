@@ -1,15 +1,27 @@
+@import '{styles-base}/rupture'
 @import '{styles-base}/variables'
 @import '{styles-base}/mixins'
+@import '{styles-base}/tabs'
+@import '{styles-base}/buttons'
 @import 'globals.import'
 @import 'birt.import'
 @import 'map.import'
 @import 'overlay.import'
+@import 'tables.import'
+@import 'tokens.import'
+@import 'toasts.import'
+@import 'lists.import'
+@import 'layers.import'
 
 body
 html
 .page-wrapper
   height 100%
   width 100%
+
+.page-wrapper
+  position relative
+  overflow hidden
 
 body
   primaryFont()
@@ -202,29 +214,6 @@ p.intro
   height 30px
   font-weight 20px
 
-.tokenfield
-  border-radius 0
-  box-shadow none
-  &.form-control
-    &.input-sm
-      padding-left 40px
-      border 0
-
-.input-group-sm .token
-.tokenfield.input-sm .token
-  min-height 26px
-  font-size 16px
-  margin-top 2px
-  margin-bottom 0
-
-.leaflet-control-layers-base
-.leaflet-control-layers-overlays
-  padding-left 20px
-  padding-right 20px
-
-.sidebar-highlight
-  color #333
-
 .pager li > a, .pager li > span
   padding 5px 5px
   border-radius 8px
@@ -248,7 +237,7 @@ p.intro
   border-bottom 2px solid $primary
 
 .filter
-  display table;
+  display table
   height 100%
 
 .filter-header
@@ -262,18 +251,14 @@ p.intro
   font-weight bold
 
 .filter-group
-  white-space nowrap
-  padding 2px
-
-.filter-wrapper
-  margin-left 25px
   margin-right 25px
-
-.filter-row
-  display inline-block
-  width 100%
-  margin-top 10px
-  margin-bottom 10px
+  margin-left 25px
+  white-space nowrap
+  margin-bottom 1em
+  &:first-of-type
+    margin-top 1em
+  &:last-of-type
+    margin-top 2em
 
 .limit-bar
   display inline-block
@@ -281,39 +266,13 @@ p.intro
   margin-top 10px
   margin-bottom 10px
 
-.btn-filter
-  width 100%
-  border-radius 0px
-  color #333
-  background-color #38B678
-  border-color #318f80
-  font-weight bold
-
-.btn-filter:hover
-  color #eee
-
 .leaflet-control-layers
   box-shadow none
   border-radius 0px
   background none
-
-.layers-wrapper
-  padding 40px 40px 40px 35px
-
-.layers-title
-  margin-bottom 8px
-  font-weight 600
-  font-size 20px
 
 .dataTable th
   text-align center
 
 .dtHidden
   display none
-
-.toast-error, .toast-info, .toast-warning, .toast-success
-  width 70% !important
-  min-width 300px !important
-
-.toast-message
-  text-align center !important

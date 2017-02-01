@@ -8,18 +8,21 @@
                "en": "Migrations"
             },
             "col1-heading": {
-                "en": "County"
+                "en": "Week"
             },
             "col2-heading": {
-                "en": "State"
+                "en": "Sightings"
             },
             "col3-heading": {
                 "en": "Date"
             },
             "col4-heading": {
                 "en": "Occurrences"
+            },
+            "col5-heading": {
+                "en": "Location"
             }
-        }
+        },
     },
     "gritsSearch": {
         "tokenfield-placeholder": {

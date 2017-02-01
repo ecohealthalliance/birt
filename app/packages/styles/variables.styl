@@ -5,17 +5,27 @@ $body-text = #333333
 $tab-unselected = rgba(102, 102, 102, 1)
 
 $primary = desaturate(#82573A, 60%)
-$primary-d = darken($primary, 30%)
+$primary-d = $primary-dark = darken($primary, 30%)
+$primary-l = $primary-light = lighten($primary, 70%)
+$primary-ll = lighten($primary, 90%)
 $primary-transparent = alpha($primary, 85%)
 $secondary = #38B678
-$secondary-d = darken($secondary, 30%)
+$secondary-d = $secondary-dark = darken($secondary, 30%)
+$secondary-l = $secondary-light = lighten($secondary, 70%)
+$secondary-ll = lighten($secondary, 90%)
 $active = $secondary
 $whiteBG = alpha(#FFFFFF, 90%)
 $transparent-white = alpha(white, 50%)
 
+$positive = $secondary
+$warning = #EFAC56
 $delete = #F07382
 
 $border-gray = #DDDDDD
+$border-primary = $primary-ll
+$border-primary-light = lighten($border-primary, 75%)
+$border-secondary = lighten($secondary, 30%)
+$border-btn = $primary-l
 
 $ll-gray = rgba(245, 245, 245, 1)
 $l-gray = rgba(235, 235, 235, 1)
@@ -23,9 +33,9 @@ $m-gray = rgba(204, 204, 204, 1)
 $d-gray = rgba(150, 150, 150, 1)
 $dd-gray = rgba(100, 100, 100, 1)
 
-$tabs-bg     = alpha($primary, 80%)
-$secondary   = rgba(179, 225, 178, 1)
-$secondary-d = darken($secondary, 20%)
+$tabs-bg = alpha($primary, 80%)
+$tab-selected = $tabs-bg
+$list-selected = lighten(desaturate($secondary, 20%), 10%)
 
 $tab-font-size = 1.9em
 
@@ -35,6 +45,9 @@ $modal-z-index = 10000
 $sidebar-main-width      = 350px
 $sidebar-main-menu-width = 50px
 $sidebar-tabular-width   = 580px
+$sidebar-main-width-small      = 300px
+$sidebar-main-menu-width-small = 40px
+$sidebar-tabular-width-small   = 450px
 
 $play-controls-height = 80px
 

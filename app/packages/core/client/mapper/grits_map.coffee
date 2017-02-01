@@ -37,7 +37,7 @@ class GritsMap extends L.Map
       @_options.layers = [OpenStreetMap]
 
     for layer in @_options.layers
-      @_gritsTileLayers[layer.options.layerName] = layer
+      @_gritsTileLayers[layer.options.layerName.replace(/_/, ' ')] = layer
 
     @_options.layers = [@_options.layers[0]]
     super(@_element, @_options)

@@ -9,17 +9,11 @@ Template.gritsMap.onRendered ->
         attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="http://cartodb.com/attributions">CartoDB</a>'
         subdomains: 'abcd'
         maxZoom: 19
-      MapQuestOpen_OSM = L.tileLayer 'http://otile{s}.mqcdn.com/tiles/1.0.0/{type}/{z}/{x}/{y}.{ext}',
-        type: 'map'
-        layerName: 'MapQuestOpen_OSM'
-        noWrap: true
-        ext: 'jpg'
-        subdomains: '1234'
       Esri_WorldImagery = L.tileLayer 'http://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
         layerName: 'Esri_WorldImagery'
         noWrap: true
 
-      baseLayers = [OpenStreetMap, Esri_WorldImagery, MapQuestOpen_OSM]
+      baseLayers = [OpenStreetMap, Esri_WorldImagery]
       element = 'grits-map'
       height = window.innerHeight
       options =

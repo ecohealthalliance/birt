@@ -1,4 +1,5 @@
 @import '{styles-base}/variables'
+@import '{styles-base}/rupture'
 
 .leaflet-left.leaflet-bottom
   left 0
@@ -15,8 +16,10 @@
     box-shadow none
     border-radius 0
     font-family $primary-font
-    background alpha($whiteBG, 50%)
+    background alpha($whiteBG, 60%)
     transition .2s
+    +below(3)
+      background alpha($whiteBG, 80%)
     &.active
       background $whiteBG
     h2
@@ -42,30 +45,41 @@
       color $d-gray
       align-self center
 
-.scrubber-container
+.scrubber
   width calc(100% - 120px)
 
-.scrubber-play
-.scrubber-stop
-  width 50px
+.scrubber--button-controls
+  display flex
+
+.scrubber--button-controls--play
+.scrubber--button-controls--stop
   overflow hidden
   cursor pointer
   margin-right 1em
-
-.scrubber-play
+  color darken($secondary-d, 10%)
   &:hover
-    color $secondary
+    transform scale(1.1)
+  +below(3)
+    font-size .85em
 
-.scrubber-stop
-  &:not(.scrubber-stop-disabled)
+.scrubber--button-controls--play
+  &:hover
+    color darken($secondary-d, 20%)
+
+.scrubber--button-controls--stop
+  color $delete
+  &:not(.scrubber--button-controls--stop--disabled)
     &:hover
-      color darken($delete, 10%)
+      color darken($delete, 30%)
 
-.scrubber-stop-disabled
-.scrubber-play-disabled
+.scrubber--button-controls--play--disabled
+.scrubber--button-controls--stop--disabled
   opacity .25
+  cursor default
+  &:hover
+    transform none
 
-.right-slider-container
+.scrubber--right-slider-container
   position relative
   width calc(100% - 60px)
   display flex
@@ -93,23 +107,64 @@
  100%
     -webkit-transform: scale(1)
 
-.scrubber-paused
- -webkit-animation-name 'pulse_animation'
- -webkit-animation-delay 0s
- -webkit-animation-duration 1500ms
- -webkit-animation-iteration-count infinite
- -webkit-animation-timing-function linear
+.scrubber--button-controls--paused
+  -webkit-animation-name 'pulse_animation'
+  -webkit-animation-delay 0s
+  -webkit-animation-duration 1500ms
+  -webkit-animation-iteration-count infinite
+  -webkit-animation-timing-function linear
 
-.scrubber-progress
+.scrubber--progress
   position absolute
   width 2px
-  height 18px
+  height 17px
   top 50%
   transform translate(0, -50%)
-  background-color $primary
+  background-color $secondary-d
   left 0%
   z-index 5
   opacity .7
+  transition .3s
+  +below(3)
+    height 12px
 
-.noUi-handle
-  z-index 10
+.noUi-target
+  border-color darken($secondary, 10%)
+  cursor pointer
+
+.noUi-connect
+  background alpha($secondary, 90%)
+  box-shadow none
+  border 0
+
+.noUi-background
+  background alpha(white, 80%)
+
+.noUi-horizontal
+  +below(3)
+    height 12px
+  .noUi-handle
+    top -9px
+    z-index 10
+    height 2.75em
+    width 2.75em
+    border-radius 50%
+    background $secondary-d
+    border 0
+    box-shadow none
+    transition .1s
+    &:hover
+      transform scale(1.1)
+      background darken($secondary-d, 10%)
+      cursor pointer
+      cursor grab
+      cursor -webkit-grab
+    &:active
+      background $primary
+    +below(3)
+      top -9px
+      height 2.25em
+      width 2.25em
+    &::before
+    &::after
+      display none

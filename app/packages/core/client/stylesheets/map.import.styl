@@ -1,14 +1,26 @@
-$widthWithoutBothSidebars = $sidebar-main-width + $sidebar-tabular-width
-$tabularSidebarAndMainSidebarMenu = $sidebar-tabular-width + $sidebar-main-menu-width
+$width-with-both-sidebars = $sidebar-main-width + $sidebar-tabular-width
+$width-with-both-sidebars-small = $sidebar-main-width-small + $sidebar-tabular-width-small
+$tabular-sidebar-and-main-sidebar-menu = $sidebar-tabular-width + $sidebar-main-menu-width
+$tabular-sidebar-and-main-sidebar-menu-small = $sidebar-tabular-width-small + $sidebar-main-menu-width-small
+
+$tabular-sidebar-overlaps-content = true
 
 #grits-map
   transition $transition-time $transition-easing
   height 100%
-  width 'calc(100% - %s)' % $widthWithoutBothSidebars
   top 0
   bottom 0
+  width 'calc(100% - %s)' % $width-with-both-sidebars
   right $sidebar-tabular-width
   left $sidebar-main-width
+  +below(3)
+    left $sidebar-main-width-small
+    if $tabular-sidebar-overlaps-content
+      width 'calc(100% - %s)' % $sidebar-main-width-small
+      right 0
+    else
+      width 'calc(100% - %s)' % $width-with-both-sidebars-small
+      right $sidebar-tabular-width-small
 
 .tabular-sidebar-closed
   &.main-sidebar-closed
@@ -16,14 +28,27 @@ $tabularSidebarAndMainSidebarMenu = $sidebar-tabular-width + $sidebar-main-menu-
       width 'calc(100% - %s)' % $sidebar-main-menu-width
       left $sidebar-main-menu-width
       right 0
+      +below(3)
+        width 'calc(100% - %s)' % $sidebar-main-menu-width-small
+        left $sidebar-main-menu-width-small
 
 .main-sidebar-closed
   #grits-map
-    width 'calc(100% - %s)' % $tabularSidebarAndMainSidebarMenu
     left $sidebar-main-menu-width
+    width 'calc(100% - %s)' % $tabular-sidebar-and-main-sidebar-menu
     right $sidebar-tabular-width
+    +below(3)
+      left $sidebar-main-menu-width-small
+      if $tabular-sidebar-overlaps-content
+        width 'calc(100% - %s)' % $sidebar-main-menu-width-small
+        right 0
+      else
+        right $sidebar-tabular-width-small
+        width 'calc(100% - %s)' % $tabular-sidebar-and-main-sidebar-menu-small
 
 .tabular-sidebar-closed
   #grits-map
     width 'calc(100% - %s)' % $sidebar-main-width
     right 0
+    +below(3)
+      width 'calc(100% - %s)' % $sidebar-main-width-small
