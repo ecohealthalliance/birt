@@ -16,14 +16,14 @@ template(name='gritsSearch')
       .filter-group
         label.filter-label {{_ "gritsSearch.start-label"}}
         #startDate.input-group.date
-          input.date-button.form-control.input-sm(type='text', value='{{start}}')
+          input.date-button.form-control.input-sm(type='text')
           span.input-group-addon
             span.glyphicon.glyphicon-calendar
 
       .filter-group(style='margin-top: 10px;')
         label.filter-label {{_ "gritsSearch.end-label"}}
         #endDate.input-group.date
-          input.date-button.form-control.input-sm(type='text', value='{{end}}')
+          input.date-button.form-control.input-sm(type='text')
           span.input-group-addon
             span.glyphicon.glyphicon-calendar
 

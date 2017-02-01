@@ -169,8 +169,8 @@ _determineFieldMatchesByWeight = (input, res) ->
 # recursive method to generate suggestions and drive the pagination feature
 _suggestionGenerator = (query, skip, callback) ->
   _matchSkip = skip
-  Meteor.call('typeahead', 'birds', query, skip, (err, res) ->
-    Meteor.call('countTypeaheadBirds', query, (err, count) ->
+  Meteor.call 'typeahead', 'birds', query, skip, (err, res) ->
+    Meteor.call 'countTypeaheadBirds', query, (err, count) ->
       if res.length > 0
         matches = _determineFieldMatchesByWeight(query, res)
         # expects an array of objects with keys [label, value]
@@ -204,7 +204,7 @@ _suggestionGenerator = (query, skip, callback) ->
 
       # bind click handlers
       if !$('.previous-suggestions').hasClass('disabled')
-        $('#previousSuggestions').bind('click', (e) ->
+        $('#previousSuggestions').bind 'click', (e) ->
           e.preventDefault()
           e.stopPropagation()
           if count <= 10 || _matchSkip <= 10
@@ -212,9 +212,9 @@ _suggestionGenerator = (query, skip, callback) ->
           else
             _matchSkip -= 10
           _suggestionGenerator(query, _matchSkip, callback)
-        )
+
       if !$('.next-suggestions').hasClass('disabled')
-        $('#forwardSuggestions').bind('click', (e) ->
+        $('#forwardSuggestions').bind 'click', (e) ->
           e.preventDefault()
           e.stopPropagation()
           if count <= 10
@@ -222,70 +222,51 @@ _suggestionGenerator = (query, skip, callback) ->
           else
             _matchSkip += 10
           _suggestionGenerator(query, _matchSkip, callback)
-          return
-        )
-      return
-    )
-    return
-  )
-  return
 
 # sets an object to be used by Meteors' Blaze templating engine (views)
-Template.gritsSearch.helpers({
+Template.gritsSearch.helpers
   isAnimationRunning: ->
     _animationRunning.get()
+
   periods: ->
-    return [
-      {value: 'days', displayName: i18n.get('gritsSearch.period-days')},
+    [
+      value: 'days'
+      displayName: i18n.get('gritsSearch.period-days')
     ]
     #  {value: 'weeks', displayName: i18n.get('gritsSearch.period-weeks')},
     #  {value: 'months', displayName: i18n.get('gritsSearch.period-months')},
     #  {value: 'years', displayName: i18n.get('gritsSearch.period-years')}
     #]
+
   defaultPeriod: (period) ->
     if period.value == 'days'
-      return true
+      true
     else
-      return false
-  GritsConstants: ->
-    return GritsConstants
+      false
+
   loadedRecords: ->
-    return Session.get(GritsConstants.SESSION_KEY_LOADED_RECORDS)
+    Session.get(GritsConstants.SESSION_KEY_LOADED_RECORDS)
+
   totalRecords: ->
-    return Session.get(GritsConstants.SESSION_KEY_TOTAL_RECORDS)
-  state: ->
-    # GritsFilterCriteria.stateChanged is a reactive-var
-    state = GritsFilterCriteria.stateChanged.get()
-    if _.isNull(state)
-      return
-    if state
-      return true
-    else
-      return false
-  start: ->
-    return _initStartDate
-  end: ->
-    return _initEndDate
-  limit: ->
-    if _init
-      # set inital limit
-      return _initLimit
-    else
-      # reactive var
-      return GritsFilterCriteria.limit.get()
+    Session.get(GritsConstants.SESSION_KEY_TOTAL_RECORDS)
+
   historicalView: ->
     Template.instance().historicalView.get()
+
   showResults: ->
     Template.instance().historicalView.get() and Session.get(GritsConstants.SESSION_KEY_TOTAL_RECORDS)
+
   summer: ->
     Template.instance().season.get() == "summer"
+
   autumn: ->
     Template.instance().season.get() == "autumn"
+
   winter: ->
     Template.instance().season.get() == "winter"
+
   spring: ->
     Template.instance().season.get() == "spring"
-})
 
 Template.gritsSearch.onCreated ->
   _initStartDate = GritsFilterCriteria.initStart()
@@ -295,10 +276,6 @@ Template.gritsSearch.onCreated ->
 
   @season = new ReactiveVar null
   @historicalView = new ReactiveVar true
-  @autorun =>
-    unless @historicalView.get() == 'historicalView'
-      # reset the seaon when the view changes
-      @season.set null
 
   @autorun =>
     season = @season.get()
@@ -327,6 +304,7 @@ Template.gritsSearch.onCreated ->
           heatmapLayerGroup.draw()
       else
         Template.gritsOverlay.hide()
+
   # Public API
   # Currently we declare methods above for documentation purposes then assign
   # to the Template.gritsSearch as a global export
@@ -339,43 +317,30 @@ Template.gritsSearch.onCreated ->
 # triggered when the 'gritsSearch' template is rendered
 Template.gritsSearch.onRendered ->
 
-  searchBar = $('#searchBar').tokenfield({
-    typeahead: [{hint: false, highlight: true}, {
+  searchBar = $('#searchBar').tokenfield
+    typeahead: [{hint: false, highlight: true},
       display: (match) ->
         if _.isUndefined(match)
           return
-        return match.label
+        match.label
       templates:
         suggestion: _suggestionTemplate
         footer: _typeaheadFooter
       source: (query, callback) ->
         _suggestionGenerator(query, 0, callback)
-        return
-    }]
-  })
+    ]
+
   _setSearchBar(searchBar)
   speciesLength = _topSpecies.length - 1
   species = _topSpecies[Math.floor(Math.random() * speciesLength)]
   $('#searchBar').tokenfield('createToken',species);
   # Toast notification options
-  toastr.options = {
-    positionClass: 'toast-bottom-center',
-    preventDuplicates: true,
-  }
-
-  # initialize the DateTimePickers
-  options = {
-    format: 'MM/DD/YY'
-  }
-  startDatePicker = $('#startDate').datetimepicker(options)
-  startDatePicker.data('DateTimePicker').widgetPositioning({vertical: 'bottom', horizontal: 'left'})
-  _setStartDatePicker(startDatePicker)
-  endDatePicker = $('#endDate').datetimepicker(options)
-  endDatePicker.data('DateTimePicker').widgetPositioning({vertical: 'bottom', horizontal: 'left'})
-  _setEndDatePicker(endDatePicker)
+  toastr.options =
+    positionClass: 'toast-bottom-center'
+    preventDuplicates: true
 
   # is the animation running
-  Meteor.autorun ->
+  @autorun ->
     running = GritsHeatmapLayer.animationRunning.get()
     # update the disabled status of the [More] button based loadedRecords
     loadedRecords = Session.get(GritsConstants.SESSION_KEY_LOADED_RECORDS)
@@ -392,6 +357,26 @@ Template.gritsSearch.onRendered ->
         # disable the [More] button
         $('#loadMore').prop('disabled', true)
 
+  @autorun =>
+    if @historicalView.get()
+      # initialize the DateTimePickers
+      Meteor.defer ->
+        _setStartDatePicker(_initDatePicker('startDate', 'dateRangeStart'))
+        _setEndDatePicker(_initDatePicker('endDate', 'dateRangeEnd'))
+    else
+      # reset the season when the view changes
+      @season.set null
+
+_initDatePicker = (elementId, dateName) ->
+  positioning =
+    vertical: 'bottom'
+    horizontal: 'left'
+  picker = $("##{elementId}").datetimepicker
+    format: 'MM/DD/YY'
+    defaultDate: Session.get(dateName)
+  picker.data('DateTimePicker').widgetPositioning(positioning)
+  picker
+
 _changeSearchBarHandler = (e) ->
   combined = []
   tokens =  _searchBar.tokenfield('getTokens')
@@ -401,71 +386,63 @@ _changeSearchBarHandler = (e) ->
     # do nothing
     return
   GritsFilterCriteria.tokens.set(combined)
-  return
-_changeDateHandler = (e) ->
-  $target = $(e.target)
+
+_changeDateHandler = (event) ->
+  $target = $(event.target)
   id = $target.attr('id')
-  if id == 'startDate'
-    if _.isNull(_startDatePicker)
-      return
-    date = _startDatePicker.data('DateTimePicker').date()
-    if date == null
-      return
-    GritsFilterCriteria.operatingDateRangeStart.set(date)
-    Session.set('dateRangeStart', date.toDate())
-    return
-  else if id == 'endDate'
-    if _.isNull(_endDatePicker)
-      return
-    date = _endDatePicker.data('DateTimePicker').date()
-    if date == null
-      return
-    GritsFilterCriteria.operatingDateRangeEnd.set(date)
-    Session.set('dateRangeEnd', date.toDate())
-    return
+  Meteor.defer ->
+    if id == 'startDate'
+      date = getStartDatePicker()?.data('DateTimePicker').date()
+      return if not date
+      GritsFilterCriteria.operatingDateRangeStart.set(date)
+      Session.set('dateRangeStart', date.toDate())
+    else if id == 'endDate'
+      date = getEndDatePicker()?.data('DateTimePicker').date()
+      return if not date
+      GritsFilterCriteria.operatingDateRangeEnd.set(date)
+      Session.set('dateRangeEnd', date.toDate())
+
 _showDateHandler = (e) ->
   $target = $(e.target)
   id = $target.attr('id')
   if id == 'compareDateOverPeriod'
-    if _.isNull(_compareDatePicker)
-      return
-  return
+    return if not _compareDatePicker
+
 _changeLimitHandler = (e) ->
   val = parseInt($("#limit").val(), 10)
   GritsFilterCriteria.limit.set(val)
-  return
+
 _changePeriodHandler = (e) ->
   _lastPeriod = $(e.target).val()
   GritsFilterCriteria.period.set(_lastPeriod)
+
 _applyFilter = (e) ->
   if $(e.target).hasClass('disabled')
     return
   GritsFilterCriteria.apply()
-  return
-# events
-#
-# Event handlers for the grits_filter.html template
+
 Template.gritsSearch.events
   'keyup #searchBar-tokenfield': (e) ->
     if e.keyCode == 13
       if $(e.target).hasClass('disabled')
         return
       GritsFilterCriteria.apply()
-    return
+
   'click #applyFilter': _applyFilter
+
   'change #limit': _changeLimitHandler
+
   'change #searchBar': _changeSearchBarHandler
+
   'dp.change': _changeDateHandler
+
   'dp.show': _showDateHandler
+
   'click #applyFilter': (e) ->
     if $(e.target).hasClass('disabled')
       return
     GritsFilterCriteria.apply()
-    return
-  'click #loadMore': ->
-    GritsFilterCriteria.setOffset()
-    GritsFilterCriteria.more()
-    return
+
   'tokenfield:initialize': (e) ->
     $target = $(e.target)
     $container = $target.closest('.tokenized')
@@ -477,11 +454,10 @@ Template.gritsSearch.events
     $container.find('.token-input.tt-input').css('height', '30px')
     $container.find('.token-input.tt-input').css('font-size', '20px')
     $container.find('.tokenized.main').prepend($("#searchIcon"))
-    $('#' + id + '-tokenfield').on('blur', (e) ->
+    $('#' + id + '-tokenfield').on 'blur', (e) ->
       # only allow tokens
       $container.find('.token-input.tt-input').val("")
-    )
-    return
+
   'tokenfield:createtoken': (e) ->
     $target = $(e.target)
     $container = $target.closest('.tokenized')
@@ -491,21 +467,26 @@ Template.gritsSearch.events
       # do not create a token and clear the input
       $target.closest('.tokenized').find('.token-input.tt-input').val("")
       e.preventDefault()
-    return
+
   'tokenfield:createdtoken': (e) ->
     $target = $(e.target)
     tokens = $target.tokenfield('getTokens')
     token = e.attrs.label
     return false
+
   'tokenfield:removedtoken': (e) ->
     $target = $(e.target)
     tokens = $target.tokenfield('getTokens')
     token = e.attrs.label
     return false
+
   'change #period': _changePeriodHandler
+
   'click .historical-view': (e, instance) ->
     instance.historicalView.set true
+
   'click .seasonal-view': (e, instance) ->
     instance.historicalView.set false
+
   'click .seasons a': (e, instance) ->
     instance.season.set $(e.target).text().toLowerCase()
