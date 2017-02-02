@@ -225,7 +225,9 @@ class GritsFilterCriteria
     _state = JSON.stringify(query)
   # process the results of the remote meteor method
   #
-  # @param [Array] documents, an Array of mongoDB documents to process
+  # @param [Array] migrations, an array of mongoDB GeoJSON documents
+  # @param [Array] frames, an array of preprocessed frames from the server
+  # @param [Array] tokens, the tokens from the typeahead
   # @param [Integer] offset, the offset of the query
   process: (migrations, frames, tokens, offset) ->
     self = this
