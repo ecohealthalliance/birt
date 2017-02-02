@@ -1,3 +1,4 @@
+DEBUG = Meteor.gritsUtil.debug
 HEATMAP_INTENSITY_MULTIPLIER = 1
 FRAME_INTERVAL = 125 # milliseconds
 _locations = [] # container to store heatmap data
@@ -148,12 +149,12 @@ class GritsHeatmapLayer extends GritsLayer
     self._map.on(
       overlayadd: (e) ->
         if e.name == self._displayName
-          if Meteor.gritsUtil.debug
+          if DEBUG
             console.log("#{self._displayName} layer was added")
         self._perturbMap()
       overlayremove: (e) ->
         if e.name == self._displayName
-          if Meteor.gritsUtil.debug
+          if DEBUG
             console.log("#{self._displayName} layer was removed")
     )
 
@@ -286,6 +287,8 @@ GritsHeatmapLayer.decrementPreviousLocations = (nextIdx, frames, period, documen
 
 # pause the heatmap animation
 GritsHeatmapLayer.pauseAnimation = ->
+  if DEBUG
+    console.log 'animationPaused'
   GritsHeatmapLayer.animationPaused.set(true)
 
 # stop the heatmap animation
@@ -294,6 +297,8 @@ GritsHeatmapLayer.stopAnimation = ->
   GritsHeatmapLayer.animationRunning.set(false)
   GritsHeatmapLayer.animationPaused.set(false)
   async.nextTick ->
+    if DEBUG
+      console.log 'stopAnimation'
     clearInterval(_animation)
     _animation = null
     # TODO, we may want to clear the session counters and/or clear the map
@@ -308,6 +313,15 @@ GritsHeatmapLayer.stopAnimation = ->
 # @param [Array] tokens, the tokens from the filter
 # @param [Number] offset, the offset from the filter
 GritsHeatmapLayer.startAnimation = (startDate, endDate, period, documents, tokens, offset) ->
+  # protect against fast double-click on play button; there is a few milliseconds
+  # delay between setting the reactive var, updating the blaze template from a
+  # play button to pause button. Therefore its possible to double-click and get
+  # more than once instance of the setInterval animation.
+  if _animation != null
+    if DEBUG
+      console.warn 'cannot startAnimation; _animation interval exists; return;'
+    return
+
   # the GritsMap instance
   map = Template.gritsMap.getInstance()
   heatmapLayerGroup = map.getGritsLayerGroup(GritsConstants.HEATMAP_GROUP_LAYER_ID)
@@ -343,6 +357,8 @@ GritsHeatmapLayer.startAnimation = (startDate, endDate, period, documents, token
   # determine the range from the filter, this will drive the animation loop
   range = moment.range(startDate, endDate)
   frames = range.toArray(period)
+  if DEBUG
+    console.log 'startAnimation.frames.length: ', frames.length
   framesLen = frames.length
   lastFrame = null
   lastScrubber = null
@@ -356,10 +372,14 @@ GritsHeatmapLayer.startAnimation = (startDate, endDate, period, documents, token
 
   # the animation is uses setInterval
   _animation = setInterval ->
+    if DEBUG
+      console.log 'processedFrames: ', processedFrames
     paused = GritsHeatmapLayer.animationPaused.get()
     if paused
       return
     if processedFrames >= framesLen
+      if DEBUG
+        console.log 'setInterval.processedFrames >= framesLen; stop; return;'
       GritsHeatmapLayer.stopAnimation()
       return
     # how is the scrubber set?
@@ -371,26 +391,35 @@ GritsHeatmapLayer.startAnimation = (startDate, endDate, period, documents, token
         processedFrames = currentScrubber[0]
         Session.set(GritsConstants.SESSION_KEY_LOADED_RECORDS, 0)
         lastScrubber = null
+        if DEBUG
+          console.log 'the end handle of the scrubber was moved left past the current position; effectively a re-wind; return;'
         return
       # the animation has reached the end handle; stop
       else
         GritsHeatmapLayer.stopAnimation()
+        if DEBUG
+          console.log 'the animation has reached the end handle; stop; return;'
         return
     # check if the current scrubber caused a fast-forward
     if processedFrames < currentScrubber[0]
       processedFrames = currentScrubber[0]
       Session.set(GritsConstants.SESSION_KEY_LOADED_RECORDS, 0)
+      if DEBUG
+        console.log 'check if the current scrubber caused a fast-forward; return;'
       return
     # check if the current scrubber caused a re-wind
     if lastScrubber != null and currentScrubber[0] < lastScrubber[0]
       processedFrames = currentScrubber[0]
       Session.set(GritsConstants.SESSION_KEY_LOADED_RECORDS, 0)
       lastScrubber = null
+      if DEBUG
+        console.log 'check if the current scrubber caused a re-wind; return;'
       return
     lastScrubber = currentScrubber
     # guard against frames that take longer to process than the interval
     if processedFrames == lastFrame
-      console.log('too fast')
+      if DEBUG
+        console.log 'too fast; return;'
       return
     completed = GritsHeatmapLayer.animationCompleted.get()
     if !completed
@@ -409,7 +438,8 @@ GritsHeatmapLayer.startAnimation = (startDate, endDate, period, documents, token
         if doc == null
           # we expect the null case for when there are no documents for the
           # date range.  call the next callback of the series and return.
-          next()
+          async.nextTick ->
+            next()
           return
         # create the location based off the mongodb document
         GritsHeatmapLayer.createLocation(dateKey, doc, tokens)
@@ -423,7 +453,10 @@ GritsHeatmapLayer.startAnimation = (startDate, endDate, period, documents, token
         # final update the global counter
         Session.set(GritsConstants.SESSION_KEY_LOADED_RECORDS, processedLocations)
         # set progress
-        GritsHeatmapLayer.animationProgress.set((processedFrames + 1) / framesLen)
+        progress = (processedFrames + 1) / framesLen
+        GritsHeatmapLayer.animationProgress.set(progress)
+        if DEBUG
+          console.log 'progress: ', progress
         # start decaying these locations after the FRAME_INTERVAL, but do not decay the last frame
         if (processedFrames + 1) < framesLen
           GritsHeatmapLayer.decrementPreviousLocations processedFrames, frames, period, documents, tokens, (err, res) ->
@@ -441,7 +474,6 @@ GritsHeatmapLayer.startAnimation = (startDate, endDate, period, documents, token
 # @param [Number] offset, the offset from the filter
 # @param [Function] done, callback when done
 GritsHeatmapLayer.migrationsByDate = (dates, token, limit, offset, done) ->
-  console.log('migrations by date')
   # show the loading indicator and call the server-side method
   GritsHeatmapLayer.animationRunning.set(true)
   async.auto({
@@ -452,7 +484,7 @@ GritsHeatmapLayer.migrationsByDate = (dates, token, limit, offset, done) ->
           callback(err)
           return
 
-        if Meteor.gritsUtil.debug
+        if DEBUG
           console.log 'totalRecords: ', totalRecords
 
         Session.set(GritsConstants.SESSION_KEY_TOTAL_RECORDS, totalRecords)
@@ -526,7 +558,7 @@ GritsHeatmapLayer.migrationsByDateRange = (startDate, endDate, token, _limit, of
           callback(err)
           return
 
-        if Meteor.gritsUtil.debug
+        if DEBUG
           console.log 'totalRecords: ', totalRecords
 
         Session.set(GritsConstants.SESSION_KEY_TOTAL_RECORDS, totalRecords)
