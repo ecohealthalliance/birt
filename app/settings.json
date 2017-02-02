@@ -3,5 +3,8 @@
     "analyticsSettings": {
       "Google Analytics" : {"trackingId": "UA-XXXXXXXX"}
     }
+  },
+  "private": {
+    "runAnnualSightings": true
   }
 }

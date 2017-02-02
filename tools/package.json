@@ -1,0 +1,21 @@
+{
+  "name": "birt-tools",
+  "version": "0.0.1",
+  "description": "Node tools for birt app",
+  "scripts": {
+    "clean": "rm -rf build && mkdir build",
+    "build": "./node_modules/.bin/babel -d ./build ./src",
+    "watch": "./node_modules/.bin/babel --watch -d ./build ./src",
+    "annualSightings": "node ./build/annualSightings.js"
+  },
+  "private": true,
+  "dependencies": {
+    "kerberos": "0.0.22",
+    "mongodb": "^2.2.0",
+    "yargs": "^6.4.0"
+  },
+  "devDependencies": {
+    "babel-cli": "^6.18.0",
+    "babel-preset-latest": "^6.16.0"
+  }
+}

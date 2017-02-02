@@ -88,7 +88,7 @@ class GritsFilterCriteria
   initStart: ->
     self = this
     #start = self._today
-    start = new Date(2002, 0, 1)
+    start = new Date(2012, 0, 1)
     self.createOrUpdate('startDate', {key: 'startDate', operator: '$gte', value: start})
     query = @getQueryObject()
     # update the state logic for the indicator
@@ -108,7 +108,7 @@ class GritsFilterCriteria
   initEnd: ->
     self = this
     #end = moment(@_today).add(7, 'd').toDate()
-    end = new Date(2002, 4, 31)
+    end = new Date(2012, 11, 31)
     self.createOrUpdate('endDate', {key: 'endDate', operator: '$lt', value: end})
     # get the query object
     query = self.getQueryObject()
