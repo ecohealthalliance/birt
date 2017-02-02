@@ -66,6 +66,8 @@ Package.onUse(function(api){
     'client/lib/tableExport.min.js',
     'client/lib/webgl-heatmap.js',
     'client/lib/webgl-heatmap-leaflet.js',
+    'client/animation/FrameBuffer.coffee',
+    'client/animation/Frame.coffee',
     'client/grits_constants.coffee',
     'client/mapper/grits_layer.coffee',
     'client/mapper/grits_map.coffee',
@@ -118,6 +120,8 @@ Package.onUse(function(api){
     'GritsLayerGroup',
     'GritsMap',
     'GritsHeatmapLayer',
+    'Frame',
+    'FrameBuffer',
     'i18n'
   ]);
 });
