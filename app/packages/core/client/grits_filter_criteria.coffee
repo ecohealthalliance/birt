@@ -225,15 +225,19 @@ class GritsFilterCriteria
     _state = JSON.stringify(query)
   # process the results of the remote meteor method
   #
-  # @param [Array] documents, an Array of mongoDB documents to process
+  # @param [Array] migrations, an array of mongoDB GeoJSON documents
+  # @param [Array] frames, an array of preprocessed frames from the server
+  # @param [Array] tokens, the tokens from the typeahead
   # @param [Integer] offset, the offset of the query
-  process: (documents, tokens, offset) ->
+  process: (migrations, frames, tokens, offset) ->
     self = this
     startDate = moment.utc(self.operatingDateRangeStart.get())
     endDate = moment.utc(self.operatingDateRangeEnd.get())
     period = self.period.get()
     # start the heatmap animation
-    GritsHeatmapLayer.startAnimation(startDate, endDate, period, documents, tokens, offset)
+    GritsHeatmapLayer.startAnimation(startDate, endDate, period, migrations, frames, tokens, offset)
+    return
+
   # applies the filter but does not reset the offset
   #
   # @param [Function] cb, the callback function
@@ -263,6 +267,7 @@ class GritsFilterCriteria
 
     startDate = moment.utc(query.startDate.$gte)
     endDate = moment.utc(query.endDate.$lt)
+    period = self.period.get()
 
     # determine the type of query
     if self.enableDateOverPeriod.get()
@@ -272,8 +277,7 @@ class GritsFilterCriteria
         toastr.error(i18n.get('toastMessages.invalidCompareDate'))
         return
 
-      period = self.period.get()
-      window.range = moment.range(startDate, endDate)
+      range = moment.range(startDate, endDate)
       if range.diff(period) == 0
         toastr.warning(i18n.get('toastMessages.dateOverIntervalWarning'))
 
@@ -282,7 +286,7 @@ class GritsFilterCriteria
       month = compareDate.month()
       dates = _.map(years, (m) -> moment.utc(Date.UTC(m.year(), month, date)).toISOString())
 
-      GritsHeatmapLayer.migrationsByDate dates, tokens, limit, offset, (err, migrations) ->
+      GritsHeatmapLayer.migrationsByDate dates, tokens, limit, offset, period, (err, migrations) ->
         if err
           return
         self.process(migrations, tokens, offset)
@@ -290,13 +294,14 @@ class GritsFilterCriteria
         if cb && _.isFunction(cb)
           cb(null, migrations)
     else
-      GritsHeatmapLayer.migrationsByDateRange startDate.toISOString(), endDate.toISOString(), tokens, limit, offset, (err, migrations) ->
+      GritsHeatmapLayer.migrationsByDateRange startDate.toISOString(), endDate.toISOString(), tokens, limit, offset, period, (err, result) ->
         if err
           return
-        self.process(migrations, tokens, offset)
+        self.process(result.migrations, result.frames, tokens, offset)
         # call the original callback function if its defined
         if cb && _.isFunction(cb)
-          cb(null, migrations)
+          cb(null, result.migrations)
+
 
   # applies the filter; resets the offset, loadedRecords, and totalRecords
   #

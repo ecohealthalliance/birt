@@ -82,7 +82,6 @@ Template.scrubber.onRendered ->
       _slider.noUiSlider.updateOptions(
         range: {min: 0, max: len}
       )
-      # determine if the filter values we use have changed state
       if _lastState == currentState
         # if state was not changed, update the slider to last know values
         scrubber = Session.get('scrubber')
@@ -90,6 +89,8 @@ Template.scrubber.onRendered ->
       else
         # state was changed, reset to the min and max
         _slider.noUiSlider.set([0, len])
+        # update the session variable wasn't needed previously
+        Session.set('scrubber', [0, len])
         _lastState = JSON.stringify([startDate, endDate, period])
 
 Template.scrubber.helpers

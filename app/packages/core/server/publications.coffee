@@ -3,6 +3,7 @@ _profile = false # enable/disable recording method performance to the collection
 
 # collection to record profiling results
 Profiling = new Mongo.Collection('profiling')
+
 # records a profile document to mongo when profiling is enabled
 #
 # @param [String] methodName, the name of the method that is being profiled
@@ -88,7 +89,10 @@ countTypeaheadBirds = (search) ->
 # @param [Integer] limit, the amount of records to limit
 # @param [Integer] skip, the amount of records to skip
 # @return [Array] an array of documents
-migrationsByQuery = (startDate, endDate, tokens, limit, skip) ->
+migrationsByQuery = (startDate, endDate, tokens, limit, skip, period) ->
+  if not _useAggregation
+    throw new Error('mongodb aggregation framework is required')
+
   if _profile
     start = new Date()
 
@@ -112,30 +116,74 @@ migrationsByQuery = (startDate, endDate, tokens, limit, skip) ->
     $or: []
   }
   fields = {date: 1, country: 1, state_province: 1, county: 1, loc: 1, sightings: 1}
-  _.each(tokens, (t) ->
+  _.each tokens, (t) ->
     obj = {}
     obj[t] = {$gte: 1}
     query.$or.push(obj)
     fields[t] = 1
-  )
-
-  matches = []
-  if _useAggregation
-    # prepare the aggregate pipeline
+  # include fields from the document
+  include = {date: '$date', country: '$country', state_province: '$state_province', county: '$county', loc: '$loc', sightings: '$sightings'}
+  # determine how we instruct mongodb to group
+  if period == 'weeks'
+    fields['yearMonthDay'] = { $dateToString: { format: '%Y%m%d', date: '$date' }}
+    fields['weekYear'] = { $dateToString: { format: '%Y%U', date: '$date' }}
     pipeline = [
       {$match: query},
       {$project: fields},
-      {$sort: {date: 1}},
       {$skip: skip},
-      {$limit: limit}
+      {$limit: limit},
+      {$group: {
+        _id: {period: '$weekYear'},
+        results: {$push: include}
+      }}
+      {$sort: {_id: 1}}
     ]
-    matches = Migrations.aggregate(pipeline)
+  else if period == 'months'
+    fields['yearMonthDay'] = { $dateToString: { format: '%Y%m%d', date: '$date' }}
+    fields['monthYear'] = { $dateToString: { format: '%Y%m', date: '$date' }}
+    pipeline = [
+      {$match: query},
+      {$project: fields},
+      {$skip: skip},
+      {$limit: limit},
+      {$group: {
+        _id: '$monthYear',
+        results: {$push: include}
+      }}
+      {$sort: {_id: 1}}
+    ]
+  else if period == 'years'
+    fields['yearMonthDay'] = { $dateToString: { format: '%Y%m%d', date: '$date' }}
+    fields['year'] = { $dateToString: { format: '%Y', date: '$date' }}
+    pipeline = [
+      {$match: query},
+      {$project: fields},
+      {$skip: skip},
+      {$limit: limit},
+      {$group: {
+        _id: {period: '$year'},
+        results: {$push: include}
+      }}
+      {$sort: {_id: 1}}
+    ]
   else
-    matches = Migrations.find(query, {fields: fields, limit: limit, skip: skip, sort: {date: 1}, transform: null}).fetch()
-
+    # default to days
+    fields['yearMonthDay'] = { $dateToString: { format: '%Y%m%d', date: '$date' }}
+    pipeline = [
+      {$match: query},
+      {$project: fields},
+      {$skip: skip},
+      {$limit: limit},
+      {$group: {
+        _id: {period: '$yearMonthDay'},
+        results: {$push: include}
+      }}
+      {$sort: {_id: 1}}
+    ]
+  matches = Migrations.aggregate(pipeline)
   if _profile
     recordProfile('migrationsByQuery', new Date() - start)
-  return matches
+  return {migrations: _.flatten(_.pluck(matches, 'results')), matches: matches}
 
 # count the total migrations for the specified date range
 #
@@ -276,7 +324,6 @@ migrationsBySeason = (params)->
       state_province: 1
       county: 1
   }).fetch()
-
 
 # count the total migrations for the specified date range
 #

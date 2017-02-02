@@ -1,5 +1,5 @@
 Meteor.gritsUtil =
-  debug: true
+  debug: false
   errorHandler: (err) ->
     if typeof err != 'undefined'
       if err.hasOwnProperty('message')
