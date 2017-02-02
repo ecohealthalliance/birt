@@ -78,7 +78,7 @@ function getAnnualCounts(collections, done) {
     const counts = {};
     function processMigration(err, migration) {
       if (err || migration == null) {
-        if (err) console.warn('err: ', err);
+        if (err) console.error('err: ', err);
         processed++;
         if (DEBUG) console.log('processed: ', processed, ' of ', years.length);
         if (years.length == processed) {
@@ -161,17 +161,24 @@ function getRecommendedDates(year) {
  * @param {object} max, hash map of species max year
  * @done {function} done, method to execute when done
  */
-function setRecommendedDates(collections, max) {
-  Object.keys(max).forEach((species) => {
-    const bird = collections.birds.findOne({_id: species});
-    const count = max[species].count;
-    const year = max[species].year;
-    if (typeof bird != 'undefined' && count > MIN_INSERTION_COUNT) {
-      const recommended_dates = getRecommendedDates(year);
-      collections.birds.update({_id:bird._id}, {$set: {recommended_dates: recommended_dates}});
-    } else {
-      collections.invalidBirds.update({_id:species}, {updated: new Date()}, {upsert: true});
-    }
+function setRecommendedDates(collections, max, done) {
+  let processed = 0;
+  const keys = Object.keys(max);
+  const total = keys.length;
+  keys.forEach((species) => {
+    collections.birds.findOne({_id: species}, (err, bird) => {
+      processed++;
+      if (err) return console.error('err: ', err);
+      const count = max[species].count;
+      const year = max[species].year;
+      if (bird && count > MIN_INSERTION_COUNT) {
+        const recommended_dates = getRecommendedDates(year);
+        collections.birds.update({_id:bird._id}, {$set: {recommended_dates: recommended_dates}});
+      } else {
+        collections.invalidBirds.update({_id:species}, {updated: new Date()}, {upsert: true});
+      }
+      if (processed === total) done();
+    });
   });
 }
 
@@ -190,9 +197,10 @@ MongoClient.connect(URL, (err, db) => {
     if (err) {
       return console.error(err);
     }
-    setRecommendedDates(collections, selectMax(annual));
-    if (DEBUG) console.log(`Finished setting recommended dates for species: ${new Date().getTime() - START_TIME} (ms)`);
-    db.close()
-    process.exit(0)
+    setRecommendedDates(collections, selectMax(annual), () => {
+      if (DEBUG) console.log(`Finished setting recommended dates for species: ${new Date().getTime() - START_TIME} (ms)`);
+      db.close()
+      process.exit(0)
+    });
   });
 });
